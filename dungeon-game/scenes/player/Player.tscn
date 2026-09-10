@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://drrxiowem0goy"]
+
+[ext_resource type="Script" uid="uid://dxs6s44nql754" path="res://scenes/player/Player.gd" id="1_wr5hl"]
+[ext_resource type="Texture2D" uid="uid://dtfsjoo30em0i" path="res://assets/sprites/player/Body_A/Animations/Idle_Base/Idle_Side-Sheet.png" id="2_gfjak"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4kuee"]
+atlas = ExtResource("2_gfjak")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spdwv"]
+size = Vector2(30, 11.718708)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ovr6g"]
+size = Vector2(9.770115, 29.648346)
+
+[node name="Player" type="CharacterBody2D" unique_id=1881097379]
+collision_layer = 2
+collision_mask = 5
+motion_mode = 1
+script = ExtResource("1_wr5hl")
+
+[node name="testingsprite" type="Sprite2D" parent="." unique_id=1031009948]
+visible = false
+texture = SubResource("AtlasTexture_4kuee")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1707168056]
+
+[node name="wallCollision" type="CollisionShape2D" parent="." unique_id=61987316]
+position = Vector2(0.49999973, 1)
+rotation = 1.5707964
+scale = Vector2(1, 1.2800046)
+shape = SubResource("RectangleShape2D_spdwv")
+
+[node name="WeaponMarker" type="Marker2D" parent="." unique_id=1093616269]
+position = Vector2(0, 9.125)
+
+[node name="HurtBox" type="Area2D" parent="." unique_id=803020027]
+collision_layer = 16
+collision_mask = 32
+
+[node name="EnemyCollision" type="CollisionShape2D" parent="HurtBox" unique_id=1992060411]
+position = Vector2(0.5000005, 0.99999976)
+scale = Vector2(1.74, 1.0793182)
+shape = SubResource("RectangleShape2D_ovr6g")

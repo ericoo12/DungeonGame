@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bj1f3bhletcwe"]
+
+[ext_resource type="Texture2D" uid="uid://b544oee8isgq4" path="res://assets/sprites/items/items_icons/UNO_reverse_blue.jpg" id="1_bqhbc"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_say6m"]
+
+[resource]
+script = ExtResource("1_say6m")
+item_name = "UNO reverse blue"
+description = "Sonic speed"
+icon = ExtResource("1_bqhbc")
+max_hearts_bonus = -2
+speed_bonus = 100.0
+damage_bonus = -5
+fire_rate_bonus = -0.2
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

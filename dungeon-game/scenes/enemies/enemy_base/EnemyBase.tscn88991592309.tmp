@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dwa7putw81xer"]
+
+[ext_resource type="Script" uid="uid://lxbsdwgl6plj" path="res://scenes/enemies/enemy_base/EnemyBase.gd" id="1_6m61i"]
+[ext_resource type="Texture2D" uid="uid://dwwa4yi883gxh" path="res://assets/sprites/enemies/rouge_enemy/Run-Sheet.png" id="2_6m61i"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+size = Vector2(13.442728, 7.016223)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e7nl1"]
+size = Vector2(12.956644, 27.582005)
+
+[node name="Enemy" type="CharacterBody2D" unique_id=1579853284]
+collision_layer = 4
+collision_mask = 11
+motion_mode = 1
+script = ExtResource("1_6m61i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1367813687]
+position = Vector2(2.9802328e-07, 17)
+rotation = -3.1415925
+scale = Vector2(1.4877931, 3.990751)
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1065903410]
+position = Vector2(-1, 16)
+collision_layer = 32
+collision_mask = 24
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=703121797]
+position = Vector2(1, 1.0250683)
+rotation = -3.1415925
+scale = Vector2(1.6979706, -1.0894835)
+shape = SubResource("RectangleShape2D_e7nl1")
+
+[node name="testsprite" type="Sprite2D" parent="." unique_id=963101555]
+visible = false
+texture = ExtResource("2_6m61i")
+hframes = 6
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=622601666]
+
+[node name="Label" type="Label" parent="." unique_id=1371920992]
+offset_left = -9.0
+offset_top = -18.0
+offset_right = 27.625
+offset_bottom = 6.51
+scale = Vector2(0.5200067, 0.16000003)

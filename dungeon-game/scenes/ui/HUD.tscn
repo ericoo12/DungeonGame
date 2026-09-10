@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://bng62ay6px8iq"]
+
+[ext_resource type="Script" uid="uid://bff6cqhcoln21" path="res://scenes/ui/HUD.gd" id="1_atyv1"]
+[ext_resource type="Script" uid="uid://rwtyxjlpapf3" path="res://scenes/ui/HeartDisplay.gd" id="2_6ll6g"]
+[ext_resource type="Script" uid="uid://p0w7irxisi33" path="res://scenes/ui/DebugStatsDisplay.gd" id="3_6ll6g"]
+
+[node name="Hud" type="CanvasLayer" unique_id=1634359545]
+script = ExtResource("1_atyv1")
+
+[node name="HealthDisplay" type="Control" parent="." unique_id=372468671]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_6ll6g")
+metadata/_custom_type_script = "uid://rwtyxjlpapf3"
+
+[node name="DebugStats" type="Label" parent="." unique_id=1046501190]
+process_mode = 3
+offset_top = 32.0
+offset_right = 40.0
+offset_bottom = 55.0
+script = ExtResource("3_6ll6g")
+
+[node name="ItemOverlay" type="Control" parent="." unique_id=1949800253]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="ItemOverlay" unique_id=1232621767]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08855995, 0.08855992, 0.08855986, 1)
+
+[node name="ItemGrid" type="GridContainer" parent="ItemOverlay" unique_id=7701462]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+columns = 6
+
+[node name="ItemDetailLabel" type="Label" parent="ItemOverlay" unique_id=826341104]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 40.0
+offset_bottom = 63.0
+
+[node name="ItemStatsLabel" type="Label" parent="ItemOverlay" unique_id=1959686496]
+layout_mode = 0
+offset_top = 145.0
+offset_right = 60.0
+offset_bottom = 205.0

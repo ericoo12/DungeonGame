@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://ca7of3ygdsooq"]
+
+[ext_resource type="Texture2D" uid="uid://bmocy4555dxly" path="res://assets/sprites/items/items_icons/UNO_reverse_red.jpg" id="1_3mkiy"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_au5dc"]
+
+[resource]
+script = ExtResource("1_au5dc")
+item_name = "UNO reverse red"
+description = "DMG up"
+icon = ExtResource("1_3mkiy")
+max_hearts_bonus = -1
+speed_bonus = -25.0
+damage_bonus = 10
+fire_rate_bonus = 0.2
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

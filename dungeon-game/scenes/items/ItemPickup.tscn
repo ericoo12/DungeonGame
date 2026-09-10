@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://2vwj0f2j11al"]
+
+[ext_resource type="Script" uid="uid://ddtntg3v3ax68" path="res://scenes/items/ItemPickup.gd" id="1_71355"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+
+[node name="ItemPickup" type="Area2D" unique_id=461120326]
+collision_mask = 7
+script = ExtResource("1_71355")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1998462875]
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=714185411]

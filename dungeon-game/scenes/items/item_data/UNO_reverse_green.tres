@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://c2xx8gtnt7n0i"]
+
+[ext_resource type="Texture2D" uid="uid://fq658kd5wesw" path="res://assets/sprites/items/items_icons/UNO_reverse_green.png" id="1_lfdou"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="2_qpnfi"]
+
+[resource]
+script = ExtResource("2_qpnfi")
+item_name = "UNO reverse green"
+description = "Speedster"
+icon = ExtResource("1_lfdou")
+speed_bonus = 25.0
+fire_rate_bonus = 0.2
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

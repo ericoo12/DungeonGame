@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://c87str8wnjc4e"]
+
+[ext_resource type="Script" uid="uid://uat00qslt73g" path="res://scenes/test/TestDummy.gd" id="1_vmp5v"]
+[ext_resource type="Texture2D" uid="uid://o4arua2neas6" path="res://icon.svg" id="2_4ynfi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vmp5v"]
+size = Vector2(140.00003, 140.00003)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+size = Vector2(21.333336, 21.333334)
+
+[sub_resource type="LabelSettings" id="LabelSettings_vmp5v"]
+font_size = 46
+
+[node name="TestDummy" type="StaticBody2D" unique_id=106047827]
+scale = Vector2(0.1, 0.1)
+collision_layer = 4
+collision_mask = 11
+script = ExtResource("1_vmp5v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1698294111]
+position = Vector2(4.7683707e-06, -4.7683707e-06)
+scale = Vector2(0.915, 0.915)
+shape = SubResource("RectangleShape2D_vmp5v")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1860661425]
+scale = Vector2(0.99999994, 0.99999994)
+collision_layer = 4
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1429594750]
+position = Vector2(0, -2.8610234e-06)
+scale = Vector2(6.000001, 6.000001)
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=966979140]
+texture = ExtResource("2_4ynfi")
+
+[node name="Label" type="Label" parent="." unique_id=1734829128]
+offset_left = -63.89
+offset_top = -99.645
+offset_right = 64.19
+offset_bottom = -64.31
+label_settings = SubResource("LabelSettings_vmp5v")
