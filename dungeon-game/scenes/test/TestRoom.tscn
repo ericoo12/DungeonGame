@@ -677,6 +677,7 @@ position = Vector2(-91, -38)
 
 [node name="Hud" parent="." unique_id=1547169626 instance=ExtResource("5_euy64")]
 process_mode = 3
+visible = false
 
 [node name="ItemPickup" parent="." unique_id=461120326 instance=ExtResource("6_32oie")]
 position = Vector2(-155, -74)

@@ -57,3 +57,11 @@ layout_mode = 0
 offset_top = 145.0
 offset_right = 60.0
 offset_bottom = 205.0
+
+[node name="Label" type="Label" parent="." unique_id=155979310]
+offset_left = 377.99994
+offset_top = 1.0
+offset_right = 417.99994
+offset_bottom = 24.0
+scale = Vector2(11.760004, 4.279998)
+text = "Items"

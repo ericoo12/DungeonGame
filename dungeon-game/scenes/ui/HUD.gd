@@ -11,6 +11,7 @@ var item_slots: Dictionary = {}  # item_name -> {control, count_label, count}
 
 
 func _ready() -> void:
+	visible = true
 	item_overlay.visible = false
 	EventBus.item_added.connect(_on_item_added)
 
