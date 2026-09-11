@@ -1,19 +1,9 @@
 [gd_scene format=3 uid="uid://cvj16on4ao6qg"]
 
 [ext_resource type="Script" uid="uid://duyp37g425je7" path="res://scenes/player/Projectile.gd" id="1_sfprp"]
+[ext_resource type="Texture2D" uid="uid://b0m24jtju1y8s" path="res://assets/sprites/items/items_icons/poop_projectile2.png" id="2_k3qbq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ng0gt"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_ng0gt"]
-
-[sub_resource type="Gradient" id="Gradient_sfprp"]
-offsets = PackedFloat32Array(0.09561128, 1)
-colors = PackedColorArray(0.24960893, 0.24960893, 0.2496089, 1, 1, 1, 1, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_e7nl1"]
-gradient = SubResource("Gradient_sfprp")
-fill_from = Vector2(1, 0)
-fill_to = Vector2(1, 1)
 
 [node name="Projectile" type="Area2D" unique_id=1024599485]
 collision_layer = 8
@@ -24,8 +14,6 @@ script = ExtResource("1_sfprp")
 scale = Vector2(0.25, 0.25)
 shape = SubResource("CircleShape2D_ng0gt")
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="." unique_id=1895566481]
-position = Vector2(-5.9604645e-07, 2.503395e-06)
-scale = Vector2(5, 5)
-mesh = SubResource("SphereMesh_ng0gt")
-texture = SubResource("GradientTexture2D_e7nl1")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1719402469]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_k3qbq")

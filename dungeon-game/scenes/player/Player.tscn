@@ -23,6 +23,9 @@ script = ExtResource("1_wr5hl")
 visible = false
 texture = SubResource("AtlasTexture_4kuee")
 
+[node name="WeaponMarker" type="Marker2D" parent="." unique_id=1093616269]
+position = Vector2(0, 8.005)
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1707168056]
 
 [node name="wallCollision" type="CollisionShape2D" parent="." unique_id=61987316]
@@ -30,9 +33,6 @@ position = Vector2(0.49999973, 1)
 rotation = 1.5707964
 scale = Vector2(1, 1.2800046)
 shape = SubResource("RectangleShape2D_spdwv")
-
-[node name="WeaponMarker" type="Marker2D" parent="." unique_id=1093616269]
-position = Vector2(0, 9.125)
 
 [node name="HurtBox" type="Area2D" parent="." unique_id=803020027]
 collision_layer = 16

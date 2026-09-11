@@ -20,6 +20,7 @@ enum Facing { DOWN, UP, SIDE }
 
 var facing: Facing = Facing.DOWN
 var facing_flip: bool = false  # true = facing left
+@export var reversed_facing: bool = true  # permanent design choice: character faces/shoots opposite its movement direction
 var shoot_timer: float = 0.0
 var shoot_cooldown: float = 0.0
 
@@ -84,11 +85,12 @@ func _update_facing(move_vec: Vector2) -> void:
 
 
 func _face_towards(dir: Vector2) -> void:
-	if abs(dir.x) > abs(dir.y):
+	var effective_dir := -dir if reversed_facing else dir
+	if abs(effective_dir.x) > abs(effective_dir.y):
 		facing = Facing.SIDE
-		facing_flip = dir.x < 0
+		facing_flip = effective_dir.x < 0
 	else:
-		facing = Facing.UP if dir.y < 0 else Facing.DOWN
+		facing = Facing.UP if effective_dir.y < 0 else Facing.DOWN
 
 
 func _update_animation(move_vec: Vector2, is_shooting: bool) -> void:
@@ -123,7 +125,7 @@ func _shoot(aim_dir: Vector2) -> void:
 	shoot_timer = PIERCE_DURATION
 
 	var projectile := PROJECTILE_SCENE.instantiate()
-	get_tree().current_scene.add_child(projectile)
+	get_parent().add_child(projectile)
 	projectile.global_position = weapon_marker.global_position + aim_dir * 10
 	projectile.damage = get_effective_damage()
 	projectile.launch(aim_dir, velocity)
