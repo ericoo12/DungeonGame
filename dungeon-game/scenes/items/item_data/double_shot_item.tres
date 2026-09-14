@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://cqdgc85nr4r7i"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_28e0a"]
+[ext_resource type="Texture2D" uid="uid://tmuw0mxqd8j8" path="res://assets/sprites/items/items_icons/doubleturd.png" id="1_ufpg5"]
+[ext_resource type="Resource" uid="uid://bmgi5v8tvh72o" path="res://scenes/items/item_data/double_shot_modifier.tres" id="3_u4j8r"]
+
+[resource]
+script = ExtResource("1_28e0a")
+shot_pattern_modifier = ExtResource("3_u4j8r")
+item_name = "Double shiit"
+description = "Fires an extra turd"
+icon = ExtResource("1_ufpg5")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -64,3 +64,9 @@ static func build_enemy_frames(sheets: Dictionary) -> SpriteFrames:
 		_add(frames, anim_name, entry["path"], entry["count"], 10.0, anim_name != "death", 64)
 
 	return frames
+
+static func build_single_animation(path: String, frame_count: int, fps: float, loop: bool = true) -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+	_add(frames, "splash", path, frame_count, fps, loop)
+	return frames

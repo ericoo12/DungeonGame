@@ -11,6 +11,11 @@
 [ext_resource type="Resource" uid="uid://bj1f3bhletcwe" path="res://scenes/items/item_data/UNO_reverse_blue.tres" id="9_nbkod"]
 [ext_resource type="Resource" uid="uid://c2xx8gtnt7n0i" path="res://scenes/items/item_data/UNO_reverse_green.tres" id="10_ktptm"]
 [ext_resource type="Resource" uid="uid://drffxilbistb3" path="res://scenes/items/item_data/UNO_reverse_yellow.tres" id="11_f44vm"]
+[ext_resource type="Resource" uid="uid://bf4norc70i6ij" path="res://scenes/items/item_data/Poop_Friend.tres" id="11_nbkod"]
+[ext_resource type="Resource" uid="uid://dj1f7sjdpi8tq" path="res://scenes/items/active_item_data/radial_burst_item.tres" id="12_ktptm"]
+[ext_resource type="Resource" uid="uid://wxaqwxos8o62" path="res://scenes/items/item_data/laser_upgrade.tres" id="13_153g2"]
+[ext_resource type="Resource" uid="uid://cqdgc85nr4r7i" path="res://scenes/items/item_data/double_shot_item.tres" id="13_pbq83"]
+[ext_resource type="Resource" uid="uid://r13i4hdrodhn" path="res://scenes/items/active_item_data/tick_beam_item.tres" id="14_153g2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_spdwv"]
 texture = ExtResource("3_he7et")
@@ -697,6 +702,30 @@ item = ExtResource("10_ktptm")
 [node name="ItemPickup5" parent="Entities" unique_id=1757492523 instance=ExtResource("6_32oie")]
 position = Vector2(47, -75)
 item = ExtResource("11_f44vm")
+
+[node name="ItemPickup6" parent="Entities" unique_id=1856162387 instance=ExtResource("6_32oie")]
+position = Vector2(93, -75)
+item = ExtResource("11_nbkod")
+
+[node name="ItemPickup7" parent="Entities" unique_id=143409373 instance=ExtResource("6_32oie")]
+position = Vector2(132, -75)
+item = ExtResource("11_nbkod")
+
+[node name="ItemPickup9" parent="Entities" unique_id=1419589195 instance=ExtResource("6_32oie")]
+position = Vector2(169, -76)
+item = ExtResource("13_153g2")
+
+[node name="ItemPickup11" parent="Entities" unique_id=391127894 instance=ExtResource("6_32oie")]
+position = Vector2(170, -39)
+item = ExtResource("13_pbq83")
+
+[node name="ItemPickup8" parent="Entities" unique_id=1564005440 instance=ExtResource("6_32oie")]
+position = Vector2(138, 78)
+item = ExtResource("12_ktptm")
+
+[node name="ItemPickup10" parent="Entities" unique_id=1010823318 instance=ExtResource("6_32oie")]
+position = Vector2(171, 78)
+item = ExtResource("14_153g2")
 
 [node name="Hud" parent="." unique_id=1547169626 instance=ExtResource("5_euy64")]
 process_mode = 3

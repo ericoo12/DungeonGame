@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://dr3g43tidjtj7"]
+
+[ext_resource type="Script" uid="uid://btvr33b1e52vg" path="res://scenes/items/tick_beam/TickBeamVisual.gd" id="1_x4c5n"]
+[ext_resource type="Shader" uid="uid://bm4vovtyf4pfq" path="res://scenes/items/tick_beam/TickBeamVisual.gdshader" id="2_p8pqc"]
+[ext_resource type="Texture2D" uid="uid://jps5n5bjsjd3" path="res://assets/sprites/items/active_items/lazerturd4.png" id="3_xhe45"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gfjak"]
+shader = ExtResource("2_p8pqc")
+shader_parameter/scroll_speed = 3.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+
+[node name="TickBeamVisual" type="Node2D" unique_id=694180036]
+script = ExtResource("1_x4c5n")
+
+[node name="Line2D" type="Line2D" parent="." unique_id=814888075]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_gfjak")
+texture = ExtResource("3_xhe45")
+
+[node name="SplashPivot" type="Node2D" parent="." unique_id=890161729]
+
+[node name="SplashSprite" type="AnimatedSprite2D" parent="SplashPivot" unique_id=1674689660]
+scale = Vector2(0.5, 0.5)
+flip_h = true
+
+[node name="DamageArea" type="Area2D" parent="." unique_id=362598279]
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=126955756]
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="WallRay" type="RayCast2D" parent="." unique_id=2043141]

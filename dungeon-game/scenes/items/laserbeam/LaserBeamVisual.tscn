@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c1gmfu85eilgq"]
+
+[ext_resource type="Script" uid="uid://fnd3hxt85cov" path="res://scenes/items/laserbeam/LaserBeamVisual.gd" id="1_5hgnc"]
+[ext_resource type="Texture2D" uid="uid://b2upq1kotjhgt" path="res://assets/sprites/items/items_icons/lazerlaser.png" id="2_74p04"]
+
+[node name="LaserBeamVisual" type="Node2D" unique_id=446581593]
+script = ExtResource("1_5hgnc")
+
+[node name="Line2D" type="Line2D" parent="." unique_id=1547521321]
+texture_repeat = 2
+texture = ExtResource("2_74p04")

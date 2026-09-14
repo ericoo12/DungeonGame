@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dy17jyc3728up"]
+
+[ext_resource type="Texture2D" uid="uid://ggn18ti0m01x" path="res://assets/sprites/items/items_icons/poop_projectile.png" id="1_6fhp8"]
+[ext_resource type="Script" uid="uid://byl41826q7tfx" path="res://scenes/items/orbitals/Orbital.gd" id="1_xm5qb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+size = Vector2(31, 32)
+
+[node name="Orbital" type="Area2D" unique_id=1423271772]
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_xm5qb")
+radius = 20.0
+damage = 5.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2124404613]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1560540112]
+texture = ExtResource("1_6fhp8")

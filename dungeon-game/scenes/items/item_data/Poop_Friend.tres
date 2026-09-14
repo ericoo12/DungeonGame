@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bf4norc70i6ij"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_6x4rq"]
+[ext_resource type="Texture2D" uid="uid://ggn18ti0m01x" path="res://assets/sprites/items/items_icons/poop_projectile.png" id="1_xm2je"]
+[ext_resource type="PackedScene" uid="uid://dy17jyc3728up" path="res://scenes/items/orbitals/Orbital.tscn" id="2_ve0hk"]
+
+[resource]
+script = ExtResource("1_6x4rq")
+item_name = "Another One Poop"
+description = "Poop that orbits you and deals contact damage to enemies"
+icon = ExtResource("1_xm2je")
+orbital_scene = ExtResource("2_ve0hk")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

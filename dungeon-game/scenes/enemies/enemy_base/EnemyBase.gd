@@ -1,25 +1,33 @@
 extends CharacterBody2D
 class_name EnemyBase
 
+# --- Core stats ---
 @export var max_health: float = 30.0
 @export var move_speed: float = 10.0
+
+# --- Contact damage (dealt to player while overlapping Hitbox/Hurtbox) ---
 @export var contact_damage: int = 1
 @export var contact_damage_interval: float = 0.6
-@export var knockback_recovery_speed: float = 800.0
 @export var contact_knockback_strength: float = 100.0
+
+# --- Knockback (received when THIS enemy takes damage) ---
+@export var knockback_recovery_speed: float = 800.0
 @export var knockback_immune: bool = false
 
-var overlapping_hurtboxes: Array[Area2D] = []
-var contact_tick_timer: float = 0.0
-var knockback_velocity: Vector2 = Vector2.ZERO
 var health: float
 var player: Node2D = null
 var facing_flip: bool = false
 var is_dying: bool = false
+var knockback_velocity: Vector2 = Vector2.ZERO
+
+# Contact-damage ticking: Area2D only fires "entered" once, so we track what's
+# still overlapping and re-apply damage on an interval as long as contact holds.
+var overlapping_hurtboxes: Array[Area2D] = []
+var contact_tick_timer: float = 0.0
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
-@onready var label: Label = $Label
+@onready var label: Label = $Label  # DEBUG ONLY — remove once real enemies ship; see project plan re: no health bars on regular enemies
 
 
 func _ready() -> void:
@@ -42,7 +50,7 @@ func _physics_process(delta: float) -> void:
 		if contact_tick_timer <= 0.0:
 			contact_tick_timer = contact_damage_interval
 			_deal_contact_damage()
-			
+
 	if knockback_velocity.length() > 1.0:
 		velocity = knockback_velocity
 		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
@@ -56,10 +64,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	sprite.flip_h = facing_flip
-
-	
-func _update_label() -> void:
-	label.text = str(health)
 
 
 func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback_strength: float = 0.0) -> void:
@@ -76,6 +80,18 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 			knockback_velocity = knockback_dir.normalized() * knockback_strength
 
 
+func die() -> void:
+	set_physics_process(false)
+	hitbox.set_deferred("monitoring", false)
+	velocity = Vector2.ZERO
+
+	if sprite.sprite_frames.has_animation("death"):
+		sprite.play("death")
+		await sprite.animation_finished
+
+	queue_free()
+
+
 func _flash() -> void:
 	sprite.modulate = Color(1, 0.3, 0.3)
 	await get_tree().create_timer(0.1).timeout
@@ -83,16 +99,8 @@ func _flash() -> void:
 		sprite.modulate = Color(1, 1, 1)
 
 
-func die() -> void:
-	set_physics_process(false)
-	hitbox.set_deferred("monitoring", false)
-	velocity = Vector2.ZERO
-	
-	if sprite.sprite_frames.has_animation("death"):
-		sprite.play("death")
-		await sprite.animation_finished
-		
-	queue_free()
+func _update_label() -> void:
+	label.text = str(health)
 
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
@@ -100,15 +108,18 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 	contact_tick_timer = contact_damage_interval
 	_deal_damage_to(area)
 
+
 func _on_hitbox_area_exited(area: Area2D) -> void:
 	overlapping_hurtboxes.erase(area)
+
 
 func _deal_contact_damage() -> void:
 	for area in overlapping_hurtboxes:
 		_deal_damage_to(area)
 
+
 func _deal_damage_to(area: Area2D) -> void:
 	var target := area.get_parent()
 	if target and target.has_method("take_damage"):
-		var knockback_dir : Vector2 = target.global_position - global_position
+		var knockback_dir: Vector2 = target.global_position - global_position
 		target.take_damage(contact_damage, knockback_dir, contact_knockback_strength)

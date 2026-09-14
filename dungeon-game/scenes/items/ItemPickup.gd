@@ -1,10 +1,11 @@
 extends Area2D
-class_name  ItemPickup
+class_name ItemPickup
 
-@export var item: Item
+@export var item: ItemBase
 @export var display_size: float = 16.0
 
 @onready var sprite: Sprite2D = $Sprite2D
+
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -16,6 +17,12 @@ func _ready() -> void:
 
 
 func _on_body_entered(body: Node) -> void:
-	if body.has_method("add_item"):
+	if not body.has_method("add_item"):
+		return
+	# ActiveItems route to a separate slot/cooldown system; everything else
+	# is a passive Item applied immediately.
+	if item is ActiveItem:
+		body.add_active_item(item)
+	else:
 		body.add_item(item)
-		queue_free()
+	queue_free()

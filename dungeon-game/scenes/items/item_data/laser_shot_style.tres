@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LaserShotStyle" format=3 uid="uid://c446p5k3olaif"]
+
+[ext_resource type="Script" uid="uid://d1ggpy58y1e26" path="res://scripts/items/effects/LaserShotStyle.gd" id="1_jve75"]
+
+[resource]
+script = ExtResource("1_jve75")
+metadata/_custom_type_script = "uid://d1ggpy58y1e26"

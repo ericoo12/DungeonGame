@@ -4,16 +4,20 @@ class_name HUD
 @onready var item_overlay: Control = $ItemOverlay
 @onready var item_grid: GridContainer = $ItemOverlay/ItemGrid
 @onready var item_detail_label: Label = $ItemOverlay/ItemDetailLabel
-@onready var debug_stats: Label = $DebugStats
 @onready var item_stats_label: Label = $ItemOverlay/ItemStatsLabel
+@onready var debug_stats: Label = $DebugStats
+@onready var active_item_icon: TextureRect = $ActiveItemSlot/Icon
 
-var item_slots: Dictionary = {}  # item_name -> {control, count_label, count}
+# Keyed by resource_path, NOT item_name — two items can share a display name
+# by mistake (happened once already), but resource_path is always unique.
+var item_slots: Dictionary = {}  # resource_path -> {control, count_label, count}
 
 
 func _ready() -> void:
 	visible = true
 	item_overlay.visible = false
 	EventBus.item_added.connect(_on_item_added)
+	EventBus.active_item_changed.connect(_on_active_item_changed)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -43,15 +47,17 @@ func _focus_first_slot() -> void:
 
 
 func _on_item_added(item: Item) -> void:
-	if item_slots.has(item.item_name):
-		var slot: Dictionary = item_slots[item.item_name]
+	var key: String = item.resource_path
+
+	if item_slots.has(key):
+		var slot: Dictionary = item_slots[key]
 		slot.count += 1
 		slot.count_label.text = "x%d" % slot.count
 		slot.count_label.visible = true
 	else:
 		var slot_control := _create_item_slot(item)
 		item_grid.add_child(slot_control)
-		item_slots[item.item_name] = {
+		item_slots[key] = {
 			"control": slot_control,
 			"count_label": slot_control.get_node("CountLabel"),
 			"count": 1,
@@ -63,7 +69,7 @@ func _create_item_slot(item: Item) -> Control:
 	slot.custom_minimum_size = Vector2(40, 40)
 	slot.flat = true
 	slot.focus_mode = Control.FOCUS_ALL
-	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE  # keyboard-only navigation, no mouse interaction
 	slot.focus_entered.connect(func():
 		item_detail_label.text = "%s\n%s" % [item.item_name, item.description]
 		item_stats_label.text = item.get_stat_summary()
@@ -85,3 +91,7 @@ func _create_item_slot(item: Item) -> Control:
 	slot.add_child(count_label)
 
 	return slot
+
+
+func _on_active_item_changed(item: ActiveItem) -> void:
+	active_item_icon.texture = item.icon

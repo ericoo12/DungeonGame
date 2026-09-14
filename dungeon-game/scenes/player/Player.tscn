@@ -14,6 +14,7 @@ size = Vector2(30, 11.718708)
 size = Vector2(9.770115, 29.648346)
 
 [node name="Player" type="CharacterBody2D" unique_id=1881097379]
+y_sort_enabled = true
 collision_layer = 2
 collision_mask = 5
 motion_mode = 1
@@ -27,6 +28,7 @@ texture = SubResource("AtlasTexture_4kuee")
 position = Vector2(0, 8.005)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1707168056]
+z_index = 1
 
 [node name="wallCollision" type="CollisionShape2D" parent="." unique_id=61987316]
 position = Vector2(0.49999973, 1)
@@ -42,3 +44,9 @@ collision_mask = 32
 position = Vector2(0.5000005, 0.99999976)
 scale = Vector2(1.74, 1.0793182)
 shape = SubResource("RectangleShape2D_ovr6g")
+
+[node name="LaserRay" type="RayCast2D" parent="." unique_id=655673405]
+position = Vector2(0, 8)
+collision_mask = 5
+
+[node name="PiercingRay" type="RayCast2D" parent="." unique_id=1047255717]

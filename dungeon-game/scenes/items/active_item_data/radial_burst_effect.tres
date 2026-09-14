@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="RadialBurstEffect" format=3 uid="uid://caj3o3ssd5olp"]
+
+[ext_resource type="Script" uid="uid://gkvutetwppux" path="res://scripts/items/effects/RadialBurstEffect.gd" id="1_xauhn"]
+
+[resource]
+script = ExtResource("1_xauhn")
+metadata/_custom_type_script = "uid://cj6r63runawpf"

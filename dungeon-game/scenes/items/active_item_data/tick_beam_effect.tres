@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="TickBeamEffect" format=3 uid="uid://bl8f8a4i7fv4x"]
+
+[ext_resource type="Script" uid="uid://botajjfo6g04w" path="res://scripts/items/effects/TickBeamEffect.gd" id="1_a06bd"]
+
+[resource]
+script = ExtResource("1_a06bd")
+metadata/_custom_type_script = "uid://botajjfo6g04w"

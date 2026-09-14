@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bff6cqhcoln21" path="res://scenes/ui/HUD.gd" id="1_atyv1"]
 [ext_resource type="Script" uid="uid://rwtyxjlpapf3" path="res://scenes/ui/HeartDisplay.gd" id="2_6ll6g"]
 [ext_resource type="Script" uid="uid://p0w7irxisi33" path="res://scenes/ui/DebugStatsDisplay.gd" id="3_6ll6g"]
+[ext_resource type="Script" uid="uid://r1q1tv2oe0m5" path="res://scenes/ui/ActiveItemSlotDisplay.gd" id="4_ig75s"]
 
 [node name="Hud" type="CanvasLayer" unique_id=1634359545]
 script = ExtResource("1_atyv1")
@@ -10,8 +11,10 @@ script = ExtResource("1_atyv1")
 [node name="HealthDisplay" type="Control" parent="." unique_id=372468671]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 41.0
+offset_top = 1.0
+offset_right = 81.0
+offset_bottom = 41.0
 script = ExtResource("2_6ll6g")
 metadata/_custom_type_script = "uid://rwtyxjlpapf3"
 
@@ -21,6 +24,29 @@ offset_top = 32.0
 offset_right = 40.0
 offset_bottom = 55.0
 script = ExtResource("3_6ll6g")
+
+[node name="ActiveItemSlot" type="Control" parent="." unique_id=89748285]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("4_ig75s")
+
+[node name="Icon" type="TextureRect" parent="ActiveItemSlot" unique_id=793315395]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+expand_mode = 1
+stretch_mode = 3
+
+[node name="CooldownOverlay" type="ColorRect" parent="ActiveItemSlot" unique_id=2087039883]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.61800003)
 
 [node name="ItemOverlay" type="Control" parent="." unique_id=1949800253]
 process_mode = 3

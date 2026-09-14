@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DoubleShotModifier" format=3 uid="uid://bmgi5v8tvh72o"]
+
+[ext_resource type="Script" uid="uid://qryyhrn66ivq" path="res://scripts/items/effects/DoubleShotModifier.gd" id="1_tsojo"]
+
+[resource]
+script = ExtResource("1_tsojo")
+metadata/_custom_type_script = "uid://qryyhrn66ivq"
