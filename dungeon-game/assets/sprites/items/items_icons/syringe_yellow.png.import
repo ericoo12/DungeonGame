@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wh33jy4qmuaj"
-path="res://.godot/imported/UNO_reverse_yellow.jpg-840e1b55a5020b8057be6cb428b18462.ctex"
+uid="uid://cqdk56dcuwytu"
+path="res://.godot/imported/syringe_yellow.png-835a1973da272fa1b2ba91b292c9d3af.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/items_icons/UNO_reverse_yellow.jpg"
-dest_files=["res://.godot/imported/UNO_reverse_yellow.jpg-840e1b55a5020b8057be6cb428b18462.ctex"]
+source_file="res://assets/sprites/items/items_icons/syringe_yellow.png"
+dest_files=["res://.godot/imported/syringe_yellow.png-835a1973da272fa1b2ba91b292c9d3af.ctex"]
 
 [params]
 

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://d2jwn7datdj6e"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_6fytt"]
+[ext_resource type="Texture2D" uid="uid://p58fcr7tksdy" path="res://assets/sprites/items/items_icons/plum_juice.png" id="1_ehbpv"]
+
+[resource]
+script = ExtResource("1_6fytt")
+damage_bonus = -10
+fire_rate_bonus = 0.3
+item_name = "Plum Juice"
+description = "Fire rate Up but lowers damage"
+icon = ExtResource("1_ehbpv")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmocy4555dxly"
-path="res://.godot/imported/UNO_reverse_red.jpg-4b4cf4d170b3a3e1b5541ba59c94a37e.ctex"
+uid="uid://bnihaisqn2qk0"
+path="res://.godot/imported/used_toilett_paper.png-992556b1c56f16c2c50e3d45830371e2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/items_icons/UNO_reverse_red.jpg"
-dest_files=["res://.godot/imported/UNO_reverse_red.jpg-4b4cf4d170b3a3e1b5541ba59c94a37e.ctex"]
+source_file="res://assets/sprites/items/items_icons/used_toilett_paper.png"
+dest_files=["res://.godot/imported/used_toilett_paper.png-992556b1c56f16c2c50e3d45830371e2.ctex"]
 
 [params]
 

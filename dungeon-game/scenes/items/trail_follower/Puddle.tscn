@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bjtg0vkxssd40"]
+
+[ext_resource type="Script" uid="uid://v8qo7dek5r5a" path="res://scenes/items/trail_follower/Puddle.gd" id="1_8kh8f"]
+[ext_resource type="Texture2D" uid="uid://dki37g6bpld43" path="res://assets/sprites/items/items_icons/blood_puddle.png" id="2_66rr0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ng0gt"]
+
+[node name="Puddle" type="Area2D" unique_id=1068411611]
+collision_mask = 4
+script = ExtResource("1_8kh8f")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1528906194]
+shape = SubResource("CircleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1127562400]
+texture = ExtResource("2_66rr0")

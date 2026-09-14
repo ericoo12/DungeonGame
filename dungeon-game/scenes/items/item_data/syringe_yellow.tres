@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://cvtttkfh20ll"]
+
+[ext_resource type="Texture2D" uid="uid://cqdk56dcuwytu" path="res://assets/sprites/items/items_icons/syringe_yellow.png" id="1_33pr8"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_pe60g"]
+
+[resource]
+script = ExtResource("1_pe60g")
+speed_bonus = 15.0
+fire_rate_bonus = 0.05
+item_name = "Yellow Syringe"
+description = "Speed and Fire Rate Boost"
+icon = ExtResource("1_33pr8")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

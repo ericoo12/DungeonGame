@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b544oee8isgq4"
-path="res://.godot/imported/UNO_reverse_blue.jpg-db66fa2435522e3cc2cc176c171a2a6c.ctex"
+uid="uid://p58fcr7tksdy"
+path="res://.godot/imported/plum_juice.png-0c77e34b57b7ae31c719f88631e619a8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/items_icons/UNO_reverse_blue.jpg"
-dest_files=["res://.godot/imported/UNO_reverse_blue.jpg-db66fa2435522e3cc2cc176c171a2a6c.ctex"]
+source_file="res://assets/sprites/items/items_icons/plum_juice.png"
+dest_files=["res://.godot/imported/plum_juice.png-0c77e34b57b7ae31c719f88631e619a8.ctex"]
 
 [params]
 

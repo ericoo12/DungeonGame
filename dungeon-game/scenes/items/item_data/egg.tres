@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bcmlp227a0fpk"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_4wr2s"]
+[ext_resource type="Texture2D" uid="uid://d3gmfm6jvsikv" path="res://assets/sprites/items/items_icons/egg.png" id="1_tghay"]
+
+[resource]
+script = ExtResource("1_4wr2s")
+max_hearts_bonus = 1
+item_name = "Egg"
+description = "+1 Heart"
+icon = ExtResource("1_tghay")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

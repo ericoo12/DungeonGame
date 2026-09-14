@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bw417ccbxwm0a"
-path="res://.godot/imported/Speed_Pill.png-0d430cd3080b04df6781fbd85272edb2.ctex"
+uid="uid://cw7vkvp0m4klx"
+path="res://.godot/imported/syringe_green.png-4be5694ec27c42bc8bdfe7cd58e76972.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/items_icons/Speed_Pill.png"
-dest_files=["res://.godot/imported/Speed_Pill.png-0d430cd3080b04df6781fbd85272edb2.ctex"]
+source_file="res://assets/sprites/items/items_icons/syringe_green.png"
+dest_files=["res://.godot/imported/syringe_green.png-4be5694ec27c42bc8bdfe7cd58e76972.ctex"]
 
 [params]
 

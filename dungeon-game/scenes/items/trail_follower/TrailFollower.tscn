@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://75eb16hg5mkh"]
+
+[ext_resource type="Texture2D" uid="uid://dixcemmhy2k0t" path="res://assets/sprites/items/items_icons/nose_bleed.png" id="1_m000j"]
+[ext_resource type="Script" uid="uid://c0exrudy5t5ck" path="res://scenes/items/trail_follower/TrailFollower.gd" id="1_v1i1a"]
+
+[node name="TrailFollower" type="Node2D" unique_id=1383149351]
+scale = Vector2(0.5, 0.5)
+script = ExtResource("1_v1i1a")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2141750727]
+texture = ExtResource("1_m000j")

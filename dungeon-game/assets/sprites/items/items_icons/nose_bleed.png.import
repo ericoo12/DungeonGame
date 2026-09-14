@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fq658kd5wesw"
-path="res://.godot/imported/UNO_reverse_green.png-bfd04ceed7b5265b2834c4344910e2a0.ctex"
+uid="uid://dixcemmhy2k0t"
+path="res://.godot/imported/nose_bleed.png-5d18119a1113c1cb017a992aed333c86.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/items_icons/UNO_reverse_green.png"
-dest_files=["res://.godot/imported/UNO_reverse_green.png-bfd04ceed7b5265b2834c4344910e2a0.ctex"]
+source_file="res://assets/sprites/items/items_icons/nose_bleed.png"
+dest_files=["res://.godot/imported/nose_bleed.png-5d18119a1113c1cb017a992aed333c86.ctex"]
 
 [params]
 

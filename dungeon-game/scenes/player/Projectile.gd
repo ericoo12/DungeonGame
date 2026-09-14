@@ -5,7 +5,7 @@ class_name Projectile
 @export var momentum_influence: float = 0.55
 @export var damage: float = 1.0
 @export var lifetime: float = 1.0
-@export var knockback_strength: float = 100.0
+@export var knockback_strength: float = 50.0
 
 var direction: Vector2 = Vector2.RIGHT
 var velocity: Vector2 = Vector2.ZERO

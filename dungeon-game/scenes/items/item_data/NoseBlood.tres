@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bpvnd7jr40nwy"]
+
+[ext_resource type="PackedScene" uid="uid://75eb16hg5mkh" path="res://scenes/items/trail_follower/TrailFollower.tscn" id="1_1x50u"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_wub7b"]
+[ext_resource type="Texture2D" uid="uid://dixcemmhy2k0t" path="res://assets/sprites/items/items_icons/nose_bleed.png" id="2_q8bkp"]
+
+[resource]
+script = ExtResource("1_wub7b")
+follower_scene = ExtResource("1_1x50u")
+item_name = "NoseBlood"
+description = "A nose follows you leaving a blood trail damaging enemies"
+icon = ExtResource("2_q8bkp")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dxu3i6kbnil07"]
+
+[ext_resource type="Texture2D" uid="uid://cw7vkvp0m4klx" path="res://assets/sprites/items/items_icons/syringe_green.png" id="1_ccgyq"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_rxsmm"]
+
+[resource]
+script = ExtResource("1_rxsmm")
+damage_bonus = 1
+item_name = "Green Syringe"
+description = "Damage Up"
+icon = ExtResource("1_ccgyq")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"
