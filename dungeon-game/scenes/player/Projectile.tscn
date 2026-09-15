@@ -11,9 +11,14 @@ collision_mask = 12
 script = ExtResource("1_sfprp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1835882581]
-scale = Vector2(0.25, 0.25)
+position = Vector2(0, -0.085)
+scale = Vector2(0.32058024, 0.135)
 shape = SubResource("CircleShape2D_ng0gt")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1719402469]
+[node name="HoverPivot" type="Node2D" parent="." unique_id=59009931]
+
+[node name="SpriteRotator" type="Node2D" parent="HoverPivot" unique_id=1586949046]
+
+[node name="Sprite2D" type="Sprite2D" parent="HoverPivot/SpriteRotator" unique_id=1719402469]
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("2_k3qbq")

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://b6c6e3c7javno"]
+
+[ext_resource type="Script" uid="uid://dwsm8t5ptl7q5" path="res://scripts/items/effects/Shadow.gd" id="1_c25ab"]
+[ext_resource type="Texture2D" uid="uid://ci4hx56n2dlx1" path="res://assets/sprites/player/shadow.png" id="1_t6nl3"]
+
+[node name="Shadow" type="Node2D" unique_id=441777832]
+script = ExtResource("1_c25ab")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=140578091]
+modulate = Color(1, 1, 1, 0.49411765)
+texture = ExtResource("1_t6nl3")

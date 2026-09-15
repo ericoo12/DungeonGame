@@ -22,6 +22,9 @@ var is_dying: bool = false
 const PLAYER_SIZE_MIN := 0.5
 const PLAYER_SIZE_MAX := 2.0
 
+# --- shadow ---
+const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
+
 # --- Facing / animation ---
 enum Facing { DOWN, UP, SIDE }
 var facing: Facing = Facing.DOWN
@@ -90,6 +93,7 @@ func _ready() -> void:
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
 	anim_sprite.sprite_frames = AnimSheetLoader.build_player_frames()
 	anim_sprite.play("idle_down")
+	_spawn_shadow()
 
 
 func _physics_process(delta: float) -> void:
@@ -352,3 +356,11 @@ func add_follower(scene: PackedScene, trail_delay: float) -> void:
 	get_parent().add_child(follower)  # sibling of Player, not a child — must NOT inherit player_scale/rotation
 	follower.setup(self, trail_delay)
 	followers.append(follower)
+
+
+func _spawn_shadow() -> void:
+	var shadow: Shadow = SHADOW_SCENE.instantiate()
+	var ground_layer := get_tree().get_first_node_in_group("ground_effects")
+	var target_parent: Node = ground_layer if ground_layer else get_parent()
+	target_parent.add_child(shadow)
+	shadow.setup(self, false)
