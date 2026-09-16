@@ -6,6 +6,7 @@ class_name Player
 var knockback_velocity: Vector2 = Vector2.ZERO
 @export var knockback_recovery_speed: float = 800.0
 @export var knockback_immune: bool = false
+@onready var camera: Camera2D = $Camera2D
 
 # --- Health ---
 @export var max_hearts: int = 3
@@ -215,7 +216,6 @@ func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
 	var dirs: Array[Vector2] = [base_dir]
 	for modifier in shot_pattern_modifiers:
 		dirs = modifier.modify_directions(dirs)
-	print("modifiers: ", shot_pattern_modifiers.size(), "  dirs: ", dirs.size())
 	for d in dirs:
 		if shot_style:
 			shot_style.fire(self, d, apply_momentum)
@@ -364,3 +364,12 @@ func _spawn_shadow() -> void:
 	var target_parent: Node = ground_layer if ground_layer else get_parent()
 	target_parent.add_child(shadow)
 	shadow.setup(self, false)
+
+
+func set_camera_bounds(room_center: Vector2, room_size: Vector2) -> void:
+	var half_size: Vector2 = room_size / 2.0
+	camera.limit_left = int(room_center.x - half_size.x)
+	camera.limit_right = int(room_center.x + half_size.x)
+	camera.limit_top = int(room_center.y - half_size.y)
+	camera.limit_bottom = int(room_center.y + half_size.y)
+	camera.reset_smoothing()

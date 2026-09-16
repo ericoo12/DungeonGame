@@ -7,6 +7,7 @@ class_name HUD
 @onready var item_stats_label: Label = $ItemOverlay/ItemStatsLabel
 @onready var debug_stats: Label = $DebugStats
 @onready var active_item_icon: TextureRect = $ActiveItemSlot/Icon
+@onready var dungeon_map: Control = $DungeonMap
 
 # Keyed by resource_path, NOT item_name — two items can share a display name
 # by mistake (happened once already), but resource_path is always unique.
@@ -28,6 +29,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("toggle_debug_stats"):
 		debug_stats.visible = not debug_stats.visible
+	
+	if event.is_action_pressed("toggle_debug_stats"):
+		debug_stats.visible = not debug_stats.visible
+		dungeon_map.visible = not dungeon_map.visible
 
 
 func _toggle_item_overlay() -> void:

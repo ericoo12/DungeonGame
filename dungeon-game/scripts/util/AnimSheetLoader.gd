@@ -61,7 +61,7 @@ static func build_enemy_frames(sheets: Dictionary) -> SpriteFrames:
 
 	for anim_name in sheets.keys():
 		var entry: Dictionary = sheets[anim_name]
-		_add(frames, anim_name, entry["path"], entry["count"], 10.0, anim_name != "death", 64)
+		_add(frames, anim_name, entry["path"], entry["count"], 18.0, anim_name != "death", 64)
 
 	return frames
 

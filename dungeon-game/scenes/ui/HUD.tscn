@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://rwtyxjlpapf3" path="res://scenes/ui/HeartDisplay.gd" id="2_6ll6g"]
 [ext_resource type="Script" uid="uid://p0w7irxisi33" path="res://scenes/ui/DebugStatsDisplay.gd" id="3_6ll6g"]
 [ext_resource type="Script" uid="uid://r1q1tv2oe0m5" path="res://scenes/ui/ActiveItemSlotDisplay.gd" id="4_ig75s"]
+[ext_resource type="Script" uid="uid://daratb0dfgggh" path="res://scripts/dungeon/DungeonMapDebug.gd" id="5_4ed8p"]
 
 [node name="Hud" type="CanvasLayer" unique_id=1634359545]
 script = ExtResource("1_atyv1")
@@ -20,6 +21,7 @@ metadata/_custom_type_script = "uid://rwtyxjlpapf3"
 
 [node name="DebugStats" type="Label" parent="." unique_id=1046501190]
 process_mode = 3
+visible = false
 offset_top = 32.0
 offset_right = 40.0
 offset_bottom = 55.0
@@ -83,3 +85,12 @@ layout_mode = 0
 offset_top = 145.0
 offset_right = 60.0
 offset_bottom = 205.0
+
+[node name="DungeonMap" type="Control" parent="." unique_id=135109454]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1029.0
+offset_top = 57.0
+offset_right = 1069.0
+offset_bottom = 97.0
+script = ExtResource("5_4ed8p")

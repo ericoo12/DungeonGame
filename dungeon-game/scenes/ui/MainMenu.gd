@@ -11,7 +11,7 @@ func _ready() -> void:
 
 
 func _on_new_game_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/test/TestRoom.tscn")
+	get_tree().change_scene_to_file("res://scenes/dungeon/Dungeon.tscn")
 
 
 func _on_quit_pressed() -> void:

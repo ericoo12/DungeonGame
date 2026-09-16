@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="DungeonGame"
-run/main_scene="uid://bsod3c162m16v"
+run/main_scene="uid://cyeq34tk4nwtv"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -22,8 +22,18 @@ GameState="*uid://ys1qpyy52wky"
 
 [display]
 
+window/size/viewport_width=1296
+window/size/viewport_height=672
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[global_group]
+
+player=""
+dungeon=""
+ground_effects=""
+enemy_spawn_points=""
+walls=""
 
 [input]
 

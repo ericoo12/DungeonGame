@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://d0qvi76opy402"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_2g67h"]
+[ext_resource type="Texture2D" uid="uid://bnihaisqn2qk0" path="res://assets/sprites/items/items_icons/used_toilett_paper.png" id="1_52oxd"]
+
+[resource]
+script = ExtResource("1_2g67h")
+knockback_bonus = 100.0
+item_name = "Used toilett paper"
+description = "add knockback"
+icon = ExtResource("1_52oxd")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"
