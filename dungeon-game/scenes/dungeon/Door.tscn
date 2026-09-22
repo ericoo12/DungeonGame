@@ -1,11 +1,14 @@
 [gd_scene format=3 uid="uid://b5e7hergm1vcs"]
 
 [ext_resource type="Script" uid="uid://j2fqtp3tryoq" path="res://scenes/dungeon/Door.gd" id="1_i75l0"]
-[ext_resource type="Texture2D" uid="uid://ddu10yppsauay" path="res://assets/sprites/door_closed.png" id="2_i75l0"]
-[ext_resource type="Texture2D" uid="uid://ceeg4svs44fok" path="res://assets/sprites/door_toiletpaper.png" id="4_u0coo"]
+[ext_resource type="Texture2D" uid="uid://ddu10yppsauay" path="res://assets/sprites/tiles/door_closed.png" id="2_i75l0"]
+[ext_resource type="Texture2D" uid="uid://ceeg4svs44fok" path="res://assets/sprites/tiles/door_toiletpaper.png" id="4_u0coo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jlufg"]
-size = Vector2(30, 14.880932)
+size = Vector2(19, 23.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+size = Vector2(19, 26)
 
 [node name="Door" type="Area2D" unique_id=158042467]
 collision_mask = 2
@@ -13,10 +16,16 @@ script = ExtResource("1_i75l0")
 closed_texture = ExtResource("2_i75l0")
 open_texture = ExtResource("4_u0coo")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2113766507]
-position = Vector2(0, 7.5000005)
-scale = Vector2(1, 1.6800025)
-shape = SubResource("RectangleShape2D_jlufg")
-
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=898076199]
 texture = ExtResource("4_u0coo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2113766507]
+position = Vector2(0, 5.25)
+shape = SubResource("RectangleShape2D_jlufg")
+
+[node name="PhysicalBlocker" type="StaticBody2D" parent="." unique_id=1472804281]
+position = Vector2(0, -39)
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PhysicalBlocker" unique_id=2093098370]
+shape = SubResource("RectangleShape2D_ng0gt")

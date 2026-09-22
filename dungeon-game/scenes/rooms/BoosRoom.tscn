@@ -1,5 +1,18 @@
 [gd_scene format=3 uid="uid://b4glh88c57oo2"]
 
 [ext_resource type="PackedScene" uid="uid://bu2hprdcy6fqt" path="res://scenes/rooms/RoomBase.tscn" id="1_hnghu"]
+[ext_resource type="PackedScene" uid="uid://boxwww05umre8" path="res://scenes/dungeon/StageDoor.tscn" id="2_61uf7"]
 
 [node name="RoomBase" unique_id=1502560529 instance=ExtResource("1_hnghu")]
+
+[node name="StageDoor" parent="Doors" parent_id_path=PackedInt32Array(1675798878) index="0" unique_id=2114646589 instance=ExtResource("2_61uf7")]
+position = Vector2(-3.8146973e-06, -51.000008)
+scale = Vector2(0.05, 0.05)
+
+[node name="Marker2D" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="0" unique_id=1169427799]
+position = Vector2(0, 0.14)
+
+[editable path="Doors/North"]
+[editable path="Doors/South"]
+[editable path="Doors/East"]
+[editable path="Doors/West"]

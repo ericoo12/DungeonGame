@@ -9,7 +9,7 @@ const DIRECTIONS := [NORTH, SOUTH, EAST, WEST]
 
 
 static func generate(room_count: int) -> Dictionary:
-	var layout: Dictionary = {}  # Vector2i -> RoomData
+	var layout: Dictionary = {}
 	var start_pos := Vector2i.ZERO
 
 	var start_data := RoomData.new()
@@ -20,7 +20,7 @@ static func generate(room_count: int) -> Dictionary:
 
 	var frontier: Array[Vector2i] = [start_pos]
 	var attempts := 0
-	var max_attempts := room_count * 20  # safety valve against unlucky random walks
+	var max_attempts := room_count * 20
 
 	while layout.size() < room_count and attempts < max_attempts:
 		attempts += 1
@@ -37,8 +37,10 @@ static func generate(room_count: int) -> Dictionary:
 		frontier.append(next)
 
 	_assign_doors(layout)
-	_assign_boss_room(layout, start_pos)
-	return layout
+	var distances: Dictionary = _bfs_distances(layout, start_pos)
+	_assign_boss_room_from_distances(layout, distances)
+
+	return {"layout": layout, "distances": distances}
 
 
 static func _assign_doors(layout: Dictionary) -> void:
@@ -48,13 +50,10 @@ static func _assign_doors(layout: Dictionary) -> void:
 			data.doors[dir] = layout.has(pos + dir)
 
 
-static func _assign_boss_room(layout: Dictionary, start_pos: Vector2i) -> void:
-	var distances: Dictionary = _bfs_distances(layout, start_pos)
-	var best_pos: Vector2i = start_pos
+static func _assign_boss_room_from_distances(layout: Dictionary, distances: Dictionary) -> void:
+	var best_pos: Vector2i = Vector2i.ZERO
 	var best_dist := -1
 
-	# Prefer a dead-end (single connection) room, furthest from start —
-	# classic "boss room at the end of a corridor" feel.
 	for pos in layout.keys():
 		var data: RoomData = layout[pos]
 		if data.type != RoomData.Type.NORMAL:

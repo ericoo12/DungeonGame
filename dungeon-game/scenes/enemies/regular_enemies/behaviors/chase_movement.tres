@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ChaseMovement" format=3 uid="uid://ddgny1n44ei8j"]
+
+[ext_resource type="Script" uid="uid://bn6irv01l48dt" path="res://scripts/enemies/ChaseMovement.gd" id="1_rfnl2"]
+
+[resource]
+script = ExtResource("1_rfnl2")
+metadata/_custom_type_script = "uid://bn6irv01l48dt"

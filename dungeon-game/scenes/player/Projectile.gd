@@ -28,6 +28,7 @@ const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
 const SPLASH_SCENE := preload("res://scenes/effects/ProjectileSplash.tscn")
 const PROJECTILE_SPLASH_BASE_SCALE := 0.3
 
+@onready var sprite: AnimatedSprite2D = $HoverPivot/SpriteRotator/AnimatedSprite2D
 @onready var hover_pivot: Node2D = $HoverPivot
 @onready var sprite_rotator: Node2D = $HoverPivot/SpriteRotator
 
@@ -38,7 +39,11 @@ func _ready() -> void:
 	_spawn_shadow()
 	await get_tree().physics_frame
 	monitoring = true
-
+	sprite.sprite_frames = AnimSheetLoader.build_single_animation(
+		"res://assets/sprites/player/projectile.png", 4, 10.0, true
+	)
+	sprite.play("splash")
+	add_to_group("projectiles")
 
 func launch(aim_dir: Vector2, shooter_velocity: Vector2) -> void:
 	var parallel_speed: float = shooter_velocity.dot(aim_dir)
@@ -46,7 +51,6 @@ func launch(aim_dir: Vector2, shooter_velocity: Vector2) -> void:
 	var perpendicular_component: Vector2 = shooter_velocity - aim_dir * parallel_speed
 	var momentum: Vector2 = (parallel_component + perpendicular_component) * momentum_influence
 	velocity = aim_dir * base_speed + momentum
-	sprite_rotator.rotation = velocity.angle()
 
 
 func _physics_process(delta: float) -> void:

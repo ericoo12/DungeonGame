@@ -4,20 +4,13 @@
 
 [node name="RoomBase" unique_id=1502560529 instance=ExtResource("1_5jxyb")]
 
+[node name="PhysicalBlocker" parent="Doors/North" parent_id_path=PackedInt32Array(158042467) index="2" unique_id=1472804281]
+position = Vector2(0, -22.25)
+
 [node name="Marker2D" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="0" unique_id=1998396861 groups=["enemy_spawn_points"]]
 position = Vector2(-157, -65)
 
-[node name="Marker2D2" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="1" unique_id=686680514 groups=["enemy_spawn_points"]]
-position = Vector2(-59, -55)
-
-[node name="Marker2D3" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="2" unique_id=1717691662 groups=["enemy_spawn_points"]]
-position = Vector2(-160, 45)
-
-[node name="Marker2D4" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="3" unique_id=1876251797 groups=["enemy_spawn_points"]]
-position = Vector2(-107, 38)
-
-[node name="Marker2D5" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="4" unique_id=561619313 groups=["enemy_spawn_points"]]
-position = Vector2(144, -55)
-
-[node name="Marker2D6" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="5" unique_id=1590334180 groups=["enemy_spawn_points"]]
-position = Vector2(126, 42)
+[editable path="Doors/North"]
+[editable path="Doors/South"]
+[editable path="Doors/East"]
+[editable path="Doors/West"]

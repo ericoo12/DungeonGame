@@ -7,3 +7,4 @@ scale = Vector2(0.2, 0.2)
 script = ExtResource("1_w00op")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2146018676]
+scale = Vector2(0.5, 0.5)
