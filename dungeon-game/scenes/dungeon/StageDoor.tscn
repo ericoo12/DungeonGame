@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://boxwww05umre8"]
+
+[ext_resource type="Script" uid="uid://c80f55gkd82u8" path="res://scenes/dungeon/StageDoor.gd" id="1_ainih"]
+[ext_resource type="Texture2D" uid="uid://fpfavo1q4oe2" path="res://assets/sprites/objects/toilet.png" id="2_4f54b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6rt4j"]
+size = Vector2(300, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ng0gt"]
+atlas = ExtResource("2_4f54b")
+region = Rect2(0, 0, 543.0891, 718.9592)
+
+[node name="StageDoor" type="Area2D" unique_id=2114646589]
+collision_mask = 2
+script = ExtResource("1_ainih")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=150251346]
+shape = SubResource("RectangleShape2D_6rt4j")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1573878924]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1687216754]
+visible = false
+texture = SubResource("AtlasTexture_ng0gt")

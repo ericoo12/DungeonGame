@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://bjkdifqw187ck"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="1_j21j6"]
+[ext_resource type="Texture2D" uid="uid://ciqbwiqmov583" path="res://assets/sprites/enemies/FlyBrown.png" id="2_xclv2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xclv2"]
+radius = 100.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_aa8og"]
+radius = 100.0
+
+[node name="Enemy" unique_id=1579853284 instance=ExtResource("1_j21j6")]
+scale = Vector2(0.5, 0.5)
+sprite_sheet_path = "res://assets/sprites/enemies/FlyBrown.png"
+is_static_visual = true
+visual_scale = 0.1
+
+[node name="testsprite" parent="." index="0" unique_id=963101555]
+texture = ExtResource("2_xclv2")
+hframes = 1
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(4.5474735e-13, 1.9073486e-06)
+shape = SubResource("CircleShape2D_xclv2")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("CircleShape2D_aa8og")

@@ -21,15 +21,14 @@ func _ready() -> void:
 	EventBus.active_item_changed.connect(_on_active_item_changed)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_items"):
+		print("toggle_items pressed — overlay visible BEFORE toggle: ", item_overlay.visible)
 		_toggle_item_overlay()
+		print("overlay visible AFTER toggle: ", item_overlay.visible)
 	elif event.is_action_pressed("ui_cancel") and item_overlay.visible:
 		_toggle_item_overlay()
 
-	if event.is_action_pressed("toggle_debug_stats"):
-		debug_stats.visible = not debug_stats.visible
-	
 	if event.is_action_pressed("toggle_debug_stats"):
 		debug_stats.visible = not debug_stats.visible
 		dungeon_map.visible = not dungeon_map.visible

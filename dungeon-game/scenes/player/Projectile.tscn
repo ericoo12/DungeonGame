@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cvj16on4ao6qg"]
 
 [ext_resource type="Script" uid="uid://duyp37g425je7" path="res://scenes/player/Projectile.gd" id="1_sfprp"]
-[ext_resource type="Texture2D" uid="uid://b0m24jtju1y8s" path="res://assets/sprites/items/items_icons/poop_projectile2.png" id="2_k3qbq"]
+[ext_resource type="Texture2D" uid="uid://clopm4jcwf4il" path="res://assets/sprites/player/projectile.png" id="2_k3qbq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ng0gt"]
 
@@ -12,13 +12,19 @@ script = ExtResource("1_sfprp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1835882581]
 position = Vector2(0, -0.085)
-scale = Vector2(0.32058024, 0.135)
+scale = Vector2(0.361, 0.235)
 shape = SubResource("CircleShape2D_ng0gt")
 
 [node name="HoverPivot" type="Node2D" parent="." unique_id=59009931]
 
 [node name="SpriteRotator" type="Node2D" parent="HoverPivot" unique_id=1586949046]
 
-[node name="Sprite2D" type="Sprite2D" parent="HoverPivot/SpriteRotator" unique_id=1719402469]
-scale = Vector2(0.2, 0.2)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="HoverPivot/SpriteRotator" unique_id=1593822074]
+scale = Vector2(0.08, 0.08)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1719402469]
+visible = false
+scale = Vector2(0.08, 0.08)
 texture = ExtResource("2_k3qbq")
+region_enabled = true
+region_rect = Rect2(21.870773, 37.317425, 82.27423, 54.49011)

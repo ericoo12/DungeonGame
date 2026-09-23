@@ -8,7 +8,7 @@ class_name ProjectileSplash
 
 func _ready() -> void:
 	sprite.sprite_frames = AnimSheetLoader.build_single_animation(
-		"res://assets/sprites/player/poop_splash.png", 4, 24.0, false
+		"res://assets/sprites/player/projectile_splash.png", 3, 12.0, false
 	)
 	sprite.play("splash")
 	sprite.animation_finished.connect(queue_free)

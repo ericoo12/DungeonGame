@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RangedAttack" format=3 uid="uid://deaabjtee1dwt"]
+
+[ext_resource type="Script" uid="uid://cb6r1svkyjyof" path="res://scripts/enemies/RangedAttack.gd" id="1_3f0cf"]
+[ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://scenes/enemies/EnemyProjectile.tscn" id="1_gxrj1"]
+
+[resource]
+script = ExtResource("1_3f0cf")
+projectile_scene = ExtResource("1_gxrj1")
+metadata/_custom_type_script = "uid://cb6r1svkyjyof"

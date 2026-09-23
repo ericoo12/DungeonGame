@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://crv1khxkqc1cs"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="1_51iyx"]
+[ext_resource type="Script" uid="uid://cny2sqleaxvd" path="res://scenes/enemies/bosses/toilet_brush/ToiletBrush.gd" id="2_auikw"]
+[ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://scenes/enemies/EnemyProjectile.tscn" id="3_2ebgb"]
+[ext_resource type="Texture2D" uid="uid://bkrwgbih3ax1o" path="res://assets/sprites/enemies/toilet_brush/brush_attack_spit_left.png" id="4_qa37g"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cmmky"]
+atlas = ExtResource("4_qa37g")
+region = Rect2(70.00069, 26.166672, 115.66669, 218.66667)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mdrox"]
+radius = 57.0
+height = 220.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ptmvy"]
+radius = 57.0
+height = 220.0
+
+[node name="Enemy" unique_id=1579853284 instance=ExtResource("1_51iyx")]
+script = ExtResource("2_auikw")
+lunge_range = 90.0
+shoot_range = 100.0
+attack_cooldown = 1.5
+lunge_speed = 200.0
+lunge_duration = 0.2
+projectile_scene = ExtResource("3_2ebgb")
+projectile_damage = 1.0
+projectile_launch_delay = 0.15
+is_boss = true
+visual_scale = 0.2
+
+[node name="testsprite" parent="." index="0" unique_id=963101555]
+texture = SubResource("AtlasTexture_cmmky")
+hframes = 1
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 5)
+shape = SubResource("CapsuleShape2D_mdrox")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+position = Vector2(0, 5)
+shape = SubResource("CapsuleShape2D_ptmvy")

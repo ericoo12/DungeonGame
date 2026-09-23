@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dvo2lskitxkxa"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="1_2hxmv"]
+[ext_resource type="Texture2D" uid="uid://dsvcrcarc3t44" path="res://assets/sprites/enemies/ball_fly.png" id="2_w8ddu"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_q154j"]
+radius = 100.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_k6g6y"]
+radius = 100.0
+
+[node name="Enemy" unique_id=1579853284 instance=ExtResource("1_2hxmv")]
+scale = Vector2(0.5, 0.5)
+sprite_sheet_path = "res://assets/sprites/enemies/ball_fly.png"
+is_static_visual = true
+visual_scale = 0.1
+
+[node name="testsprite" parent="." index="0" unique_id=963101555]
+texture = ExtResource("2_w8ddu")
+hframes = 1
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(-2.8421764e-14, 2.3841858e-07)
+shape = SubResource("CircleShape2D_q154j")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("CircleShape2D_k6g6y")
+
+[node name="Label" parent="." index="4" unique_id=1371920992]
+offset_top = -19.0
+offset_bottom = 5.51

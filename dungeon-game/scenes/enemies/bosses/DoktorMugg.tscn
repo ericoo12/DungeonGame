@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://dbd6c2cbwu7jb"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="1_hjwlr"]
+[ext_resource type="Texture2D" uid="uid://v8snqfthhg5l" path="res://assets/sprites/enemies/doktor_mugg/DoktorMugg-Sheet.png" id="2_lwkor"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4wd1e"]
+atlas = ExtResource("2_lwkor")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_51iyx"]
+radius = 25.0
+height = 60.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_auikw"]
+radius = 25.0
+height = 60.0
+
+[node name="Enemy" unique_id=1579853284 instance=ExtResource("1_hjwlr")]
+sprite_sheet_path = "res://assets/sprites/enemies/doktor_mugg/DoktorMugg-Sheet.png"
+max_health = 100.0
+move_speed = 50.0
+contact_knockback_strength = 200.0
+is_boss = true
+
+[node name="testsprite" parent="." index="0" unique_id=963101555]
+scale = Vector2(1.5, 1)
+texture = SubResource("AtlasTexture_4wd1e")
+hframes = 1
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 2.33)
+shape = SubResource("CapsuleShape2D_51iyx")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+position = Vector2(0, 2.33)
+shape = SubResource("CapsuleShape2D_auikw")
+
+[node name="Label" parent="." index="4" unique_id=1371920992]
+offset_top = -36.0
+offset_bottom = -11.49

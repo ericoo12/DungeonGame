@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dk6xlvxec8kec"]
+
+[ext_resource type="Script" uid="uid://dj14t0mq3imns" path="res://scenes/enemies/EnemyProjectile.gd" id="1_cmmky"]
+[ext_resource type="Texture2D" uid="uid://dki37g6bpld43" path="res://assets/sprites/items/items_icons/blood_puddle.png" id="2_tsqg0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ng0gt"]
+radius = 16.2
+
+[node name="EnemyProjectile" type="Area2D" unique_id=1404136849]
+scale = Vector2(0.5, 0.5)
+collision_layer = 64
+collision_mask = 17
+script = ExtResource("1_cmmky")
+speed = 180.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=15346552]
+position = Vector2(0.46, -1.35)
+shape = SubResource("CircleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=632972302]
+texture = ExtResource("2_tsqg0")

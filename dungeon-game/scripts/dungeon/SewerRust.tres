@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RoomFloorVariant" format=3 uid="uid://cs8k8x1emlnc1"]
+
+[ext_resource type="Script" uid="uid://bpeg8hj5rhrvx" path="res://scripts/dungeon/RoomFloorVariant.gd" id="1_7whw7"]
+[ext_resource type="Texture2D" uid="uid://b0r1megtltvhm" path="res://assets/sprites/tiles/sewer.png" id="2_esjlx"]
+
+[resource]
+script = ExtResource("1_7whw7")
+texture = ExtResource("2_esjlx")
+metadata/_custom_type_script = "uid://bpeg8hj5rhrvx"

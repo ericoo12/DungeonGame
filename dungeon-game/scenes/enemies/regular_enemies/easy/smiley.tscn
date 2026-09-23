@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://cn870j8d47g67"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="1_hwx20"]
+[ext_resource type="Texture2D" uid="uid://cst6rpnnfbmpo" path="res://assets/sprites/enemies/smiley.png" id="2_6ptda"]
+[ext_resource type="Resource" uid="uid://cmuxxey7yt7a1" path="res://scenes/enemies/regular_enemies/behaviors/stationary_movement.tres" id="2_mxipq"]
+[ext_resource type="Resource" uid="uid://deaabjtee1dwt" path="res://scenes/enemies/regular_enemies/behaviors/ranged_spit_attack.tres" id="3_ut8t4"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mxipq"]
+radius = 47.0
+height = 150.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ut8t4"]
+radius = 47.0
+height = 150.0
+
+[node name="Enemy" unique_id=1579853284 instance=ExtResource("1_hwx20")]
+scale = Vector2(0.5, 0.5)
+sprite_sheet_path = "res://assets/sprites/enemies/smiley.png"
+is_static_visual = true
+movement_behavior = ExtResource("2_mxipq")
+attack_behavior = ExtResource("3_ut8t4")
+visual_scale = 0.4
+
+[node name="testsprite" parent="." index="0" unique_id=963101555]
+texture = ExtResource("2_6ptda")
+hframes = 1
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(3.335, 3.44)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_mxipq")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+position = Vector2(3.74, 3.595)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_ut8t4")
