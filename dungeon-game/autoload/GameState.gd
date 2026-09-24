@@ -3,6 +3,7 @@ extends Node
 signal stage_changed(new_stage: int)
 
 var current_stage: int = 1
+var picked_up_items: Array[ItemBase] = []
 
 const HEALTH_SCALE_PER_STAGE := 0.25  # +25% enemy/boss max health per stage beyond 1
 const DAMAGE_SCALE_PER_STAGE := 0.15  # +15% enemy/boss contact damage per stage beyond 1
@@ -23,4 +24,5 @@ func advance_stage() -> void:
 
 func reset() -> void:
 	current_stage = 1
+	picked_up_items.clear()
 	stage_changed.emit(current_stage)

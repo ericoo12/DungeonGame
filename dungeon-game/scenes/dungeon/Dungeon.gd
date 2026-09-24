@@ -15,6 +15,10 @@ var boss_scenes: Array[PackedScene] = []
 @export var start_room_scene: PackedScene
 @export var normal_room_scenes: Array[PackedScene] = []
 @export var boss_room_scene: PackedScene
+@export var item_room_scene: PackedScene
+@export var item_pool_folder: String = "res://scenes/items/item_data/"
+
+var item_pool: Array[ItemBase] = []
 
 @export var easy_max_distance: int = 2    # rooms this close to start only pull from easy_enemy_scenes
 @export var hard_min_distance: int = 5    # rooms this far or farther can pull from hard_enemy_scenes
@@ -44,6 +48,7 @@ func _ready() -> void:
 	medium_enemy_scenes = _load_scenes_from_folder(medium_enemy_folder)
 	hard_enemy_scenes = _load_scenes_from_folder(hard_enemy_folder)
 	boss_scenes = _load_scenes_from_folder(boss_folder)
+	item_pool = _load_items_from_folder(item_pool_folder)
 	
 	_generate_and_load_floor()
 
@@ -77,9 +82,11 @@ func _generate_and_load_floor() -> void:
 	room_distances = result.distances
 	current_room = null
 	_load_room(Vector2i.ZERO, DungeonGenerator.SOUTH)
-	
+
 	player.global_position = current_room.global_position  # true initial spawn only — centers the player
 	player.set_camera_bounds(current_room.global_position, room_world_size)
+	player.reset_position_history()
+	player.reset_followers_position()
 
 
 func _on_boss_defeated() -> void:
@@ -98,6 +105,9 @@ func travel(direction: Vector2i) -> void:
 func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	for proj in get_tree().get_nodes_in_group("projectiles"):
 		proj.queue_free()
+		
+	for pickup in get_tree().get_nodes_in_group("item_pickups"):
+		pickup.queue_free()
 
 	var data: RoomData = layout[grid_pos]
 
@@ -109,6 +119,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	match data.type:
 		RoomData.Type.START: scene = start_room_scene
 		RoomData.Type.BOSS: scene = boss_room_scene
+		RoomData.Type.ITEM: scene = item_room_scene
 		_: 
 			if data.scene_path == "":
 				scene = normal_room_scenes[randi() % normal_room_scenes.size()]
@@ -126,7 +137,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	
 	var entrance_direction := entered_from * -1
 	var half_size := room_world_size / 2.0
-	var distance_from_wall := 40.0
+	var distance_from_wall := 50.0
 
 	var spawn_offset := Vector2(
 		entrance_direction.x * (half_size.x - distance_from_wall),
@@ -135,8 +146,29 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 
 	player.global_position = current_room.global_position + spawn_offset
 	player.set_camera_bounds(current_room.global_position, room_world_size)
-
+	player.reset_position_history()
+	player.reset_followers_position()
 
 func advance_to_next_stage() -> void:
 	GameState.advance_stage()
 	_generate_and_load_floor()
+
+
+func _load_items_from_folder(path: String) -> Array[ItemBase]:
+	var result: Array[ItemBase] = []
+	var dir := DirAccess.open(path)
+	if dir == null:
+		push_error("Dungeon: could not open folder " + path)
+		return result
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".tres"):
+			var item: ItemBase = load(path + file_name)
+			if item:
+				result.append(item)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+	return result

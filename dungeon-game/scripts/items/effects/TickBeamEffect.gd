@@ -5,7 +5,7 @@
 class_name TickBeamEffect
 extends ActiveItemEffect
 
-@export var max_range: float = 300.0
+@export var max_range: float = 3000.0
 @export var damage: float = 5.0
 @export var damage_interval: float = 0.3
 @export var beam_width: float = 6.0

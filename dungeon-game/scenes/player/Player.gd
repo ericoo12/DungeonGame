@@ -16,13 +16,17 @@ const INVULN_DURATION := 1.0
 var is_dying: bool = false
 
 # --- Player size (scales sprite + collisions together) ---
-@export var player_scale: float = 0.15
+@export var player_scale: float = 0.015
+@onready var hurtbox: Area2D = $HurtBox
 @onready var body_collision: CollisionShape2D = $wallCollision
 @onready var hurtbox_collision: CollisionShape2D = $HurtBox/EnemyCollision
-const PLAYER_SIZE_MIN := 0.1
+const PLAYER_SIZE_MIN := 0.0001
 const PLAYER_SIZE_MAX := 2.0
 @onready var lower_sprite: AnimatedSprite2D = $LowerBodySprite
 @onready var upper_sprite: AnimatedSprite2D = $UpperBodySprite
+var body_collision_base_position: Vector2 = Vector2.ZERO
+var hurtbox_collision_base_position: Vector2 = Vector2.ZERO
+var hurtbox_base_position: Vector2 = Vector2.ZERO
 # --- Shadow ---
 const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
 
@@ -117,6 +121,9 @@ var upper_base_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	add_to_group("player")
+	body_collision_base_position = body_collision.position
+	hurtbox_collision_base_position = hurtbox_collision.position
+	hurtbox_base_position = hurtbox.position
 	set_player_scale(player_scale)
 	current_hearts = max_hearts
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
@@ -127,6 +134,7 @@ func _ready() -> void:
 	upper_sprite.sprite_frames = body_frames.upper
 	upper_base_position = upper_sprite.position
 	lower_base_position = lower_sprite.position
+
 	lower_sprite.play("idle_down")
 	upper_sprite.play("idle_down")
 
@@ -221,8 +229,8 @@ func _face_towards(dir: Vector2) -> void:
 func _update_animation(move_vec: Vector2, is_shooting: bool) -> void:
 	var dir_suffix := _facing_suffix()
 	var flip := (facing == Facing.RIGHT)
-	var anim_dir := dir_suffix  # true facing — used for transform lookups, "right" included
-	var frame_dir := "left" if facing == Facing.RIGHT else dir_suffix  # which art to actually play
+	var anim_dir := dir_suffix
+	var frame_dir := "left" if facing == Facing.RIGHT else dir_suffix
 
 	lower_sprite.flip_h = flip
 	upper_sprite.flip_h = flip
@@ -233,7 +241,7 @@ func _update_animation(move_vec: Vector2, is_shooting: bool) -> void:
 	var lower_transform_key: String = ("run_" if move_vec.length() > 0.0 else "idle_") + anim_dir
 	var lower_transform: Dictionary = LOWER_ANIM_TRANSFORM.get(lower_transform_key, {"scale": 1.0, "offset": Vector2.ZERO})
 	lower_sprite.scale = Vector2.ONE * player_scale * lower_transform.scale
-	lower_sprite.position = lower_base_position + lower_transform.offset
+	lower_sprite.position = (lower_base_position + lower_transform.offset) * player_scale
 
 	var upper_state: String = "attack" if (shoot_timer > 0.0 or is_shooting) else "idle"
 	var upper_frame_name: String = upper_state + "_" + frame_dir
@@ -244,7 +252,7 @@ func _update_animation(move_vec: Vector2, is_shooting: bool) -> void:
 	var upper_transform_key: String = upper_state + "_" + anim_dir
 	var upper_transform: Dictionary = UPPER_ANIM_TRANSFORM.get(upper_transform_key, {"scale": 1.0, "offset": Vector2.ZERO})
 	upper_sprite.scale = Vector2.ONE * player_scale * upper_transform.scale
-	upper_sprite.position = upper_base_position + upper_transform.offset
+	upper_sprite.position = (upper_base_position + upper_transform.offset) * player_scale
 
 
 func _facing_suffix() -> String:
@@ -271,7 +279,6 @@ func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
 	var dirs: Array[Vector2] = [base_dir]
 	for modifier in shot_pattern_modifiers:
 		dirs = modifier.modify_directions(dirs)
-
 	for d in dirs:
 		if shot_style:
 			shot_style.fire(self, d, apply_momentum)
@@ -368,6 +375,9 @@ func set_player_scale(value: float) -> void:
 	upper_sprite.scale = Vector2.ONE * player_scale
 	body_collision.scale = Vector2.ONE * player_scale
 	hurtbox_collision.scale = Vector2.ONE * player_scale
+	body_collision.position = body_collision_base_position * player_scale
+	hurtbox_collision.position = hurtbox_collision_base_position * player_scale
+	hurtbox.position = hurtbox_base_position * player_scale
 
 
 func equip_shot_style(style: ShotStyleModifier) -> void:
@@ -427,3 +437,13 @@ func set_camera_bounds(room_center: Vector2, room_size: Vector2) -> void:
 	camera.limit_top = int(room_center.y - half_size.y)
 	camera.limit_bottom = int(room_center.y + half_size.y)
 	camera.reset_smoothing()
+
+
+func reset_position_history() -> void:
+	position_history.clear()
+
+
+func reset_followers_position() -> void:
+	for follower in followers:
+		if is_instance_valid(follower):
+			follower.global_position = global_position

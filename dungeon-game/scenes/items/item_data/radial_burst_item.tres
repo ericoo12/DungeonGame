@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ActiveItem" format=3 uid="uid://dj1f7sjdpi8tq"]
 
-[ext_resource type="Resource" uid="uid://caj3o3ssd5olp" path="res://scenes/items/active_item_data/radial_burst_effect.tres" id="1_57u5c"]
+[ext_resource type="Resource" uid="uid://caj3o3ssd5olp" path="res://scenes/items/modifiers/radial_burst_effect.tres" id="1_57u5c"]
 [ext_resource type="Script" uid="uid://sjjya86fvnn6" path="res://scripts/items/ActiveItem.gd" id="1_dvp5h"]
 [ext_resource type="Texture2D" uid="uid://b405uclpmmbw3" path="res://assets/sprites/items/active_items/omniturd.png" id="2_8kboh"]
 

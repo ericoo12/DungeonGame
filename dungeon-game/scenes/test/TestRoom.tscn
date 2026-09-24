@@ -4,7 +4,6 @@
 [ext_resource type="TileSet" uid="uid://rartwq82fgjl" path="res://wall_with_physics.tres" id="2_orq3s"]
 [ext_resource type="PackedScene" uid="uid://c87str8wnjc4e" path="res://scenes/test/TestDummy.tscn" id="2_v4np5"]
 [ext_resource type="Texture2D" uid="uid://cpiabtykw2mpl" path="res://assets/Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png" id="3_he7et"]
-[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="4_spdwv"]
 [ext_resource type="PackedScene" uid="uid://bng62ay6px8iq" path="res://scenes/ui/HUD.tscn" id="5_euy64"]
 [ext_resource type="PackedScene" uid="uid://2vwj0f2j11al" path="res://scenes/items/ItemPickup.tscn" id="6_32oie"]
 [ext_resource type="Resource" uid="uid://dytv3ocqacyrh" path="res://scenes/items/item_data/syringe_red.tres" id="6_pbq83"]
@@ -13,10 +12,10 @@
 [ext_resource type="Resource" uid="uid://bcmlp227a0fpk" path="res://scenes/items/item_data/egg.tres" id="9_1g4r2"]
 [ext_resource type="Resource" uid="uid://d2jwn7datdj6e" path="res://scenes/items/item_data/plum_juice.tres" id="10_xg2r1"]
 [ext_resource type="Resource" uid="uid://bf4norc70i6ij" path="res://scenes/items/item_data/Poop_Friend.tres" id="11_nbkod"]
-[ext_resource type="Resource" uid="uid://dj1f7sjdpi8tq" path="res://scenes/items/active_item_data/radial_burst_item.tres" id="12_ktptm"]
+[ext_resource type="Resource" uid="uid://dj1f7sjdpi8tq" path="res://scenes/items/item_data/radial_burst_item.tres" id="12_ktptm"]
 [ext_resource type="Resource" uid="uid://wxaqwxos8o62" path="res://scenes/items/item_data/laser_upgrade.tres" id="13_153g2"]
 [ext_resource type="Resource" uid="uid://cqdgc85nr4r7i" path="res://scenes/items/item_data/double_shot_item.tres" id="13_pbq83"]
-[ext_resource type="Resource" uid="uid://r13i4hdrodhn" path="res://scenes/items/active_item_data/tick_beam_item.tres" id="14_153g2"]
+[ext_resource type="Resource" uid="uid://r13i4hdrodhn" path="res://scenes/items/item_data/tick_beam_item.tres" id="14_153g2"]
 [ext_resource type="Resource" uid="uid://bpvnd7jr40nwy" path="res://scenes/items/item_data/NoseBlood.tres" id="14_n6vps"]
 [ext_resource type="Resource" uid="uid://d0qvi76opy402" path="res://scenes/items/item_data/used_toilett_paper.tres" id="18_1g4r2"]
 
@@ -338,15 +337,13 @@ layer_0/tile_data = PackedInt32Array(-2293799, 196610, 0, -2228263, 196610, 1, -
 y_sort_enabled = true
 
 [node name="Player" parent="Entities" unique_id=1881097379 instance=ExtResource("1_qt7xo")]
+scale = Vector2(1, 1)
 
 [node name="Camera2D2" type="Camera2D" parent="Entities/Player" unique_id=323038033]
 zoom = Vector2(3, 3)
 
 [node name="TestDummy" parent="Entities" unique_id=1491204886 instance=ExtResource("2_v4np5")]
 position = Vector2(85.00006, -29.999996)
-
-[node name="Enemy" parent="Entities" unique_id=1579853284 instance=ExtResource("4_spdwv")]
-position = Vector2(-91, -38)
 
 [node name="Redsyringe" parent="Entities" unique_id=461120326 instance=ExtResource("6_32oie")]
 position = Vector2(-155, -74)
@@ -377,7 +374,7 @@ position = Vector2(132, -75)
 item = ExtResource("11_nbkod")
 
 [node name="Lazer" parent="Entities" unique_id=1419589195 instance=ExtResource("6_32oie")]
-position = Vector2(169, -76)
+position = Vector2(-126, 33)
 item = ExtResource("13_153g2")
 
 [node name="DoubleShit" parent="Entities" unique_id=391127894 instance=ExtResource("6_32oie")]
@@ -401,5 +398,4 @@ position = Vector2(123, 21)
 item = ExtResource("18_1g4r2")
 
 [node name="Hud" parent="." unique_id=1547169626 instance=ExtResource("5_euy64")]
-process_mode = 3
 visible = false

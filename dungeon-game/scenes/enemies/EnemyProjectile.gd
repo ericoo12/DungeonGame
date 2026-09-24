@@ -8,12 +8,16 @@ class_name EnemyProjectile
 
 var velocity: Vector2 = Vector2.ZERO
 
+const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
+@export var shadow_scale: float = 0.2
+@export var shadow_offset: Vector2 = Vector2(0, 2)
 
 func _ready() -> void:
 	monitoring = false
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
 	get_tree().create_timer(lifetime).timeout.connect(queue_free)
+	_spawn_shadow()
 	await get_tree().physics_frame
 	monitoring = true
 	add_to_group("projectiles")
@@ -43,3 +47,13 @@ func _try_deal_damage(target: Node) -> void:
 		queue_free()
 	elif target.is_in_group("walls"):
 		queue_free()
+
+
+func _spawn_shadow() -> void:
+	var shadow := SHADOW_SCENE.instantiate()
+	var ground_layer := get_tree().get_first_node_in_group("ground_effects")
+	var target_parent: Node = ground_layer if ground_layer else get_parent()
+	target_parent.add_child(shadow)
+	shadow.scale = Vector2.ONE * shadow_scale
+	shadow.offset = shadow_offset
+	shadow.setup(self, true)

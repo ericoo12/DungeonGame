@@ -49,8 +49,10 @@ func apply(player: Player) -> void:
 		player.add_orbital(orbital_scene)
 
 	if follower_scene:
+		print("applying follower_scene: ", follower_scene)
 		player.add_follower(follower_scene, follower_trail_delay)
-
+	else:
+		print("follower_scene is NULL on this item")
 	if knockback_bonus != 0.0:
 		player.projectile_knockback = clamp(player.projectile_knockback + knockback_bonus, Player.KNOCKBACK_MIN, Player.KNOCKBACK_MAX)
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_2bwcx"]
 [ext_resource type="Texture2D" uid="uid://b2upq1kotjhgt" path="res://assets/sprites/items/items_icons/lazerlaser.png" id="1_qjd67"]
-[ext_resource type="Resource" uid="uid://c446p5k3olaif" path="res://scenes/items/item_data/laser_shot_style.tres" id="3_ptddd"]
+[ext_resource type="Resource" uid="uid://c446p5k3olaif" path="res://scenes/items/modifiers/laser_shot_style.tres" id="3_ptddd"]
 
 [resource]
 script = ExtResource("1_2bwcx")

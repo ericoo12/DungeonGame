@@ -15,7 +15,6 @@ class_name ToiletBrushEnemy
 @export var projectile_launch_delay: float = 0.15  # tune to match the actual "launch" frame timing
 
 var attack_timer: float = 0.0
-var facing_right: bool = false  # separate from facing_direction, since there's no "right" art to key off of
 var is_lunging: bool = false
 var lunge_direction: Vector2 = Vector2.ZERO
 
@@ -37,6 +36,7 @@ func _ready() -> void:
 	)
 	sprite.play("run_down")
 	set_visual_scale(visual_scale)
+	_spawn_shadow()
 	spawn_timer = spawn_grace_period
 	_update_label()
 

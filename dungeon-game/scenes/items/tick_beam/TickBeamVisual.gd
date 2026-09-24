@@ -28,7 +28,7 @@ var tick_timer: float = 0.0
 var overlapping_bodies: Array[Node] = []
 
 var base_width: float = 6.0
-var max_range: float = 300.0
+var max_range: float = 3000.0
 
 
 func _ready() -> void:

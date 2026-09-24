@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ActiveItem" format=3 uid="uid://r13i4hdrodhn"]
 
-[ext_resource type="Resource" uid="uid://bl8f8a4i7fv4x" path="res://scenes/items/active_item_data/tick_beam_effect.tres" id="1_8koxa"]
+[ext_resource type="Resource" uid="uid://bl8f8a4i7fv4x" path="res://scenes/items/modifiers/tick_beam_effect.tres" id="1_8koxa"]
 [ext_resource type="Script" uid="uid://sjjya86fvnn6" path="res://scripts/items/ActiveItem.gd" id="1_tpwk7"]
 [ext_resource type="Texture2D" uid="uid://ciiftc2rxmtpf" path="res://assets/sprites/items/active_items/lazerturd-icon.png" id="2_8koxa"]
 

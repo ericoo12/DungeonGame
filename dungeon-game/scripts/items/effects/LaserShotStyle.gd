@@ -5,7 +5,7 @@ class_name LaserShotStyle
 extends ShotStyleModifier
 
 # Base values, as tuned on the resource itself.
-@export var base_max_range: float = 300.0
+@export var base_max_range: float = 3000.0
 @export var base_beam_width: float = 6.0
 @export var visual_duration: float = 0.2
 @export var start_offset: float = 2.00
@@ -37,12 +37,16 @@ func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
 	var end_point: Vector2 = start_point + dir * max_range
 
 	if player.laser_ray.is_colliding():
-			end_point = player.laser_ray.get_collision_point()
-			var collider: Object = player.laser_ray.get_collider()
-			if collider and collider.has_method("take_damage"):
-				collider.take_damage(player.get_effective_damage(), dir, player.projectile_knockback)
-
-	# Purely cosmetic — the visual beam is spawned after damage is already
+		end_point = player.laser_ray.get_collision_point()
+		var collider: Object = player.laser_ray.get_collider()
+		print("[LASER] player_pos=", player.global_position, " dir=", dir, " max_range=", max_range,
+		" HIT: ", collider.name if collider else "?", " at dist=", start_point.distance_to(end_point))
+		if collider and collider.has_method("take_damage"):
+			collider.take_damage(player.get_effective_damage(), dir, player.projectile_knockback)
+	else:
+		print("[LASER] player_pos=", player.global_position, " dir=", dir, " max_range=", max_range,
+			" NO HIT — traveled full max_range=", max_range)
+	# Purely cosmetic — the visual beam is spawned after damage is alreadys
 	# resolved above, since this is a hitscan (instant), not a travelling shot.
 	var beam: LaserBeamVisual = BEAM_VISUAL_SCENE.instantiate()
 	player.add_child(beam)

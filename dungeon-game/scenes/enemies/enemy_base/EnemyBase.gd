@@ -4,6 +4,14 @@ class_name EnemyBase
 # --- Enemies sprites ---
 @export var sprite_sheet_path: String
 @export var is_static_visual: bool = false
+
+# --- shadow ---
+const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
+@export var shadow_scale_ratio: float = 1.0    # multiplier on top of visual_scale — tune per enemy if its shadow looks off relative to its sprite
+@export var shadow_offset: Vector2 = Vector2(0, 6)
+
+var shadow: Shadow = null
+
 # --- Stats ---
 @export var max_health: float = 30.0
 @export var move_speed: float = 10.0
@@ -31,7 +39,7 @@ var is_dying: bool = false
 var knockback_velocity: Vector2 = Vector2.ZERO
 
 var facing_direction: String = "down"  # down / left / right / up
-
+var facing_right: bool = false 
 var action_state: String = ""  # "", "attack", "damage" — prevents run animation from overriding attack/damage
 
 # --- Contact damage ticking ---
@@ -65,8 +73,9 @@ func _ready() -> void:
 	else:
 		sprite.sprite_frames = AnimSheetLoader.build_enemy_frames(sprite_sheet_path)
 	sprite.play("run_down")
-	spawn_timer = spawn_grace_period
 	set_visual_scale(visual_scale)
+	_spawn_shadow()
+	spawn_timer = spawn_grace_period
 	_update_label()
 
 
@@ -112,13 +121,28 @@ func set_visual_scale(value: float) -> void:
 	sprite.scale = Vector2.ONE * visual_scale
 	body_collision.scale = Vector2.ONE * visual_scale
 	hitbox_collision.scale = Vector2.ONE * visual_scale
+	if shadow:
+		shadow.scale = Vector2.ONE * visual_scale * shadow_scale_ratio
 
 
 func _update_facing_direction(dir: Vector2) -> void:
 	if abs(dir.x) > abs(dir.y):
-		facing_direction = "right" if dir.x > 0.0 else "left"
+		if dir.x > 0.0:
+			facing_direction = "right"
+			facing_right = false
+		else:
+			facing_direction = "left"
+			facing_right = false
 	else:
 		facing_direction = "down" if dir.y > 0.0 else "up"
+		facing_right = false
+
+	# If this enemy's SpriteFrames has no dedicated "right" art, mirror "left" instead.
+	if facing_direction == "right" and sprite.sprite_frames and not sprite.sprite_frames.has_animation("run_right"):
+		facing_direction = "left"
+		facing_right = true
+
+	sprite.flip_h = facing_right
 
 
 func _play_run_animation() -> void:
@@ -250,3 +274,12 @@ func _deal_damage_to(area: Area2D) -> void:
 	if target and target.has_method("take_damage"):
 		var knockback_dir: Vector2 = target.global_position - global_position
 		target.take_damage(contact_damage, knockback_dir, contact_knockback_strength)
+
+
+func _spawn_shadow() -> void:
+	shadow = SHADOW_SCENE.instantiate()
+	var ground_layer := get_tree().get_first_node_in_group("ground_effects")
+	var target_parent: Node = ground_layer if ground_layer else get_parent()
+	target_parent.add_child(shadow)
+	shadow.offset = shadow_offset
+	shadow.setup(self, true)  # true — shadow dies with the enemy, unlike the player's persistent version

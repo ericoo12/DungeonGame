@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bwl5grm0ecqfm"]
+
+[ext_resource type="PackedScene" uid="uid://bu2hprdcy6fqt" path="res://scenes/rooms/RoomBase.tscn" id="1_rhx33"]
+
+[node name="RoomBase" unique_id=1502560529 instance=ExtResource("1_rhx33")]
+
+[editable path="Doors/North"]
+[editable path="Doors/South"]
+[editable path="Doors/East"]
+[editable path="Doors/West"]

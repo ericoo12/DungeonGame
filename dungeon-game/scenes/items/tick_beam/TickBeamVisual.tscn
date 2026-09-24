@@ -11,6 +11,7 @@ shader_parameter/scroll_speed = 3.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
 
 [node name="TickBeamVisual" type="Node2D" unique_id=694180036]
+scale = Vector2(5, 5)
 script = ExtResource("1_x4c5n")
 
 [node name="Line2D" type="Line2D" parent="." unique_id=814888075]

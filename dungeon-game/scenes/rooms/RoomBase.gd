@@ -13,6 +13,8 @@ var _enemy_count: int = 0
 @onready var stage_door: StageDoor = get_node_or_null("Doors/StageDoor")
 var _is_boss_room: bool = false
 var _entities_container: Node2D = null
+var _current_room_data: RoomData = null
+const ITEM_PICKUP_SCENE := preload("res://scenes/items/ItemPickup.tscn")
 
 func _ready() -> void:
 	for dir in [DungeonGenerator.NORTH, DungeonGenerator.SOUTH, DungeonGenerator.EAST, DungeonGenerator.WEST]:
@@ -22,28 +24,33 @@ func _ready() -> void:
 
 
 func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
-	_apply_floor_variant(dungeon.current_floor_variant)
-	_is_boss_room = room_data.type == RoomData.Type.BOSS
+	_current_room_data = room_data
 	_entities_container = entities_container
-	
+	_apply_floor_variant(dungeon.current_floor_variant)
+
 	for dir in doors.keys():
 		var door: Door = doors[dir]
 		door.direction = dir
 		var has_connection: bool = room_data.doors[dir]
 		door.visible = has_connection
-
 		if has_connection:
-			door.set_unlocked(room_data.cleared)
+			door.set_unlocked(room_data.cleared or room_data.type == RoomData.Type.ITEM)
 		else:
-			door.set_unlocked(false)  # no room this direction — stays solid, like a normal wall segment
+			door.set_unlocked(false)
+
+	if room_data.type == RoomData.Type.BOSS and room_data.stage_door_activated and stage_door:
+		stage_door.activate()
 
 	if room_data.cleared or room_data.type == RoomData.Type.START:
 		return
 
 	if room_data.type == RoomData.Type.BOSS:
 		_spawn_boss(dungeon, entities_container)
+	elif room_data.type == RoomData.Type.ITEM:
+		_spawn_pickup(room_data, dungeon)
 	else:
 		_spawn_enemies(distance, dungeon, entities_container)
+		
 
 
 func _spawn_enemies(distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
@@ -85,6 +92,7 @@ func _on_enemy_removed() -> void:
 		room_cleared.emit()
 		if stage_door:
 			stage_door.activate()
+			_current_room_data.stage_door_activated = true
 
 
 func _unlock_all_doors() -> void:
@@ -143,3 +151,39 @@ func _spawn_stage_door() -> void:
 	var door := Dungeon.STAGE_DOOR_SCENE.instantiate()
 	_entities_container.add_child(door)
 	door.global_position = spawn_pos
+
+
+func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
+	var chosen_item: ItemBase
+
+	if room_data.assigned_item:
+		chosen_item = room_data.assigned_item
+	else:
+		var available: Array[ItemBase] = []
+		for candidate in dungeon.item_pool:
+			if not GameState.picked_up_items.has(candidate):
+				available.append(candidate)
+
+		if available.is_empty():
+			return
+
+		chosen_item = available[randi() % available.size()]
+		room_data.assigned_item = chosen_item
+		GameState.picked_up_items.append(chosen_item)
+
+	var spawn_points := get_tree().get_nodes_in_group("enemy_spawn_points")
+	var local_points: Array = []
+	for p in spawn_points:
+		if is_ancestor_of(p):
+			local_points.append(p)
+	var spawn_pos: Vector2 = local_points[0].global_position if local_points.size() > 0 else global_position
+
+	var pickup: ItemPickup = ITEM_PICKUP_SCENE.instantiate()
+	_entities_container.add_child(pickup)
+	pickup.global_position = spawn_pos
+	pickup.setup(chosen_item)
+	pickup.item_taken.connect(func():
+		room_data.cleared = true
+		room_cleared.emit()
+	)
+	

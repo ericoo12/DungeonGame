@@ -1,6 +1,8 @@
 extends Area2D
 class_name ItemPickup
 
+signal item_taken
+
 @export var item: ItemBase
 @export var display_size: float = 16.0
 
@@ -8,7 +10,16 @@ class_name ItemPickup
 
 
 func _ready() -> void:
+	add_to_group("item_pickups")
 	body_entered.connect(_on_body_entered)
+	_update_visual()
+
+func setup(new_item: ItemBase) -> void:
+	item = new_item
+	if is_inside_tree():
+		_update_visual()
+
+func _update_visual() -> void:
 	if item and item.icon:
 		sprite.texture = item.icon
 		var tex_size := item.icon.get_size()
@@ -19,10 +30,9 @@ func _ready() -> void:
 func _on_body_entered(body: Node) -> void:
 	if not body.has_method("add_item"):
 		return
-	# ActiveItems route to a separate slot/cooldown system; everything else
-	# is a passive Item applied immediately.
 	if item is ActiveItem:
 		body.add_active_item(item)
 	else:
 		body.add_item(item)
+	item_taken.emit()
 	queue_free()

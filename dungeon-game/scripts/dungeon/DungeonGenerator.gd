@@ -39,7 +39,7 @@ static func generate(room_count: int) -> Dictionary:
 	_assign_doors(layout)
 	var distances: Dictionary = _bfs_distances(layout, start_pos)
 	_assign_boss_room_from_distances(layout, distances)
-
+	_assign_item_room_from_distances(layout, distances)
 	return {"layout": layout, "distances": distances}
 
 
@@ -92,3 +92,29 @@ static func _bfs_distances(layout: Dictionary, start_pos: Vector2i) -> Dictionar
 				distances[neighbor] = distances[current] + 1
 				queue.append(neighbor)
 	return distances
+
+
+static func _assign_item_room_from_distances(layout: Dictionary, distances: Dictionary) -> void:
+	var best_pos: Vector2i = Vector2i.ZERO
+	var best_dist := -1
+
+	for pos in layout.keys():
+		var data: RoomData = layout[pos]
+		if data.type != RoomData.Type.NORMAL:  # skips START/BOSS automatically — boss is already reassigned by this point
+			continue
+		var connections := 0
+		for dir in DIRECTIONS:
+			if data.doors[dir]:
+				connections += 1
+		if connections == 1 and distances.get(pos, 0) > best_dist:
+			best_dist = distances[pos]
+			best_pos = pos
+
+	if best_dist == -1:
+		for pos in layout.keys():
+			if layout[pos].type == RoomData.Type.NORMAL and distances.get(pos, 0) > best_dist:
+				best_dist = distances[pos]
+				best_pos = pos
+
+	if layout.has(best_pos):
+		layout[best_pos].type = RoomData.Type.ITEM
