@@ -7,6 +7,7 @@ class_name Projectile
 @export var lifetime: float = 1.0
 @export var knockback_strength: float = 50.0
 @export var rise_duration: float = 0.08
+@export var speed_multiplier: float = 1.0
 
 var direction: Vector2 = Vector2.RIGHT
 
@@ -19,6 +20,13 @@ const PROJECTILE_SHADOW_OFFSET := Vector2(0, 8)
 @export var flight_height: float = 1.0
 @export var sink_depth: float = 6.0
 @export var fall_start_ratio: float = 0.75
+
+
+# --- Visuals (override these in inherited scenes like ChargedProjectile.tscn) ---
+@export_file("*.png") var sprite_sheet_path: String = "res://assets/sprites/player/projectiles/projectile.png"
+@export var sprite_frame_count: int = 4
+@export var sprite_fps: float = 10.0
+
 
 var velocity: Vector2 = Vector2.ZERO
 var elapsed: float = 0.0
@@ -36,13 +44,13 @@ func _ready() -> void:
 	monitoring = false
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
+	sprite.sprite_frames = AnimSheetLoader.build_single_animation(
+		sprite_sheet_path, sprite_frame_count, sprite_fps, true
+	)
+	sprite.play("splash")
 	_spawn_shadow()
 	await get_tree().physics_frame
 	monitoring = true
-	sprite.sprite_frames = AnimSheetLoader.build_single_animation(
-		"res://assets/sprites/player/projectile.png", 4, 10.0, true
-	)
-	sprite.play("splash")
 	add_to_group("projectiles")
 
 func launch(aim_dir: Vector2, shooter_velocity: Vector2) -> void:
@@ -50,7 +58,8 @@ func launch(aim_dir: Vector2, shooter_velocity: Vector2) -> void:
 	var parallel_component: Vector2 = aim_dir * max(parallel_speed, 0.0)
 	var perpendicular_component: Vector2 = shooter_velocity - aim_dir * parallel_speed
 	var momentum: Vector2 = (parallel_component + perpendicular_component) * momentum_influence
-	velocity = aim_dir * base_speed + momentum
+	velocity = aim_dir * base_speed * speed_multiplier + momentum
+	sprite_rotator.rotation = velocity.angle()
 
 
 func _physics_process(delta: float) -> void:

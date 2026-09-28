@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dus84rqolvfrl"]
+
+[ext_resource type="Script" uid="uid://gr1sb0e0sjsy" path="res://scenes/items/charge_shot/ChargeShot.gd" id="1_e0cm6"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_e78p1"]
+[ext_resource type="PackedScene" uid="uid://dmk3mogyn4tqk" path="res://scenes/items/charge_shot/charged_projectile.tscn" id="1_n7dxn"]
+[ext_resource type="Texture2D" uid="uid://bg1hfw7hdsqdk" path="res://assets/sprites/items/items_icons/grannys_pants_icon.png" id="2_ggv54"]
+
+[sub_resource type="Resource" id="Resource_e0cm6"]
+script = ExtResource("1_e0cm6")
+projectile_scene = ExtResource("1_n7dxn")
+metadata/_custom_type_script = "uid://gr1sb0e0sjsy"
+
+[resource]
+script = ExtResource("1_e78p1")
+charge_shot = SubResource("Resource_e0cm6")
+item_name = "Grannys pants"
+description = "Charge up to shoot Grannys pants"
+icon = ExtResource("2_ggv54")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

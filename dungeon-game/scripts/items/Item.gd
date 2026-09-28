@@ -14,6 +14,12 @@ extends ItemBase
 @export var range_bonus: float = 0.0	# common +0.2, uncommon +0.4, rare +0.8, bad -0.3
 @export var size_bonus: float = 0.0	# common +0.15, uncommon +0.3, rare +0.5, bad -0.2
 @export var player_size_bonus: float = 0.0	# common -0.1, rare -0.2, bad 0.2
+@export var shot_speed_bonus: float = 0.0
+
+# --- Multiplicative stat bonuses
+@export var fire_rate_multiplier: float = 1.0       # >1 = fires faster, e.g. 5.5 = 5.5x faster
+@export var damage_multiplier: float = 1.0          # <1 = weaker shots, e.g. 0.2 = keep 20% (-80%)
+@export var projectile_size_multiplier: float = 1.0 # <1 = smaller shots, e.g. 0.5 = half size
 
 # --- Orbital companion (spawns a persistent Orbital instance) ---
 @export var orbital_scene: PackedScene
@@ -31,7 +37,11 @@ extends ItemBase
 # via Player.fire_single_shot().
 @export var shot_style: ShotStyleModifier
 @export var shot_pattern_modifier: ShotPatternModifier
+@export var charge_shot: ChargeShotSettings
 
+#--- Cosmetics ---
+@export var cosmetic_scene: PackedScene
+@export_enum("Head", "Face", "Neck", "Body", "Back", "LeftHand", "RightHand", "Feet", "Aura", "Trail") var cosmetic_slot: String = ""
 
 func apply(player: Player) -> void:
 	if max_hearts_bonus != 0:
@@ -49,10 +59,8 @@ func apply(player: Player) -> void:
 		player.add_orbital(orbital_scene)
 
 	if follower_scene:
-		print("applying follower_scene: ", follower_scene)
 		player.add_follower(follower_scene, follower_trail_delay)
-	else:
-		print("follower_scene is NULL on this item")
+		
 	if knockback_bonus != 0.0:
 		player.projectile_knockback = clamp(player.projectile_knockback + knockback_bonus, Player.KNOCKBACK_MIN, Player.KNOCKBACK_MAX)
 
@@ -72,6 +80,25 @@ func apply(player: Player) -> void:
 
 	if knockback_bonus != 0.0 or range_bonus != 0.0 or size_bonus != 0.0:
 		player.resync_shot_style()
+		
+	if fire_rate_multiplier != 1.0:
+		player.fire_rate = clamp(player.fire_rate / fire_rate_multiplier, 0.05, 2.0)
+
+	if damage_multiplier != 1.0:
+		player.damage_multiplier = clamp(player.damage_multiplier * damage_multiplier, 0.05, 5.0)
+
+	if projectile_size_multiplier != 1.0:
+		player.projectile_size = clamp(player.projectile_size * projectile_size_multiplier, Player.PROJECTILE_SIZE_MIN, Player.PROJECTILE_SIZE_MAX)
+	
+	if shot_speed_bonus != 0.0:
+		player.shot_speed = clamp(player.shot_speed + shot_speed_bonus, Player.SHOT_SPEED_MIN, Player.SHOT_SPEED_MAX)
+	
+	if cosmetic_scene:
+		player.add_cosmetic(cosmetic_scene, cosmetic_slot)
+	
+	if charge_shot:
+		player.charge_shot = charge_shot
+
 
 
 ## Builds the "+2 Damage" / "+0.5 Speed" style summary shown in the item overlay's

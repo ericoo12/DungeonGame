@@ -5,7 +5,8 @@
 
 [resource]
 script = ExtResource("1_m2idp")
-max_hearts_bonus = 1
+damage_bonus = 1
+range_bonus = 1.5
 item_name = "Red Syringe"
 description = "Adds a heart"
 icon = ExtResource("1_nx8hd")

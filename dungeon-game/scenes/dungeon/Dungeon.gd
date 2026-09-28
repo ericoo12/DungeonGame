@@ -129,10 +129,10 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 
 	current_room = scene.instantiate()
 	room_container.add_child(current_room)
+	current_grid_pos = grid_pos   # moved up from further down
 	current_room.setup(data, room_distances.get(grid_pos, 0), self, entities)
 	current_room.room_cleared.connect(func(): data.cleared = true)
 
-	current_grid_pos = grid_pos
 
 	
 	var entrance_direction := entered_from * -1
@@ -172,3 +172,9 @@ func _load_items_from_folder(path: String) -> Array[ItemBase]:
 	dir.list_dir_end()
 
 	return result
+
+
+## Returns the RoomData.Type of the room next to the current one, or -1 if there's none.
+func get_neighbor_type(direction: Vector2i) -> int:
+	var data: RoomData = layout.get(current_grid_pos + direction)
+	return data.type if data else -1

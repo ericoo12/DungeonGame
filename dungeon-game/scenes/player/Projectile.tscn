@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cvj16on4ao6qg"]
 
 [ext_resource type="Script" uid="uid://duyp37g425je7" path="res://scenes/player/Projectile.gd" id="1_sfprp"]
-[ext_resource type="Texture2D" uid="uid://clopm4jcwf4il" path="res://assets/sprites/player/projectile.png" id="2_k3qbq"]
+[ext_resource type="Texture2D" uid="uid://clopm4jcwf4il" path="res://assets/sprites/player/projectiles/projectile.png" id="2_k3qbq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ng0gt"]
 

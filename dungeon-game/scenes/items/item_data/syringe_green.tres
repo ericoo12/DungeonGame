@@ -5,7 +5,9 @@
 
 [resource]
 script = ExtResource("1_rxsmm")
-damage_bonus = 1
+speed_bonus = 30.0
+range_bonus = 1.5
+shot_speed_bonus = 0.2
 item_name = "Green Syringe"
 description = "Damage Up"
 icon = ExtResource("1_ccgyq")

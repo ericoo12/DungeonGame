@@ -39,13 +39,8 @@ func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
 	if player.laser_ray.is_colliding():
 		end_point = player.laser_ray.get_collision_point()
 		var collider: Object = player.laser_ray.get_collider()
-		print("[LASER] player_pos=", player.global_position, " dir=", dir, " max_range=", max_range,
-		" HIT: ", collider.name if collider else "?", " at dist=", start_point.distance_to(end_point))
 		if collider and collider.has_method("take_damage"):
 			collider.take_damage(player.get_effective_damage(), dir, player.projectile_knockback)
-	else:
-		print("[LASER] player_pos=", player.global_position, " dir=", dir, " max_range=", max_range,
-			" NO HIT — traveled full max_range=", max_range)
 	# Purely cosmetic — the visual beam is spawned after damage is alreadys
 	# resolved above, since this is a hitscan (instant), not a travelling shot.
 	var beam: LaserBeamVisual = BEAM_VISUAL_SCENE.instantiate()

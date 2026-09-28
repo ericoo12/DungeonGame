@@ -5,8 +5,9 @@
 
 [resource]
 script = ExtResource("1_6fytt")
-damage_bonus = -1
-fire_rate_bonus = 0.3
+fire_rate_multiplier = 5.5
+damage_multiplier = 0.2
+projectile_size_multiplier = 0.5
 item_name = "Plum Juice"
 description = "Fire rate Up but lowers damage"
 icon = ExtResource("1_ehbpv")

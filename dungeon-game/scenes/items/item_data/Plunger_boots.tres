@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dw6yfvk81vfdv"]
+
+[ext_resource type="PackedScene" uid="uid://dlk384qoemye5" path="res://scenes/items/cosmetics/plunger_boots/PlungerBootsCosmetics.tscn" id="1_mpe7k"]
+[ext_resource type="Texture2D" uid="uid://cx6bysl4lh6st" path="res://assets/sprites/player/cosmetics/plunger_boots/plunger_boots_icon_64.png" id="2_khkai"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="3_aopnq"]
+
+[resource]
+script = ExtResource("3_aopnq")
+speed_bonus = 15.0
+knockback_bonus = 40.0
+cosmetic_scene = ExtResource("1_mpe7k")
+cosmetic_slot = "Feet"
+item_name = "Plunger boots"
+description = "speed + knockback"
+icon = ExtResource("2_khkai")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

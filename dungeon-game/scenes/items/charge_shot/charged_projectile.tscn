@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dmk3mogyn4tqk"]
+
+[ext_resource type="PackedScene" uid="uid://cvj16on4ao6qg" path="res://scenes/player/Projectile.tscn" id="1_50twd"]
+
+[node name="Projectile" unique_id=1024599485 instance=ExtResource("1_50twd")]
+sprite_sheet_path = "uid://d24vyn8vtl7jq"

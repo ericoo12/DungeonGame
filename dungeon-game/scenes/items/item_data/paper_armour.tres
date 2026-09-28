@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://c5ttmqjoq74x8"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_edauh"]
+[ext_resource type="PackedScene" uid="uid://dips8lyefv45e" path="res://scenes/items/cosmetics/paper_armour/PaperArmour.tscn" id="1_ypi41"]
+[ext_resource type="Texture2D" uid="uid://bflmo20h0revs" path="res://assets/sprites/player/cosmetics/paper_armour/paper_armour_icon.png" id="2_ypi41"]
+
+[resource]
+script = ExtResource("1_edauh")
+max_hearts_bonus = 2
+speed_bonus = -25.0
+cosmetic_scene = ExtResource("1_ypi41")
+cosmetic_slot = "Body"
+item_name = "Paper armour"
+description = "More health, less speed"
+icon = ExtResource("2_ypi41")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

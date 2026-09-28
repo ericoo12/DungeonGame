@@ -35,6 +35,7 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 		door.visible = has_connection
 		if has_connection:
 			door.set_unlocked(room_data.cleared or room_data.type == RoomData.Type.ITEM)
+			door.set_style(_door_style(room_data.type, dungeon.get_neighbor_type(dir)))
 		else:
 			door.set_unlocked(false)
 
@@ -187,3 +188,11 @@ func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
 		room_cleared.emit()
 	)
 	
+
+## Neighbor's type wins, so a door INTO a special room shows its style. If the neighbor
+## is normal, the current room's type is used, so doors INSIDE a special room match it.
+func _door_style(own_type: int, neighbor_type: int) -> Door.Style:
+	for t in [neighbor_type, own_type]:
+		if t == RoomData.Type.BOSS: return Door.Style.BOSS
+		if t == RoomData.Type.ITEM: return Door.Style.ITEM
+	return Door.Style.NORMAL

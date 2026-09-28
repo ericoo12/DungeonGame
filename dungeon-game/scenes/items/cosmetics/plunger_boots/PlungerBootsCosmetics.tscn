@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dlk384qoemye5"]
+
+[ext_resource type="Script" uid="uid://fnd80qe6xgty" path="res://scenes/items/cosmetics/plunger_boots/PlungerBootsCosmetics.gd" id="1_5l2cn"]
+
+[node name="PlungerBootsCosmetics" type="Node2D" unique_id=1157134703]
+z_index = 1
+script = ExtResource("1_5l2cn")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=405031489]

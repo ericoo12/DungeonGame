@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dips8lyefv45e"]
+
+[ext_resource type="Script" uid="uid://imihmbh1i76d" path="res://scenes/items/cosmetics/paper_armour/PaperArmour.gd" id="1_f3uq0"]
+
+[node name="PaperArmour" type="Node2D" unique_id=734560736]
+script = ExtResource("1_f3uq0")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2033090440]

@@ -3,43 +3,49 @@ extends RefCounted
 
 
 # ============================================================
-# PLAYER - CAPTAIN FILLING (two-layer body system)
+# PLAYER - CAPTAIN FILLING
+# Lower body: animated legs (idle + run per direction, 2-row grid, one file per direction).
+# Upper body: static torso/head/arm textures, assembled in Player.gd.
 # ============================================================
 
-## Lower body (hips/legs/feet) and upper body (torso/arms/head) animate and
-## flip independently, composited together in Player.tscn. Lower has idle+run
-## per direction (2-row grid, one file per direction); upper has idle+attack
-## per direction (separate single-row files).
-static func build_layered_body_frames() -> Dictionary:
+static func build_lower_body_frames() -> SpriteFrames:
 	var lower := SpriteFrames.new()
 	lower.remove_animation("default")
-	var upper := SpriteFrames.new()
-	upper.remove_animation("default")
 
 	const LOWER_PATH := "res://assets/sprites/player/Filling2/Lower/"
-	const UPPER_PATH := "res://assets/sprites/player/Filling2/Upper/"
 
-	# --- Lower body ---
-	_add_2row_anim(lower, "idle_down", LOWER_PATH + "front_aligned.png", 0, [0], 6.0, true)
-	_add_2row_anim(lower, "run_down",  LOWER_PATH + "front_aligned.png", 1, [0, 1, 2, 3], 8.0, true)
+	_add_2row_anim(lower, "idle_down", LOWER_PATH + "front_lower.png", 0, [0], 6.0, true)
+	_add_2row_anim(lower, "run_down",  LOWER_PATH + "front_lower.png", 1, [0, 1, 2, 3], 8.0, true)
 
-	_add_2row_anim(lower, "idle_left", LOWER_PATH + "left_aligned.png", 0, [0], 6.0, true)
-	_add_2row_anim(lower, "run_left",  LOWER_PATH + "left_aligned.png", 1, [0, 1, 3, 2], 12.0, true)
+	_add_2row_anim(lower, "idle_left", LOWER_PATH + "left_lower.png", 0, [0], 6.0, true)
+	_add_2row_anim(lower, "run_left",  LOWER_PATH + "left_lower.png", 1, [0, 1, 3, 2], 12.0, true)
 
-	_add_2row_anim(lower, "idle_up", LOWER_PATH + "up_aligned.png", 0, [0], 6.0, true)
-	_add_2row_anim(lower, "run_up",  LOWER_PATH + "up_aligned.png", 1, [0, 1, 2, 3], 4.0, true)
+	_add_2row_anim(lower, "idle_up", LOWER_PATH + "up_lower.png", 0, [0], 6.0, true)
+	_add_2row_anim(lower, "run_up",  LOWER_PATH + "up_lower.png", 1, [0, 1, 2, 3], 4.0, true)
 
-	# --- Upper body: idle ---
-	_add_player_anim(upper, "idle_down", UPPER_PATH + "idle_down_aligned.png", [0, 1, 2, 3], 6.0, true)
-	_add_player_anim(upper, "idle_left", UPPER_PATH + "captain_filling_upper_idle_left_aligned.png", [0, 1, 2, 3], 6.0, true)
-	_add_player_anim(upper, "idle_up",   UPPER_PATH + "captain_filling_upper_idle_up_aligned.png",   [0, 1, 2, 3], 6.0, true)
+	return lower
 
-	# --- Upper body: attack ---
-	_add_player_anim(upper, "attack_down", UPPER_PATH + "attack_front.png", [0, 1, 2, 3], 8.0, false)
-	_add_player_anim(upper, "attack_left", UPPER_PATH + "attack_left2.png", [0, 1, 2, 3], 8.0, false)
-	_add_player_anim(upper, "attack_up",   UPPER_PATH + "attack_up.png",   [0, 1, 2, 3], 8.0, false)
 
-	return {"lower": lower, "upper": upper}
+## Returns {"torso": {dir: Texture2D}, "head": {...}, "arm": {...}, "offarm": {...}} for
+## down/left/up. Right is left with flip_h, handled in Player.gd.
+## Plain textures, not SpriteFrames — these pieces don't animate.
+static func build_body_part_textures() -> Dictionary:
+	const BODY_PATH := "res://assets/sprites/player/Filling3/"
+
+	var result := {"torso": {}, "head": {}, "arm": {}, "offarm": {}}
+	for dir in ["down", "left", "up"]:
+		result.torso[dir] = _load_texture(BODY_PATH + "torso_%s.png" % dir)
+		result.head[dir] = _load_texture(BODY_PATH + "head_%s.png" % dir)
+		result.arm[dir] = _load_texture(BODY_PATH + "arm_%s.png" % dir)
+		result.offarm[dir] = _load_texture(BODY_PATH + "offarm_%s.png" % dir)
+	return result
+
+
+static func _load_texture(path: String) -> Texture2D:
+	var tex := load(path) as Texture2D
+	if tex == null:
+		push_error("AnimSheetLoader: could not load texture: " + path)
+	return tex
 
 
 static func _add_player_anim(frames: SpriteFrames, anim_name: String, path: String, frame_indices: Array, fps: float, loop: bool, source_columns: int = 4) -> void:
@@ -218,7 +224,7 @@ static func build_single_animation(path: String, frame_count: int, fps: float, l
 	return frames
 	
 	
-	## Same as build_single_animation, but takes explicit frame_indices instead of
+## Same as build_single_animation, but takes explicit frame_indices instead of
 ## a plain count — lets you skip/reorder/loop a specific subset of frames.
 static func build_single_animation_indexed(path: String, frame_indices: Array, source_columns: int, fps: float, loop: bool = true, animation_name: String = "splash") -> SpriteFrames:
 	var frames := SpriteFrames.new()
@@ -241,5 +247,19 @@ static func build_single_animation_indexed(path: String, frame_indices: Array, s
 		atlas.atlas = tex
 		atlas.region = Rect2(i * frame_width, 0, frame_width, frame_height)
 		frames.add_frame(animation_name, atlas)
+
+	return frames
+
+
+static func build_cosmetic_2row_frames(down_path: String, left_path: String, up_path: String) -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+
+	_add_2row_anim(frames, "idle_down", down_path, 0, [0, 1, 2, 3], 6.0, true)
+	_add_2row_anim(frames, "run_down",  down_path, 1, [0, 1, 2, 3], 8.0, true)
+	_add_2row_anim(frames, "idle_left", left_path, 0, [0, 1, 2, 3], 6.0, true)
+	_add_2row_anim(frames, "run_left",  left_path, 1, [0, 1, 2, 3], 8.0, true)
+	_add_2row_anim(frames, "idle_up",   up_path,   0, [0, 1, 2, 3], 6.0, true)
+	_add_2row_anim(frames, "run_up",    up_path,   1, [0, 1, 2, 3], 8.0, true)
 
 	return frames

@@ -20,10 +20,9 @@ var is_dying: bool = false
 @onready var hurtbox: Area2D = $HurtBox
 @onready var body_collision: CollisionShape2D = $wallCollision
 @onready var hurtbox_collision: CollisionShape2D = $HurtBox/EnemyCollision
-const PLAYER_SIZE_MIN := 0.0001
+const PLAYER_SIZE_MIN := 0.001
 const PLAYER_SIZE_MAX := 2.0
 @onready var lower_sprite: AnimatedSprite2D = $LowerBodySprite
-@onready var upper_sprite: AnimatedSprite2D = $UpperBodySprite
 var body_collision_base_position: Vector2 = Vector2.ZERO
 var hurtbox_collision_base_position: Vector2 = Vector2.ZERO
 var hurtbox_base_position: Vector2 = Vector2.ZERO
@@ -41,23 +40,39 @@ var last_true_aim_dir: Vector2 = Vector2.DOWN  # actual shooting direction, kept
 @export var allow_diagonal_shooting: bool = false
 var shoot_timer: float = 0.0
 var shoot_cooldown: float = 0.0
-const SHOOT_POSE_DURATION := 0.33  # Captain Filling's throw animation: 5 frames @ 10 FPS ≈ 0.5s
+const SHOOT_POSE_DURATION := 0.33  # how long he keeps facing the shot direction after firing
 const PROJECTILE_SCENE := preload("res://scenes/player/Projectile.tscn")
 
+# --- Charge shot (set by items with a ChargeShotSettings) ---
+var charge_shot: ChargeShotSettings = null
+var charge_held: float = 0.0
+var charge_aim: Vector2 = Vector2.DOWN
+var charge_damage_mult: float = 1.0
+var charge_size_mult: float = 1.0
+var charge_knockback_mult: float = 1.0
+var charge_speed_mult: float = 1.0
+const CHARGE_GLOW_COLOR := Color(1.6, 1.3, 0.6)
+var charge_projectile_scene: PackedScene = null
 # --- Projectile modifiers ---
-@export var projectile_knockback: float = 100.0
 @export var projectile_range: float = 1.0
-@export var projectile_size: float = 1.0
-const KNOCKBACK_MIN := 0.0
-const KNOCKBACK_MAX := 500.0
 const RANGE_MIN := 0.3
 const RANGE_MAX := 4.0
+
+@export var projectile_size: float = 1.0
 const PROJECTILE_SIZE_MIN := 0.3
 const PROJECTILE_SIZE_MAX := 3.0
 
+@export var projectile_knockback: float = 100.0
+const KNOCKBACK_MIN := 0.0
+const KNOCKBACK_MAX := 500.0
+
+@export var shot_speed: float = 1.0
+const SHOT_SPEED_MIN := 0.3
+const SHOT_SPEED_MAX := 3.0
 # --- Damage ---
 @export var base_damage: float = 3.5
 var damage_ups: int = 0
+var damage_multiplier: float = 1.0
 
 # --- Weapon composition ---
 var shot_style: ShotStyleModifier = null
@@ -86,38 +101,138 @@ const MAX_HISTORY_AGE := 3.0
 @onready var weapon_marker: Marker2D = $WeaponMarker
 @onready var laser_ray: RayCast2D = $LaserRay
 
-const UPPER_ANIM_TRANSFORM := {
-	"idle_down":   {"scale": 1.0, "offset": Vector2(-5.0, -5.0)},
-	"attack_down": {"scale": 0.9, "offset": Vector2(-10.0, 5.0)},
-	
-	"idle_left":   {"scale": 1.0, "offset": Vector2(0.0, 5.0)},
-	"attack_left": {"scale": 1.0, "offset": Vector2(-15.0, 15.0)},
-	
-	"idle_right":  {"scale": 1.0, "offset": Vector2(-15.0, 5.0)},
-	"attack_right":{"scale": 1.0, "offset": Vector2(0.0, 15.0)},
-	
-	"idle_up":     {"scale": 1.0, "offset": Vector2(-5.0, 0.0)},
-	"attack_up":   {"scale": 0.9, "offset": Vector2(-10.0, 0.0)},
-}
-
+# --- Lower body ---
 const LOWER_ANIM_TRANSFORM := {
-	"idle_down": {"scale": 1.0, "offset": Vector2.ZERO},
-	"run_down":  {"scale": 1.0, "offset": Vector2.ZERO},
+	"idle_down": {"scale": 0.75, "offset": Vector2.ZERO},
+	"run_down":  {"scale": 0.75, "offset": Vector2.ZERO},
 	
-	"idle_left": {"scale": 1.0, "offset": Vector2.ZERO},
-	"run_left":  {"scale": 1.0, "offset": Vector2(5.0, 0.0)},
+	"idle_left": {"scale": 0.75, "offset": Vector2.ZERO},
+	"run_left":  {"scale": 0.75, "offset": Vector2(5.0, 0.0)},
 	
-	"idle_right": {"scale": 1.0, "offset": Vector2.ZERO},
-	"run_right":  {"scale": 1.0, "offset": Vector2(-5.0, 0.0)},
+	"idle_right": {"scale": 0.75, "offset": Vector2.ZERO},
+	"run_right":  {"scale": 0.75, "offset": Vector2(-5.0, 0.0)},
 	
-	"idle_up":   {"scale": 1.0, "offset": Vector2.ZERO},
-	"run_up":    {"scale": 1.0, "offset": Vector2(0.0, 0.0)},  # run_up's legs extend ~27px higher than idle_up — shift down to compensate
+	"idle_up":   {"scale": 0.75, "offset": Vector2.ZERO},
+	"run_up":    {"scale": 0.75, "offset": Vector2(0.0, 0.0)},  # run_up's legs extend ~27px higher than idle_up — shift down to compensate
 }
 
-var lower_base_position: Vector2 = Vector2.ZERO  # set once in _ready(), same pattern as upper_base_position
+var lower_base_position: Vector2 = Vector2.ZERO  # set once in _ready()
 
-var upper_base_position: Vector2 = Vector2.ZERO  
+const BODY_TEXTURE_SCALE := 256.0 / 1254.0
+const BODY_Z_INDEX := 1  # draws above the lower body (z 0)
 
+# Shoulder-joint pivot of each arm texture, in arm-texture pixels. Puts the shoulder
+# on the arm node's origin so position = where the shoulder is and the recoil rotates
+# around it. Measured from the art — only change this if the arm art changes.
+# Right uses left with X negated (flip_h doesn't mirror Sprite2D.offset by itself).
+const ARM_PIVOT := {
+	"down": Vector2(9, 116),
+	"left": Vector2(-246, -8),
+	"up":   Vector2(-13, -143),
+}
+
+# Arm reaction when shooting
+const ARM_KICK_DISTANCE := 6.0        # head-pixels, pushed opposite the aim direction
+const ARM_KICK_ROTATION := 0.25       # radians of muzzle rise, side views only
+const ARM_KICK_RETURN_TIME := 0.15
+const ARM_FLASH_COLOR := Color(1.8, 1.8, 1.8)
+
+## Where the whole upper body sits relative to the player root, in head-pixels.
+@export var body_offset: Vector2 = Vector2(0, 0)
+
+@export_group("Body Pose: Down", "down_")
+@export var down_torso_pos: Vector2 = Vector2(0, 5)
+@export_range(0.1, 3.0, 0.01) var down_torso_scale: float = 0.75
+@export var down_head_pos: Vector2 = Vector2(0, 0)
+@export_range(0.1, 3.0, 0.01) var down_head_scale: float = 1.0
+@export var down_arm_pos: Vector2 = Vector2(-40, -4)
+@export_range(0.1, 3.0, 0.01) var down_arm_scale: float = 0.9
+@export var down_arm_behind: bool = false
+@export_range(0.0, 1.0, 0.01) var down_arm_shade: float = 1.0
+@export var down_offarm_pos: Vector2 = Vector2(36, -10)
+@export_range(0.1, 3.0, 0.01) var down_offarm_scale: float = 0.9
+@export var down_offarm_behind: bool = false
+@export_range(0.0, 1.0, 0.01) var down_offarm_shade: float = 1.0
+
+@export_group("Body Pose: Left", "left_")
+@export var left_torso_pos: Vector2 = Vector2(5.0, 8.0)
+@export_range(0.1, 3.0, 0.01) var left_torso_scale: float = 0.5
+@export var left_head_pos: Vector2 = Vector2(0, 0)
+@export_range(0.1, 3.0, 0.01) var left_head_scale: float = 1.0
+@export var left_arm_pos: Vector2 = Vector2(10, 6)
+@export_range(0.1, 3.0, 0.01) var left_arm_scale: float = 0.75
+@export var left_arm_behind: bool = true
+@export_range(0.0, 1.0, 0.01) var left_arm_shade: float = 0.8
+@export var left_offarm_pos: Vector2 = Vector2(8, -4)
+@export_range(0.1, 3.0, 0.01) var left_offarm_scale: float = 0.8
+@export var left_offarm_behind: bool = false
+@export_range(0.0, 1.0, 0.01) var left_offarm_shade: float = 1.0
+
+@export_group("Body Pose: Right", "right_")
+@export var right_torso_pos: Vector2 = Vector2(-5.0, 8.0)
+@export_range(0.1, 3.0, 0.01) var right_torso_scale: float = 0.5
+@export var right_head_pos: Vector2 = Vector2(0, 0)
+@export_range(0.1, 3.0, 0.01) var right_head_scale: float = 1.0
+@export var right_arm_pos: Vector2 = Vector2(-10, 6)
+@export_range(0.1, 3.0, 0.01) var right_arm_scale: float = 0.75
+@export var right_arm_behind: bool = false
+@export_range(0.0, 1.0, 0.01) var right_arm_shade: float = 1.0
+@export var right_offarm_pos: Vector2 = Vector2(-8, -4)
+@export_range(0.1, 3.0, 0.01) var right_offarm_scale: float = 0.75
+@export var right_offarm_behind: bool = true
+@export_range(0.0, 1.0, 0.01) var right_offarm_shade: float = 0.8
+
+@export_group("Body Pose: Up", "up_")
+@export var up_torso_pos: Vector2 = Vector2(0, 10)
+@export_range(0.1, 3.0, 0.01) var up_torso_scale: float = 0.75
+@export var up_head_pos: Vector2 = Vector2(0, 0)
+@export_range(0.1, 3.0, 0.01) var up_head_scale: float = 1.0
+@export var up_arm_pos: Vector2 = Vector2(40, -4)
+@export_range(0.1, 3.0, 0.01) var up_arm_scale: float = 0.9
+@export var up_arm_behind: bool = true
+@export_range(0.0, 1.0, 0.01) var up_arm_shade: float = 1.0
+@export var up_offarm_pos: Vector2 = Vector2(-36, -10)
+@export_range(0.1, 3.0, 0.01) var up_offarm_scale: float = 0.9
+@export var up_offarm_behind: bool = false
+@export_range(0.0, 1.0, 0.01) var up_offarm_shade: float = 1.0
+
+@export_group("")
+
+@export var down_offarm_visible: bool = true
+@export var left_offarm_visible: bool = true
+@export var right_offarm_visible: bool = false
+@export var up_offarm_visible: bool = true
+var body_root: Node2D
+var torso_sprite: Sprite2D
+var head_sprite: Sprite2D
+var arm_sprite: Sprite2D      # gun arm (his right)
+var offarm_sprite: Sprite2D   # empty-hand arm (his left)
+var body_textures: Dictionary = {}
+var arm_kick: Vector2 = Vector2.ZERO   # tweened back to zero after each shot
+var arm_kick_rot: float = 0.0
+var _arm_tween: Tween
+
+# --- Cosmetics ---
+const COSMETIC_SLOTS := ["Head", "Face", "Neck", "Body", "Back", "LeftHand", "RightHand", "Feet", "Aura", "Trail"]
+var body_overlays: Array[Node2D] = []   # Body-slot cosmetics, drawn over the torso
+# Placeholder positions — tune each by eye per direction, same process as every
+# other offset in this file. Values are LEFT-facing canonical positions;
+# X is automatically mirrored when facing right.
+const SLOT_ANCHOR_OFFSETS := {
+	"Head":      {"down": Vector2(0, -45), "left": Vector2(5, -45), "right": Vector2(-5, -45), "up": Vector2(0, -47)},
+	"Face":      {"down": Vector2(0, -40), "left": Vector2(8, -40), "right": Vector2(-8, -40), "up": Vector2(0, -42)},
+	"Neck":      {"down": Vector2(0, -30), "left": Vector2(5, -30), "right": Vector2(-5, -30), "up": Vector2(0, -32)},
+	"Body":      {"down": Vector2(0, -15), "left": Vector2(0, -15), "right": Vector2(0, -15), "up": Vector2(0, -15)},
+	"Back":      {"down": Vector2(0, -15), "left": Vector2(-8, -15), "right": Vector2(8, -15), "up": Vector2(0, -13)},
+	"LeftHand":  {"down": Vector2(-12, -10), "left": Vector2(-10, -10), "right": Vector2(10, -10), "up": Vector2(-12, -10)},
+	"RightHand": {"down": Vector2(12, -10), "left": Vector2(10, -10), "right": Vector2(-10, -10), "up": Vector2(12, -10)},
+	"Feet":      {"down": Vector2(0, 60), "left": Vector2(0, 50), "right": Vector2(0, 50), "up": Vector2(0, 50)},
+	"Aura":      {"down": Vector2(0, -20), "left": Vector2(0, -20), "right": Vector2(0, -20), "up": Vector2(0, -20)},
+	"Trail":     {"down": Vector2(0, 0), "left": Vector2(0, 0), "right": Vector2(0, 0), "up": Vector2(0, 0)},
+}
+
+var cosmetic_anchors: Dictionary = {}       # slot name -> Node2D anchor
+var equipped_cosmetics: Dictionary = {}     # slot name -> Array[Node2D] instances
 
 func _ready() -> void:
 	add_to_group("player")
@@ -128,18 +243,20 @@ func _ready() -> void:
 	current_hearts = max_hearts
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
 
-	var body_frames: Dictionary = AnimSheetLoader.build_layered_body_frames()
-
-	lower_sprite.sprite_frames = body_frames.lower
-	upper_sprite.sprite_frames = body_frames.upper
-	upper_base_position = upper_sprite.position
+	lower_sprite.sprite_frames = AnimSheetLoader.build_lower_body_frames()
 	lower_base_position = lower_sprite.position
-
 	lower_sprite.play("idle_down")
-	upper_sprite.play("idle_down")
+
+	_build_body()
 
 	_spawn_shadow()
-
+	
+	for slot in COSMETIC_SLOTS:
+		var anchor := Node2D.new()
+		anchor.name = "CosmeticAnchor_" + slot
+		add_child(anchor)
+		cosmetic_anchors[slot] = anchor
+		equipped_cosmetics[slot] = []
 
 func _physics_process(delta: float) -> void:
 	var move_vec := Vector2(
@@ -181,10 +298,18 @@ func _physics_process(delta: float) -> void:
 	if is_shooting:
 		var normalized_aim := aim_vec.normalized()
 		_face_towards(normalized_aim)  # Captain Filling faces the same direction he's shooting
-		if shoot_cooldown <= 0.0:
+		if charge_shot:
+			charge_aim = normalized_aim
+			if shoot_cooldown <= 0.0:
+				charge_held = min(charge_held + delta, _full_charge_time())
+		elif shoot_cooldown <= 0.0:
 			_shoot(normalized_aim, move_vec.length() > 0.0)
+	elif charge_shot and charge_held > 0.0:
+		_release_charge()
 	elif shoot_timer <= 0.0:
 		_update_facing(move_vec)
+
+	_update_charge_glow()
 
 	if active_item_cooldown_timer > 0.0:
 		active_item_cooldown_timer = max(active_item_cooldown_timer - delta, 0.0)
@@ -194,7 +319,7 @@ func _physics_process(delta: float) -> void:
 		active_item.effect.activate(self)
 		active_item_cooldown_timer = active_item.cooldown
 
-	_update_animation(move_vec, is_shooting)
+	_update_animation(move_vec)
 
 
 func _update_facing(move_vec: Vector2) -> void:
@@ -226,14 +351,13 @@ func _face_towards(dir: Vector2) -> void:
 		facing = Facing.UP if normalized_dir.y < 0.0 else Facing.DOWN
 
 
-func _update_animation(move_vec: Vector2, is_shooting: bool) -> void:
-	var dir_suffix := _facing_suffix()
+func _update_animation(move_vec: Vector2) -> void:
+	var anim_dir := _facing_suffix()
 	var flip := (facing == Facing.RIGHT)
-	var anim_dir := dir_suffix
-	var frame_dir := "left" if facing == Facing.RIGHT else dir_suffix
+	var frame_dir := "left" if flip else anim_dir
 
+	# --- Lower body ---
 	lower_sprite.flip_h = flip
-	upper_sprite.flip_h = flip
 
 	var lower_frame_name: String = ("run_" if move_vec.length() > 0.0 else "idle_") + frame_dir
 	lower_sprite.play(lower_frame_name)
@@ -243,36 +367,142 @@ func _update_animation(move_vec: Vector2, is_shooting: bool) -> void:
 	lower_sprite.scale = Vector2.ONE * player_scale * lower_transform.scale
 	lower_sprite.position = (lower_base_position + lower_transform.offset) * player_scale
 
-	var upper_state: String = "attack" if (shoot_timer > 0.0 or is_shooting) else "idle"
-	var upper_frame_name: String = upper_state + "_" + frame_dir
-	if not upper_sprite.sprite_frames.has_animation(upper_frame_name):
-		upper_frame_name = "idle_" + frame_dir
-	upper_sprite.play(upper_frame_name)
+	# --- Upper body ---
+	_update_body(anim_dir, flip)
+	
+	_update_cosmetic_anchors(anim_dir, flip)
 
-	var upper_transform_key: String = upper_state + "_" + anim_dir
-	var upper_transform: Dictionary = UPPER_ANIM_TRANSFORM.get(upper_transform_key, {"scale": 1.0, "offset": Vector2.ZERO})
-	upper_sprite.scale = Vector2.ONE * player_scale * upper_transform.scale
-	upper_sprite.position = (upper_base_position + upper_transform.offset) * player_scale
+
+# ============================================================
+# UPPER BODY functions
+# ============================================================
+
+func _build_body() -> void:
+	body_textures = AnimSheetLoader.build_body_part_textures()
+
+	# Container keeps the pieces together. It is NOT y-sorted, so child order is
+	# draw order: [arms behind..., torso, head, arms in front...] — set in _update_body().
+	body_root = Node2D.new()
+	body_root.name = "Body"
+	body_root.z_index = BODY_Z_INDEX
+	add_child(body_root)
+
+	arm_sprite = _make_body_sprite("ArmSprite")
+	offarm_sprite = _make_body_sprite("OffArmSprite")
+	torso_sprite = _make_body_sprite("TorsoSprite")
+	head_sprite = _make_body_sprite("HeadSprite")
+
+	_update_body("down", false)
+
+
+func _make_body_sprite(node_name: String) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.name = node_name
+	body_root.add_child(sprite)
+	return sprite
+
+
+# Reads one of the exported per-direction pose values, e.g. _pose("left", "arm_pos").
+func _pose(dir: String, key: String) -> Variant:
+	return get("%s_%s" % [dir, key])
+
+
+func _update_body(anim_dir: String, flip: bool) -> void:
+	var tex_dir := "left" if flip else anim_dir
+
+	body_root.position = body_offset * player_scale
+	body_root.scale = Vector2.ONE * player_scale
+
+	torso_sprite.texture = body_textures.torso[tex_dir]
+	head_sprite.texture = body_textures.head[tex_dir]
+	arm_sprite.texture = body_textures.arm[tex_dir]
+	offarm_sprite.texture = body_textures.offarm[tex_dir]
+
+	torso_sprite.flip_h = flip
+	head_sprite.flip_h = flip
+	arm_sprite.flip_h = flip
+	offarm_sprite.flip_h = flip
+
+	# --- Torso / head ---
+	torso_sprite.position = _pose(anim_dir, "torso_pos")
+	torso_sprite.scale = Vector2.ONE * BODY_TEXTURE_SCALE * _pose(anim_dir, "torso_scale")
+	head_sprite.position = _pose(anim_dir, "head_pos")
+	head_sprite.scale = Vector2.ONE * _pose(anim_dir, "head_scale")
+
+	# --- Arm ---
+	var pivot: Vector2 = ARM_PIVOT[tex_dir]
+	if flip:
+		pivot.x = -pivot.x
+	arm_sprite.offset = pivot
+	arm_sprite.position = _pose(anim_dir, "arm_pos") + arm_kick
+	arm_sprite.scale = Vector2.ONE * BODY_TEXTURE_SCALE * _pose(anim_dir, "arm_scale")
+	arm_sprite.rotation = arm_kick_rot
+
+	# self_modulate for the shade, modulate is left free for the shot flash
+	var shade: float = _pose(anim_dir, "arm_shade")
+	arm_sprite.self_modulate = Color(shade, shade, shade)
+
+	# --- Off-hand arm ---
+	# Its art already has the top of the shoulder at the canvas center, so no pivot
+	# offset is needed and it's 256px like the head (no texture scale).
+	offarm_sprite.position = _pose(anim_dir, "offarm_pos")
+	offarm_sprite.scale = Vector2.ONE * _pose(anim_dir, "offarm_scale")
+	var off_shade: float = _pose(anim_dir, "offarm_shade")
+	offarm_sprite.self_modulate = Color(off_shade, off_shade, off_shade)
+	offarm_sprite.visible = _pose(anim_dir, "offarm_visible")
+	# --- Draw order ---
+	var order: Array[Node] = []
+	if _pose(anim_dir, "arm_behind"): order.append(arm_sprite)
+	if _pose(anim_dir, "offarm_behind"): order.append(offarm_sprite)
+	order.append(torso_sprite)
+	for overlay in body_overlays:
+		if is_instance_valid(overlay):
+			order.append(overlay)
+	order.append(head_sprite)
+	if not _pose(anim_dir, "offarm_behind"): order.append(offarm_sprite)
+	if not _pose(anim_dir, "arm_behind"): order.append(arm_sprite)
+	for i in order.size():
+		if order[i].get_index() != i:
+			body_root.move_child(order[i], i)
+
+
+func _play_arm_kick(aim_dir: Vector2) -> void:
+	if _arm_tween and _arm_tween.is_valid():
+		_arm_tween.kill()
+
+	arm_kick = -aim_dir * ARM_KICK_DISTANCE
+	match facing:
+		Facing.LEFT: arm_kick_rot = ARM_KICK_ROTATION    # clockwise = muzzle up when pointing left
+		Facing.RIGHT: arm_kick_rot = -ARM_KICK_ROTATION
+		_: arm_kick_rot = 0.0
+	arm_sprite.modulate = ARM_FLASH_COLOR
+
+	_arm_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_arm_tween.tween_property(self, "arm_kick", Vector2.ZERO, ARM_KICK_RETURN_TIME)
+	_arm_tween.tween_property(self, "arm_kick_rot", 0.0, ARM_KICK_RETURN_TIME)
+	_arm_tween.tween_property(arm_sprite, "modulate", Color.WHITE, ARM_KICK_RETURN_TIME)
 
 
 func _facing_suffix() -> String:
 	match facing:
 		Facing.DOWN: return "down"
 		Facing.LEFT: return "left"
-		Facing.RIGHT: return "right"  # now returns the real direction — mirroring is handled separately in _update_animation()
+		Facing.RIGHT: return "right"  # real direction — mirroring is handled separately via flip
 		Facing.UP: return "up"
 	return "down"
 
 
 func get_effective_damage() -> float:
 	var scaling_input: float = max(0.0, damage_ups * 1.2 + 1.0)
-	return max(0.5, base_damage * sqrt(scaling_input))
+	return max(0.5, base_damage * sqrt(scaling_input)) * damage_multiplier * charge_damage_mult
 
 
 func _shoot(aim_dir: Vector2, is_moving: bool) -> void:
 	shoot_cooldown = fire_rate
 	shoot_timer = SHOOT_POSE_DURATION
 	fire_single_shot(aim_dir)
+	if arm_sprite:
+		_play_arm_kick(aim_dir)
 
 
 func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
@@ -287,11 +517,13 @@ func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
 
 
 func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true) -> void:
-	var projectile := PROJECTILE_SCENE.instantiate()
+	var scene: PackedScene = charge_projectile_scene if charge_projectile_scene else PROJECTILE_SCENE
+	var projectile := scene.instantiate()
 	projectile.damage = get_effective_damage()
-	projectile.knockback_strength = projectile_knockback
+	projectile.knockback_strength = projectile_knockback * charge_knockback_mult
 	projectile.lifetime = projectile_range
-	projectile.scale = Vector2.ONE * projectile_size
+	projectile.speed_multiplier = shot_speed * charge_speed_mult
+	projectile.scale = Vector2.ONE * projectile_size * charge_size_mult
 
 	get_parent().add_child(projectile)
 	projectile.global_position = weapon_marker.global_position + aim_dir * 10
@@ -320,13 +552,13 @@ func _start_invulnerability() -> void:
 	var tween := create_tween()
 	tween.set_loops(5)
 	tween.tween_property(lower_sprite, "modulate:a", 0.3, 0.1)
-	tween.parallel().tween_property(upper_sprite, "modulate:a", 0.3, 0.1)
+	tween.parallel().tween_property(body_root, "modulate:a", 0.3, 0.1)
 	tween.tween_property(lower_sprite, "modulate:a", 1.0, 0.1)
-	tween.parallel().tween_property(upper_sprite, "modulate:a", 1.0, 0.1)
+	tween.parallel().tween_property(body_root, "modulate:a", 1.0, 0.1)
 	await get_tree().create_timer(INVULN_DURATION).timeout
 	invulnerable = false
 	lower_sprite.modulate.a = 1.0
-	upper_sprite.modulate.a = 1.0
+	body_root.modulate.a = 1.0
 
 
 func _die() -> void:
@@ -338,7 +570,6 @@ func _die() -> void:
 	velocity = Vector2.ZERO
 
 	lower_sprite.stop()
-	upper_sprite.stop()
 	await get_tree().create_timer(0.5).timeout
 	GameState.reset()
 	get_tree().reload_current_scene()
@@ -372,7 +603,9 @@ func _recalculate_orbital_spacing() -> void:
 func set_player_scale(value: float) -> void:
 	player_scale = clamp(value, PLAYER_SIZE_MIN, PLAYER_SIZE_MAX)
 	lower_sprite.scale = Vector2.ONE * player_scale
-	upper_sprite.scale = Vector2.ONE * player_scale
+	if body_root:
+		body_root.scale = Vector2.ONE * player_scale
+		body_root.position = body_offset * player_scale
 	body_collision.scale = Vector2.ONE * player_scale
 	hurtbox_collision.scale = Vector2.ONE * player_scale
 	body_collision.position = body_collision_base_position * player_scale
@@ -447,3 +680,84 @@ func reset_followers_position() -> void:
 	for follower in followers:
 		if is_instance_valid(follower):
 			follower.global_position = global_position
+
+func _update_cosmetic_anchors(anim_dir: String, flip: bool) -> void:
+	for slot in COSMETIC_SLOTS:
+		var per_dir: Dictionary = SLOT_ANCHOR_OFFSETS.get(slot, {})
+		var base_offset: Vector2 = per_dir.get(anim_dir, Vector2.ZERO)
+		var offset := base_offset
+		if flip:
+			offset.x = -offset.x
+
+		var anchor: Node2D = cosmetic_anchors[slot]
+		anchor.position = offset * player_scale
+		anchor.scale = Vector2.ONE * player_scale * (-1.0 if (flip and slot in ["Head", "Face"]) else 1.0)
+
+func add_cosmetic(scene: PackedScene, slot: String) -> void:
+	if not cosmetic_anchors.has(slot):
+		push_warning("Player: unknown cosmetic slot '%s'" % slot)
+		return
+	if slot == "Body" and body_root:
+		var overlay := scene.instantiate()
+		body_root.add_child(overlay)
+		body_overlays.append(overlay)
+		equipped_cosmetics[slot].append(overlay)
+		return
+
+	var instance := scene.instantiate()
+	cosmetic_anchors[slot].add_child(instance)
+
+	var count: int = equipped_cosmetics[slot].size()
+	instance.position += Vector2(count * 4, count * -3)  # slight stagger so stacked cosmetics stay visible
+
+	equipped_cosmetics[slot].append(instance)
+
+
+func _full_charge_time() -> float:
+	return max(fire_rate * charge_shot.charge_time_multiplier, 0.05)
+
+
+func get_charge_ratio() -> float:
+	if charge_shot == null:
+		return 0.0
+	return charge_held / _full_charge_time()
+
+
+func _release_charge() -> void:
+	var ratio := get_charge_ratio()
+	charge_held = 0.0
+	if arm_sprite:
+		arm_sprite.modulate = Color.WHITE  # clear the charge glow
+
+	if ratio < charge_shot.min_charge_ratio:
+		return  # released too early, nothing fires
+
+	# t goes 0 → 1 across the usable charge range
+	var t: float = 1.0
+	if charge_shot.min_charge_ratio < 1.0:
+		t = inverse_lerp(charge_shot.min_charge_ratio, 1.0, ratio)
+
+	charge_damage_mult = lerpf(charge_shot.min_damage_multiplier, charge_shot.max_damage_multiplier, t)
+	charge_size_mult = lerpf(1.0, charge_shot.max_size_multiplier, t)
+	charge_knockback_mult = lerpf(1.0, charge_shot.max_knockback_multiplier, t)
+	charge_speed_mult = lerpf(1.0, charge_shot.max_speed_multiplier, t)
+	charge_projectile_scene = charge_shot.projectile_scene
+	_shoot(charge_aim, false)
+	charge_projectile_scene = null
+	
+	charge_damage_mult = 1.0
+	charge_size_mult = 1.0
+	charge_knockback_mult = 1.0
+	charge_speed_mult = 1.0
+
+
+# Gun arm glows while charging, and pulses when fully charged.
+func _update_charge_glow() -> void:
+	if arm_sprite == null or charge_held <= 0.0:
+		return
+	var ratio := get_charge_ratio()
+	var color := Color.WHITE.lerp(CHARGE_GLOW_COLOR, ratio)
+	if ratio >= 1.0:
+		var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.02)
+		color = color.lerp(ARM_FLASH_COLOR, pulse * 0.5)
+	arm_sprite.modulate = color

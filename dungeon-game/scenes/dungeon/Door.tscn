@@ -1,8 +1,15 @@
 [gd_scene format=3 uid="uid://b5e7hergm1vcs"]
 
 [ext_resource type="Script" uid="uid://j2fqtp3tryoq" path="res://scenes/dungeon/Door.gd" id="1_i75l0"]
-[ext_resource type="Texture2D" uid="uid://ddu10yppsauay" path="res://assets/sprites/tiles/door_closed.png" id="2_i75l0"]
+[ext_resource type="Texture2D" uid="uid://ddu10yppsauay" path="res://assets/sprites/tiles/doors/door_closed.png" id="2_i75l0"]
+[ext_resource type="Texture2D" uid="uid://c4fwv2voem7s5" path="res://assets/sprites/tiles/doors/door_open.png" id="3_7qj4q"]
+[ext_resource type="Texture2D" uid="uid://d4i2dv3ovb0s0" path="res://assets/sprites/tiles/doors/door_item_locked.png" id="4_opyt5"]
 [ext_resource type="Texture2D" uid="uid://ceeg4svs44fok" path="res://assets/sprites/tiles/door_toiletpaper.png" id="4_u0coo"]
+[ext_resource type="Texture2D" uid="uid://i82ajo2qmlhn" path="res://assets/sprites/tiles/doors/door_boss_locked.png" id="6_68ekj"]
+[ext_resource type="Texture2D" uid="uid://jcf28lqegofr" path="res://assets/sprites/tiles/doors/door_boss.png" id="7_g558c"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3b2ty"]
+load_path = "res://.godot/imported/door_item.png-6e0c3c14457a5d943675bfb64d90ec12.ctex"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jlufg"]
 size = Vector2(19, 23.5)
@@ -14,7 +21,11 @@ size = Vector2(19, 26)
 collision_mask = 2
 script = ExtResource("1_i75l0")
 closed_texture = ExtResource("2_i75l0")
-open_texture = ExtResource("4_u0coo")
+open_texture = ExtResource("3_7qj4q")
+item_closed_texture = ExtResource("4_opyt5")
+item_open_texture = SubResource("CompressedTexture2D_3b2ty")
+boss_closed_texture = ExtResource("6_68ekj")
+boss_open_texture = ExtResource("7_g558c")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=898076199]
 texture = ExtResource("4_u0coo")
