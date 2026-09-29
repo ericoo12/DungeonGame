@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://td40nqpn4fk5"
-path="res://.godot/imported/door2.png-3ee9cf749c184fffe4fcb62e6a54e62c.ctex"
+uid="uid://ceeg4svs44fok"
+path="res://.godot/imported/door_toiletpaper.png-cf49350afaac32c3107495d2b3a543a9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/tiles/door2.png"
-dest_files=["res://.godot/imported/door2.png-3ee9cf749c184fffe4fcb62e6a54e62c.ctex"]
+source_file="res://assets/sprites/tiles/doors/door_toiletpaper.png"
+dest_files=["res://.godot/imported/door_toiletpaper.png-cf49350afaac32c3107495d2b3a543a9.ctex"]
 
 [params]
 

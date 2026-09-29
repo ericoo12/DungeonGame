@@ -11,7 +11,6 @@ shader_parameter/scroll_speed = 3.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
 
 [node name="TickBeamVisual" type="Node2D" unique_id=694180036]
-scale = Vector2(5, 5)
 script = ExtResource("1_x4c5n")
 
 [node name="Line2D" type="Line2D" parent="." unique_id=814888075]
@@ -22,11 +21,11 @@ texture = ExtResource("3_xhe45")
 [node name="SplashPivot" type="Node2D" parent="." unique_id=890161729]
 
 [node name="SplashSprite" type="AnimatedSprite2D" parent="SplashPivot" unique_id=1674689660]
-scale = Vector2(0.5, 0.5)
+scale = Vector2(1.25, 1.25)
 flip_h = true
 
 [node name="DamageArea" type="Area2D" parent="." unique_id=362598279]
-collision_mask = 4
+collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=126955756]
 shape = SubResource("RectangleShape2D_ng0gt")

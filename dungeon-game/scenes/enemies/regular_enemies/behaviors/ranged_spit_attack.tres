@@ -6,4 +6,5 @@
 [resource]
 script = ExtResource("1_3f0cf")
 projectile_scene = ExtResource("1_gxrj1")
+range = 130.0
 metadata/_custom_type_script = "uid://cb6r1svkyjyof"

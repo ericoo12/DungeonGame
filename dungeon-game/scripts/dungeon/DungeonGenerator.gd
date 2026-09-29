@@ -8,7 +8,7 @@ const WEST := Vector2i(-1, 0)
 const DIRECTIONS := [NORTH, SOUTH, EAST, WEST]
 
 
-static func generate(room_count: int) -> Dictionary:
+static func generate(room_count: int, loop_chance: float = 0.1, max_loops: int = 1) -> Dictionary:
 	var layout: Dictionary = {}
 	var start_pos := Vector2i.ZERO
 
@@ -35,8 +35,10 @@ static func generate(room_count: int) -> Dictionary:
 		data.type = RoomData.Type.NORMAL
 		layout[next] = data
 		frontier.append(next)
-
+		_connect(layout, from, next, dir)
+	
 	_assign_doors(layout)
+	_assign_extra_connections(layout, 0.1, 1)   # ~10% chance per open adjacency, at most 1 loop per floor
 	var distances: Dictionary = _bfs_distances(layout, start_pos)
 	_assign_boss_room_from_distances(layout, distances)
 	_assign_item_room_from_distances(layout, distances)
@@ -118,3 +120,27 @@ static func _assign_item_room_from_distances(layout: Dictionary, distances: Dict
 
 	if layout.has(best_pos):
 		layout[best_pos].type = RoomData.Type.ITEM
+
+
+static func _connect(layout: Dictionary, a: Vector2i, b: Vector2i, dir: Vector2i) -> void:
+	layout[a].doors[dir] = true
+	layout[b].doors[dir] = true
+
+
+static func _assign_extra_connections(layout: Dictionary, loop_chance: float, max_loops: int) -> void:
+	var loops_added := 0
+	for pos in layout.keys():
+		if loops_added >= max_loops:
+			break
+		var data: RoomData = layout[pos]
+		for dir in DIRECTIONS:
+			if data.doors[dir]:
+				continue  # already connected this direction, part of the tree
+			var neighbor_pos: Vector2i = pos + dir
+			if not layout.has(neighbor_pos):
+				continue
+			if randf() < loop_chance:
+				_connect(layout, pos, neighbor_pos, dir)
+				loops_added += 1
+				if loops_added >= max_loops:
+					break

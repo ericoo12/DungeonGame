@@ -16,6 +16,14 @@ var _entities_container: Node2D = null
 var _current_room_data: RoomData = null
 const ITEM_PICKUP_SCENE := preload("res://scenes/items/ItemPickup.tscn")
 
+## Walkability grid built from WallBlockers + live obstacles.
+## Shared with enemy pathfinding: grid.to_astar(), grid.is_walkable(cell), etc.
+var grid: RoomGrid = null
+## Cells (16px, room-local) the grid covers: the interior plus the wall ring around it.
+## Cells outside are treated as solid.
+@export var grid_rect: Rect2i = Rect2i(-12, -7, 24, 13)
+signal obstacle_layout_changed  # emitted when an obstacle breaks (grid already updated)
+
 func _ready() -> void:
 	for dir in [DungeonGenerator.NORTH, DungeonGenerator.SOUTH, DungeonGenerator.EAST, DungeonGenerator.WEST]:
 		var node_name: String = _door_node_name(dir)
@@ -27,6 +35,9 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	_current_room_data = room_data
 	_entities_container = entities_container
 	_apply_floor_variant(dungeon.current_floor_variant)
+
+	grid = RoomGrid.new(self, grid_rect)
+	_add_wall_blockers_to_grid()
 
 	for dir in doors.keys():
 		var door: Door = doors[dir]
@@ -42,6 +53,10 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	if room_data.type == RoomData.Type.BOSS and room_data.stage_door_activated and stage_door:
 		stage_door.activate()
 
+	# Before the cleared-check: obstacles persist after a room is cleared.
+	if room_data.type == RoomData.Type.NORMAL:
+		_spawn_obstacles(room_data, dungeon)
+
 	if room_data.cleared or room_data.type == RoomData.Type.START:
 		return
 
@@ -55,21 +70,26 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 
 
 func _spawn_enemies(distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
-	var pool: Array[PackedScene] = _pick_pool(distance, dungeon)
-	if pool.is_empty():
-		return
+	# Where: procedural cells from the grid (runs after _spawn_obstacles, so the grid
+	# already contains this room's obstacles), or the old hand-placed markers.
+	var positions: Array[Vector2] = []
+	if dungeon.use_procedural_enemy_spawns and grid != null:
+		var count := dungeon.get_enemy_count_for_stage(GameState.current_stage)
+		var cells := EnemySpawnPlanner.pick_cells(grid, _entry_cells(dungeon), count,
+			dungeon.enemy_min_entry_distance, dungeon.enemy_spawn_samples)
+		for cell in cells:
+			positions.append(grid.cell_to_global(cell))
+	else:
+		for point in _local_group_nodes("enemy_spawn_points"):
+			positions.append(point.global_position)
 
-	var spawn_points := get_tree().get_nodes_in_group("enemy_spawn_points")
-	var local_points: Array = []
-	for p in spawn_points:
-		if is_ancestor_of(p):
-			local_points.append(p)
+	# What: a mix of difficulty tiers, types drawn from a shuffle bag for variety.
+	var scenes := _pick_enemy_scenes(positions.size(), distance, dungeon)
 
-	for point in local_points:
-		var scene: PackedScene = pool[randi() % pool.size()]
-		var enemy := scene.instantiate()
+	for i in scenes.size():
+		var enemy := scenes[i].instantiate()
 		entities_container.add_child(enemy)
-		enemy.global_position = point.global_position
+		enemy.global_position = positions[i]
 		enemy.tree_exiting.connect(_on_enemy_removed)
 		_enemy_count += 1
 
@@ -77,13 +97,57 @@ func _spawn_enemies(distance: int, dungeon: Dungeon, entities_container: Node2D)
 		_unlock_all_doors()
 
 
-func _pick_pool(distance: int, dungeon: Dungeon) -> Array[PackedScene]:
+## Chance per enemy of being drawn from [easy, medium, hard], by the room's tier
+## (easy_max_distance / hard_min_distance on Dungeon). Empty pools are skipped automatically.
+const TIER_WEIGHTS_EASY_ROOM := [1.0, 0.0, 0.0]
+const TIER_WEIGHTS_MEDIUM_ROOM := [0.35, 0.65, 0.0]
+const TIER_WEIGHTS_HARD_ROOM := [0.15, 0.35, 0.5]
+
+
+func _pick_enemy_scenes(count: int, distance: int, dungeon: Dungeon) -> Array[PackedScene]:
+	var tiers: Array = [dungeon.easy_enemy_scenes, dungeon.medium_enemy_scenes, dungeon.hard_enemy_scenes]
+	var weights: Array = TIER_WEIGHTS_EASY_ROOM
 	if distance >= dungeon.hard_min_distance:
-		return dungeon.hard_enemy_scenes
+		weights = TIER_WEIGHTS_HARD_ROOM
 	elif distance > dungeon.easy_max_distance:
-		return dungeon.medium_enemy_scenes
-	else:
-		return dungeon.easy_enemy_scenes
+		weights = TIER_WEIGHTS_MEDIUM_ROOM
+
+	# Shuffle bag per tier: every type in a tier appears once before any repeats.
+	var bags: Array = [[], [], []]
+	var result: Array[PackedScene] = []
+	for i in count:
+		var tier := _roll_tier(weights, tiers)
+		if tier == -1:
+			break
+		if bags[tier].is_empty():
+			bags[tier] = tiers[tier].duplicate()
+			bags[tier].shuffle()
+		result.append(bags[tier].pop_back())
+	return result
+
+
+func _roll_tier(weights: Array, tiers: Array) -> int:
+	var total := 0.0
+	for t in 3:
+		if not tiers[t].is_empty():
+			total += weights[t]
+	if total <= 0.0:
+		# The room's tiers are all empty (e.g. no medium enemies made yet): use any non-empty pool.
+		for t in 3:
+			if not tiers[t].is_empty():
+				return t
+		return -1
+	var roll := randf() * total
+	for t in 3:
+		if tiers[t].is_empty():
+			continue
+		roll -= weights[t]
+		if roll <= 0.0:
+			return t
+	for t in [2, 1, 0]:
+		if not tiers[t].is_empty():
+			return t
+	return -1
 
 
 func _on_enemy_removed() -> void:
@@ -196,3 +260,113 @@ func _door_style(own_type: int, neighbor_type: int) -> Door.Style:
 		if t == RoomData.Type.BOSS: return Door.Style.BOSS
 		if t == RoomData.Type.ITEM: return Door.Style.ITEM
 	return Door.Style.NORMAL
+
+
+# --- Obstacles ---------------------------------------------------------------
+
+func _spawn_obstacles(room_data: RoomData, dungeon: Dungeon) -> void:
+	if grid == null:
+		return
+	var markers := _local_group_nodes("obstacle_spawn_points")
+	if markers.is_empty():
+		return
+
+	if not room_data.obstacles_rolled:
+		room_data.obstacle_state = _roll_obstacle_layout(room_data, dungeon, markers)
+		room_data.obstacles_rolled = true
+
+	for index in room_data.obstacle_state:
+		var entry: Dictionary = room_data.obstacle_state[index]
+		if index >= markers.size():
+			continue
+		var scene: PackedScene = load(entry.scene_path)
+		if scene == null:
+			continue
+		var cell := grid.global_to_cell(markers[index].global_position)
+		var obstacle: Obstacle = scene.instantiate()
+		if entry.broken and not obstacle.leave_remains:
+			obstacle.free()
+			continue
+		_entities_container.add_child(obstacle)
+		obstacle.global_position = grid.cell_to_global(cell)  # snapped, so physics matches the grid
+		if entry.broken:
+			obstacle.show_as_broken()  # debris from an earlier visit: walkable, not in the grid
+			continue
+		grid.set_obstacle(cell, true)
+		obstacle.broken.connect(func():
+			entry.broken = true  # persists on RoomData: stays broken on revisit
+			grid.set_obstacle(cell, false)
+			obstacle_layout_changed.emit()
+		)
+
+
+func _roll_obstacle_layout(room_data: RoomData, dungeon: Dungeon, markers: Array) -> Dictionary:
+	var marker_cells: Array[Vector2i] = []
+	for marker in markers:
+		marker_cells.append(grid.global_to_cell(marker.global_position))
+
+	var clear_cells: Dictionary = {}
+
+	# Where the player appears for each connected door: must be free and reachable.
+	var entry_cells := _entry_cells(dungeon)
+	for cell in entry_cells:
+		_add_clearance(clear_cells, cell, 1)
+
+	# Marker-placed enemies must not spawn inside/boxed in by obstacles (unkillable enemy =
+	# softlock). Procedural enemies don't need this: they're only placed on cells that are
+	# reachable AFTER obstacles exist (see EnemySpawnPlanner).
+	var required_cells: Array[Vector2i] = []
+	var marker_enemies: Array = [] if dungeon.use_procedural_enemy_spawns else _local_group_nodes("enemy_spawn_points")
+	for point in marker_enemies:
+		var cell := grid.global_to_cell(point.global_position)
+		required_cells.append(cell)
+		_add_clearance(clear_cells, cell, 1)
+
+	return ObstaclePlacer.generate(
+		grid, marker_cells, entry_cells, required_cells, clear_cells,
+		dungeon.breakable_obstacle_scenes, dungeon.solid_obstacle_scenes,
+		dungeon.obstacle_spawn_chance, dungeon.breakable_obstacle_ratio,
+		dungeon.obstacle_layout_candidates, dungeon.validate_obstacle_layouts)
+
+
+## Rectangle CollisionShape2Ds under the WallBlockers StaticBody2D (all walls in
+## RoomBase; inherited rooms can add more) block the grid, so obstacle/enemy placement
+## agrees with physics. Rotation is ignored: keep these axis-aligned.
+## (ProjectileWalls is deliberately NOT read: it's the outer ring for shots/enemies.)
+func _add_wall_blockers_to_grid() -> void:
+	var blockers := get_node_or_null("WallBlockers")
+	if blockers == null:
+		return
+	for child in blockers.get_children():
+		var shape_node := child as CollisionShape2D
+		if shape_node == null or shape_node.disabled:
+			continue
+		var rect_shape := shape_node.shape as RectangleShape2D
+		if rect_shape == null:
+			continue
+		var size := rect_shape.size * shape_node.global_scale.abs()
+		grid.block_rect(Rect2(shape_node.global_position - size / 2.0, size))
+
+
+## Grid cell where the player appears for each connected door of this room.
+func _entry_cells(dungeon: Dungeon) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for dir in DungeonGenerator.DIRECTIONS:
+		if _current_room_data.doors.get(dir, false):
+			cells.append(grid.global_to_cell(global_position + dungeon.get_entry_offset(dir)))
+	return cells
+
+
+func _add_clearance(cells: Dictionary, center: Vector2i, radius: int) -> void:
+	for dx in range(-radius, radius + 1):
+		for dy in range(-radius, radius + 1):
+			cells[center + Vector2i(dx, dy)] = true
+
+
+## Nodes in `group` that belong to this room (same scoping as the spawn functions above).
+func _local_group_nodes(group: String) -> Array:
+	var result: Array = []
+	for node in get_tree().get_nodes_in_group(group):
+		if is_ancestor_of(node):
+			result.append(node)
+	return result

@@ -13,10 +13,10 @@ class_name TickBeamVisual
 @onready var damage_shape: CollisionShape2D = $DamageArea/CollisionShape2D
 @onready var wall_ray: RayCast2D = $WallRay
 
-# Actual per-frame pixel width of the splash sheet (96x64, 2 frames = 48px each).
-# Used to pin the splash's wall-facing edge in place while it shrinks — see
-# SplashPivot's role in _ready()/_update_beam_geometry().
-const SPLASH_FRAME_WIDTH := 6.0
+# Offset (per unit of SplashSprite scale) that pins the splash's wall-facing edge in
+# place while it shrinks — see SplashPivot's role in _ready()/_update_beam_geometry().
+# Resize the splash by changing SplashSprite's scale in the scene; this follows it.
+const SPLASH_EDGE_OFFSET := 6.0
 
 var duration: float = 1.5
 var shrink_duration: float = 0.3
@@ -41,7 +41,7 @@ func _ready() -> void:
 	# (0,0) point lines up with the sprite's right (wall-facing) edge — see
 	# _update_beam_geometry(), where splash_pivot itself is positioned at the
 	# true wall-collision point.
-	splash_sprite.position = Vector2(-SPLASH_FRAME_WIDTH / 2.0, 0)
+	splash_sprite.position = Vector2(-SPLASH_EDGE_OFFSET * splash_sprite.scale.x, 0)
 
 
 func setup(start: Vector2, direction: Vector2, range_limit: float, width: float, vis_duration: float, dmg: float, tick_interval: float, shrink_time: float = 0.3) -> void:
@@ -91,6 +91,16 @@ func _physics_process(delta: float) -> void:
 
 func _update_beam_geometry() -> void:
 	wall_ray.force_raycast_update()
+	# Obstacles share the world layer with walls, but the beam should pass through
+	# them (DamageArea hurts them instead) — exclude each one and re-cast.
+	var guard := 0
+	while wall_ray.is_colliding() and guard < 16:
+		var collider := wall_ray.get_collider() as Node
+		if collider == null or not collider.is_in_group("obstacles"):
+			break
+		wall_ray.add_exception(collider)
+		wall_ray.force_raycast_update()
+		guard += 1
 
 	var length: float = max_range
 	var did_hit := false

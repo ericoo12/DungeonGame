@@ -600,6 +600,12 @@ func _recalculate_orbital_spacing() -> void:
 		orbitals[i].angle_offset = TAU * float(i) / float(count)
 
 
+## Center of the HurtBox (chest-down) in world space. Enemies aim here instead of the
+## player's origin, which sits higher up on the body.
+func get_hurtbox_center() -> Vector2:
+	return hurtbox_collision.global_position
+
+
 func set_player_scale(value: float) -> void:
 	player_scale = clamp(value, PLAYER_SIZE_MIN, PLAYER_SIZE_MAX)
 	lower_sprite.scale = Vector2.ONE * player_scale

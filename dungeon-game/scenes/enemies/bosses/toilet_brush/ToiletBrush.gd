@@ -64,7 +64,7 @@ func _physics_process(delta: float) -> void:
 			if dist <= lunge_range and attack_timer <= 0.0:
 				_do_lunge_attack()
 			elif dist <= shoot_range and attack_timer <= 0.0:
-				_do_shoot_attack(dir)
+				_do_shoot_attack((get_player_aim_point() - global_position).normalized())
 			elif dist > shoot_range:
 				velocity = dir * move_speed
 			else:

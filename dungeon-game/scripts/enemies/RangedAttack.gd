@@ -19,7 +19,7 @@ func try_attack(enemy: EnemyBase, delta: float) -> void:
 		return
 
 	timer = cooldown
-	var dir: Vector2 = (enemy.player.global_position - enemy.global_position).normalized()
+	var dir: Vector2 = (enemy.get_player_aim_point() - enemy.global_position).normalized()
 	var proj := projectile_scene.instantiate()
 	enemy.get_parent().add_child(proj)
 	proj.global_position = enemy.global_position

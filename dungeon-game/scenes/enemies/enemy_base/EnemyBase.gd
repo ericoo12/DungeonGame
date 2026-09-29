@@ -283,3 +283,12 @@ func _spawn_shadow() -> void:
 	target_parent.add_child(shadow)
 	shadow.offset = shadow_offset
 	shadow.setup(self, true)  # true — shadow dies with the enemy, unlike the player's persistent version
+
+
+## Where ranged attacks should aim: the player's hurtbox center (falls back to origin).
+func get_player_aim_point() -> Vector2:
+	if player == null:
+		return global_position
+	if player.has_method("get_hurtbox_center"):
+		return player.call("get_hurtbox_center")  # player is typed Node2D here
+	return player.global_position

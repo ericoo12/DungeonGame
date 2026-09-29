@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/obstacles/Obstacle.gd" id="1_obst"]
+[ext_resource type="Texture2D" path="res://assets/Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_obst"]
+size = Vector2(14, 12)
+
+[node name="Barrel" type="StaticBody2D"]
+collision_layer = 9
+collision_mask = 0
+script = ExtResource("1_obst")
+breakable = true
+hits_to_break = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -3)
+texture = ExtResource("2_tex")
+region_enabled = true
+region_rect = Rect2(224, 122, 16, 22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1)
+shape = SubResource("RectangleShape2D_obst")

@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://dxs6s44nql754" path="res://scenes/player/Player.gd" id="1_wr5hl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_spdwv"]
-size = Vector2(130, 63)
+size = Vector2(53, 63)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ovr6g"]
-size = Vector2(130, 63)
+size = Vector2(80, 63)
 
 [node name="Player" type="CharacterBody2D" unique_id=1881097379]
 y_sort_enabled = true
@@ -35,12 +35,12 @@ z_index = 1
 position = Vector2(8, -45)
 
 [node name="wallCollision" type="CollisionShape2D" parent="." unique_id=61987316]
-position = Vector2(0, 46)
+position = Vector2(0, 84)
 rotation = 1.5707964
 shape = SubResource("RectangleShape2D_spdwv")
 
 [node name="HurtBox" type="Area2D" parent="." unique_id=803020027]
-position = Vector2(0, 46)
+position = Vector2(0, 70.225)
 collision_layer = 16
 collision_mask = 32
 

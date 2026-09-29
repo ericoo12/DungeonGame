@@ -45,4 +45,5 @@ func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
 	# resolved above, since this is a hitscan (instant), not a travelling shot.
 	var beam: LaserBeamVisual = BEAM_VISUAL_SCENE.instantiate()
 	player.add_child(beam)
-	beam.setup(start_point, end_point, beam_width, visual_duration)
+	beam.setup(start_point, end_point, beam_width, visual_duration,
+		dir, max_range, player.laser_ray.collision_mask, [player.get_rid()])
