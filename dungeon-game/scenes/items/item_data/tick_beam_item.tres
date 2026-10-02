@@ -9,6 +9,6 @@ script = ExtResource("1_tpwk7")
 effect = ExtResource("1_8koxa")
 cooldown = 0.0
 item_name = "Turd Geyser"
-description = "Fire a turd geyser"
+description = "Unleash the pressure. Fire a damaging beam for one second."
 icon = ExtResource("2_8koxa")
 metadata/_custom_type_script = "uid://sjjya86fvnn6"

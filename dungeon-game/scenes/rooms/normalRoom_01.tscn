@@ -4,132 +4,129 @@
 
 [node name="RoomBase" unique_id=1502560529 instance=ExtResource("1_5jxyb")]
 
-[node name="PhysicalBlocker" parent="Doors/North" parent_id_path=PackedInt32Array(158042467) index="2" unique_id=1472804281]
-position = Vector2(0, -22.25)
-
 [node name="Marker2D" type="Marker2D" parent="EnemySpawnPoints" parent_id_path=PackedInt32Array(2016783228) index="0" unique_id=1998396861 groups=["enemy_spawn_points"]]
 position = Vector2(-157, -65)
 
-[node name="ObstacleSpawnPoints" type="Node2D" parent="." unique_id=1952099019]
+[node name="ObstacleSpawnPoints" type="Node2D" parent="." index="5" unique_id=1952099019]
 
-[node name="Obstacle00" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=592491201 groups=["obstacle_spawn_points"]]
+[node name="Obstacle00" type="Marker2D" parent="ObstacleSpawnPoints" index="0" unique_id=592491201 groups=["obstacle_spawn_points"]]
 position = Vector2(-104, -40)
 
-[node name="Obstacle01" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1057442964 groups=["obstacle_spawn_points"]]
+[node name="Obstacle01" type="Marker2D" parent="ObstacleSpawnPoints" index="1" unique_id=1057442964 groups=["obstacle_spawn_points"]]
 position = Vector2(-88, -40)
 
-[node name="Obstacle02" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1056910491 groups=["obstacle_spawn_points"]]
+[node name="Obstacle02" type="Marker2D" parent="ObstacleSpawnPoints" index="2" unique_id=1056910491 groups=["obstacle_spawn_points"]]
 position = Vector2(-104, -24)
 
-[node name="Obstacle03" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=891558714 groups=["obstacle_spawn_points"]]
+[node name="Obstacle03" type="Marker2D" parent="ObstacleSpawnPoints" index="3" unique_id=891558714 groups=["obstacle_spawn_points"]]
 position = Vector2(88, -40)
 
-[node name="Obstacle04" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1335895752 groups=["obstacle_spawn_points"]]
+[node name="Obstacle04" type="Marker2D" parent="ObstacleSpawnPoints" index="4" unique_id=1335895752 groups=["obstacle_spawn_points"]]
 position = Vector2(104, -40)
 
-[node name="Obstacle05" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=679466450 groups=["obstacle_spawn_points"]]
+[node name="Obstacle05" type="Marker2D" parent="ObstacleSpawnPoints" index="5" unique_id=679466450 groups=["obstacle_spawn_points"]]
 position = Vector2(104, -24)
 
-[node name="Obstacle06" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1885350792 groups=["obstacle_spawn_points"]]
+[node name="Obstacle06" type="Marker2D" parent="ObstacleSpawnPoints" index="6" unique_id=1885350792 groups=["obstacle_spawn_points"]]
 position = Vector2(-104, 40)
 
-[node name="Obstacle07" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=821862987 groups=["obstacle_spawn_points"]]
+[node name="Obstacle07" type="Marker2D" parent="ObstacleSpawnPoints" index="7" unique_id=821862987 groups=["obstacle_spawn_points"]]
 position = Vector2(-104, 24)
 
-[node name="Obstacle08" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1254668780 groups=["obstacle_spawn_points"]]
+[node name="Obstacle08" type="Marker2D" parent="ObstacleSpawnPoints" index="8" unique_id=1254668780 groups=["obstacle_spawn_points"]]
 position = Vector2(-88, 40)
 
-[node name="Obstacle09" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1715587081 groups=["obstacle_spawn_points"]]
+[node name="Obstacle09" type="Marker2D" parent="ObstacleSpawnPoints" index="9" unique_id=1715587081 groups=["obstacle_spawn_points"]]
 position = Vector2(104, 40)
 
-[node name="Obstacle10" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=185850732 groups=["obstacle_spawn_points"]]
+[node name="Obstacle10" type="Marker2D" parent="ObstacleSpawnPoints" index="10" unique_id=185850732 groups=["obstacle_spawn_points"]]
 position = Vector2(104, 24)
 
-[node name="Obstacle11" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=2081472592 groups=["obstacle_spawn_points"]]
+[node name="Obstacle11" type="Marker2D" parent="ObstacleSpawnPoints" index="11" unique_id=2081472592 groups=["obstacle_spawn_points"]]
 position = Vector2(88, 40)
 
-[node name="Obstacle12" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1057114423 groups=["obstacle_spawn_points"]]
+[node name="Obstacle12" type="Marker2D" parent="ObstacleSpawnPoints" index="12" unique_id=1057114423 groups=["obstacle_spawn_points"]]
 position = Vector2(-24, -24)
 
-[node name="Obstacle13" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=2059049019 groups=["obstacle_spawn_points"]]
+[node name="Obstacle13" type="Marker2D" parent="ObstacleSpawnPoints" index="13" unique_id=2059049019 groups=["obstacle_spawn_points"]]
 position = Vector2(24, -24)
 
-[node name="Obstacle14" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1534477855 groups=["obstacle_spawn_points"]]
+[node name="Obstacle14" type="Marker2D" parent="ObstacleSpawnPoints" index="14" unique_id=1534477855 groups=["obstacle_spawn_points"]]
 position = Vector2(-24, 24)
 
-[node name="Obstacle15" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1436257385 groups=["obstacle_spawn_points"]]
+[node name="Obstacle15" type="Marker2D" parent="ObstacleSpawnPoints" index="15" unique_id=1436257385 groups=["obstacle_spawn_points"]]
 position = Vector2(24, 24)
 
-[node name="Obstacle16" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1275274395 groups=["obstacle_spawn_points"]]
+[node name="Obstacle16" type="Marker2D" parent="ObstacleSpawnPoints" index="16" unique_id=1275274395 groups=["obstacle_spawn_points"]]
 position = Vector2(-40, 56)
 
-[node name="Obstacle17" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=936641504 groups=["obstacle_spawn_points"]]
+[node name="Obstacle17" type="Marker2D" parent="ObstacleSpawnPoints" index="17" unique_id=936641504 groups=["obstacle_spawn_points"]]
 position = Vector2(40, 56)
 
-[node name="Obstacle18" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1391695971 groups=["obstacle_spawn_points"]]
+[node name="Obstacle18" type="Marker2D" parent="ObstacleSpawnPoints" index="18" unique_id=1391695971 groups=["obstacle_spawn_points"]]
 position = Vector2(-168, 72)
 
-[node name="Obstacle19" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=720550685 groups=["obstacle_spawn_points"]]
+[node name="Obstacle19" type="Marker2D" parent="ObstacleSpawnPoints" index="19" unique_id=720550685 groups=["obstacle_spawn_points"]]
 position = Vector2(168, 72)
 
-[node name="Obstacle20" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1982711115 groups=["obstacle_spawn_points"]]
+[node name="Obstacle20" type="Marker2D" parent="ObstacleSpawnPoints" index="20" unique_id=1982711115 groups=["obstacle_spawn_points"]]
 position = Vector2(168, -72)
 
-[node name="Obstacle21" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=359513056 groups=["obstacle_spawn_points"]]
+[node name="Obstacle21" type="Marker2D" parent="ObstacleSpawnPoints" index="21" unique_id=359513056 groups=["obstacle_spawn_points"]]
 position = Vector2(-168, -72)
 
-[node name="Obstacle22" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=2095485176 groups=["obstacle_spawn_points"]]
+[node name="Obstacle22" type="Marker2D" parent="ObstacleSpawnPoints" index="22" unique_id=2095485176 groups=["obstacle_spawn_points"]]
 position = Vector2(-136, -24)
 
-[node name="Obstacle23" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=345345222 groups=["obstacle_spawn_points"]]
+[node name="Obstacle23" type="Marker2D" parent="ObstacleSpawnPoints" index="23" unique_id=345345222 groups=["obstacle_spawn_points"]]
 position = Vector2(-136, -8)
 
-[node name="Obstacle24" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1585970957 groups=["obstacle_spawn_points"]]
+[node name="Obstacle24" type="Marker2D" parent="ObstacleSpawnPoints" index="24" unique_id=1585970957 groups=["obstacle_spawn_points"]]
 position = Vector2(-136, 8)
 
-[node name="Obstacle25" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=267465203 groups=["obstacle_spawn_points"]]
+[node name="Obstacle25" type="Marker2D" parent="ObstacleSpawnPoints" index="25" unique_id=267465203 groups=["obstacle_spawn_points"]]
 position = Vector2(-136, 24)
 
-[node name="Obstacle26" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=2007357318 groups=["obstacle_spawn_points"]]
+[node name="Obstacle26" type="Marker2D" parent="ObstacleSpawnPoints" index="26" unique_id=2007357318 groups=["obstacle_spawn_points"]]
 position = Vector2(-136, 40)
 
-[node name="Obstacle27" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=815433207 groups=["obstacle_spawn_points"]]
+[node name="Obstacle27" type="Marker2D" parent="ObstacleSpawnPoints" index="27" unique_id=815433207 groups=["obstacle_spawn_points"]]
 position = Vector2(-152, -24)
 
-[node name="Obstacle28" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=322441350 groups=["obstacle_spawn_points"]]
+[node name="Obstacle28" type="Marker2D" parent="ObstacleSpawnPoints" index="28" unique_id=322441350 groups=["obstacle_spawn_points"]]
 position = Vector2(-168, -24)
 
-[node name="Obstacle29" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1940008686 groups=["obstacle_spawn_points"]]
+[node name="Obstacle29" type="Marker2D" parent="ObstacleSpawnPoints" index="29" unique_id=1940008686 groups=["obstacle_spawn_points"]]
 position = Vector2(-152, 40)
 
-[node name="Obstacle30" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1689213878 groups=["obstacle_spawn_points"]]
+[node name="Obstacle30" type="Marker2D" parent="ObstacleSpawnPoints" index="30" unique_id=1689213878 groups=["obstacle_spawn_points"]]
 position = Vector2(-168, 40)
 
-[node name="Obstacle31" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=2104820251 groups=["obstacle_spawn_points"]]
+[node name="Obstacle31" type="Marker2D" parent="ObstacleSpawnPoints" index="31" unique_id=2104820251 groups=["obstacle_spawn_points"]]
 position = Vector2(136, -24)
 
-[node name="Obstacle32" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=2059473494 groups=["obstacle_spawn_points"]]
+[node name="Obstacle32" type="Marker2D" parent="ObstacleSpawnPoints" index="32" unique_id=2059473494 groups=["obstacle_spawn_points"]]
 position = Vector2(136, -8)
 
-[node name="Obstacle33" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=102636532 groups=["obstacle_spawn_points"]]
+[node name="Obstacle33" type="Marker2D" parent="ObstacleSpawnPoints" index="33" unique_id=102636532 groups=["obstacle_spawn_points"]]
 position = Vector2(136, 8)
 
-[node name="Obstacle34" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1896992121 groups=["obstacle_spawn_points"]]
+[node name="Obstacle34" type="Marker2D" parent="ObstacleSpawnPoints" index="34" unique_id=1896992121 groups=["obstacle_spawn_points"]]
 position = Vector2(136, 24)
 
-[node name="Obstacle35" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1481434808 groups=["obstacle_spawn_points"]]
+[node name="Obstacle35" type="Marker2D" parent="ObstacleSpawnPoints" index="35" unique_id=1481434808 groups=["obstacle_spawn_points"]]
 position = Vector2(136, 40)
 
-[node name="Obstacle36" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1338687034 groups=["obstacle_spawn_points"]]
+[node name="Obstacle36" type="Marker2D" parent="ObstacleSpawnPoints" index="36" unique_id=1338687034 groups=["obstacle_spawn_points"]]
 position = Vector2(152, -24)
 
-[node name="Obstacle37" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=826401555 groups=["obstacle_spawn_points"]]
+[node name="Obstacle37" type="Marker2D" parent="ObstacleSpawnPoints" index="37" unique_id=826401555 groups=["obstacle_spawn_points"]]
 position = Vector2(168, -24)
 
-[node name="Obstacle38" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=716683659 groups=["obstacle_spawn_points"]]
+[node name="Obstacle38" type="Marker2D" parent="ObstacleSpawnPoints" index="38" unique_id=716683659 groups=["obstacle_spawn_points"]]
 position = Vector2(152, 40)
 
-[node name="Obstacle39" type="Marker2D" parent="ObstacleSpawnPoints" unique_id=1355119511 groups=["obstacle_spawn_points"]]
+[node name="Obstacle39" type="Marker2D" parent="ObstacleSpawnPoints" index="39" unique_id=1355119511 groups=["obstacle_spawn_points"]]
 position = Vector2(168, 40)
 
 [editable path="Doors/North"]

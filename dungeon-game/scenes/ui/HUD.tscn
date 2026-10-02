@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://p0w7irxisi33" path="res://scenes/ui/DebugStatsDisplay.gd" id="3_6ll6g"]
 [ext_resource type="Script" uid="uid://r1q1tv2oe0m5" path="res://scenes/ui/ActiveItemSlotDisplay.gd" id="4_ig75s"]
 [ext_resource type="Script" uid="uid://daratb0dfgggh" path="res://scripts/dungeon/DungeonMapDebug.gd" id="5_4ed8p"]
+[ext_resource type="Script" path="res://scenes/ui/InventoryOverlay.gd" id="6_invov"]
 
 [node name="Hud" type="CanvasLayer" unique_id=1634359545]
 process_mode = 3
@@ -58,33 +59,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Background" type="ColorRect" parent="ItemOverlay" unique_id=1232621767]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.08855995, 0.08855992, 0.08855986, 1)
-
-[node name="ItemGrid" type="GridContainer" parent="ItemOverlay" unique_id=7701462]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-columns = 6
-
-[node name="ItemDetailLabel" type="Label" parent="ItemOverlay" unique_id=826341104]
-layout_mode = 0
-offset_top = 40.0
-offset_right = 40.0
-offset_bottom = 63.0
-
-[node name="ItemStatsLabel" type="Label" parent="ItemOverlay" unique_id=1959686496]
-layout_mode = 0
-offset_top = 145.0
-offset_right = 60.0
-offset_bottom = 205.0
+script = ExtResource("6_invov")
 
 [node name="DungeonMap" type="Control" parent="." unique_id=135109454]
 layout_mode = 3

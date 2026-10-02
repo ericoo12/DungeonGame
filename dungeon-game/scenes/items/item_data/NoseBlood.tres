@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_wub7b")
 follower_scene = ExtResource("1_1x50u")
-item_name = "NoseBlood"
-description = "A nose follows you leaving a blood trail damaging enemies"
+item_name = "Nosebleed"
+description = "A bloody little follower. Leaves a trail that damages enemies."
 icon = ExtResource("2_q8bkp")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -9,6 +9,6 @@ speed_bonus = 15.0
 fire_rate_bonus = 0.05
 range_bonus = 1.5
 item_name = "Yellow Syringe"
-description = "Speed and Fire Rate Boost"
+description = "A little extra urgency. Movement speed, fire rate and range up."
 icon = ExtResource("1_33pr8")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

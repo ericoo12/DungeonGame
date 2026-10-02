@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_2g67h")
 knockback_bonus = 100.0
-item_name = "Used toilett paper"
-description = "add knockback"
+item_name = "Used Toilet Paper"
+description = "Keep your distance. Knockback up."
 icon = ExtResource("1_52oxd")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -13,7 +13,7 @@ metadata/_custom_type_script = "uid://gr1sb0e0sjsy"
 [resource]
 script = ExtResource("1_e78p1")
 charge_shot = SubResource("Resource_e0cm6")
-item_name = "Grannys pants"
-description = "Charge up to shoot Grannys pants"
+item_name = "Granny's Pants"
+description = "Hold to charge. Release a bigger, harder-hitting pair of pants."
 icon = ExtResource("2_ggv54")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

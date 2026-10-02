@@ -107,12 +107,43 @@ func apply(player: Player) -> void:
 ## item_name/description instead.
 func get_stat_summary() -> String:
 	var lines: PackedStringArray = []
-	if max_hearts_bonus != 0:
-		lines.append("%+d Max Hearts" % max_hearts_bonus)
-	if damage_bonus != 0:
-		lines.append("%+d Damage" % damage_bonus)
-	if speed_bonus != 0.0:
-		lines.append("%+.1f Speed" % speed_bonus)
-	if fire_rate_bonus != 0.0:
-		lines.append("%+.2f Fire Rate" % fire_rate_bonus)
+	for line in get_stat_lines():
+		lines.append(line.text)
 	return "\n".join(lines)
+
+
+## Same info as get_stat_summary(), but structured for the inventory UI:
+## [{ "text": String, "good": bool, "neutral": bool }]. "good" accounts for stats where
+## lower is better (e.g. player size).
+func get_stat_lines() -> Array[Dictionary]:
+	var lines: Array[Dictionary] = []
+	_add_line(lines, max_hearts_bonus, "%+d Max Hearts" % max_hearts_bonus)
+	_add_line(lines, damage_bonus, "%+d Damage" % damage_bonus)
+	_add_line(lines, speed_bonus, "%+.0f Speed" % speed_bonus)
+	_add_line(lines, fire_rate_bonus, "%+.2f Fire Rate" % fire_rate_bonus)
+	_add_line(lines, knockback_bonus, "%+.0f Knockback" % knockback_bonus)
+	_add_line(lines, range_bonus, "%+.1f Range" % range_bonus)
+	_add_line(lines, size_bonus, "%+.2f Shot Size" % size_bonus)
+	_add_line(lines, shot_speed_bonus, "%+.0f Shot Speed" % shot_speed_bonus)
+	_add_line(lines, -player_size_bonus, "%+.2f Player Size" % player_size_bonus)  # smaller = good
+	_add_line(lines, fire_rate_multiplier - 1.0, "x%.2f Fire Rate" % fire_rate_multiplier)
+	_add_line(lines, damage_multiplier - 1.0, "x%.2f Damage" % damage_multiplier)
+	_add_line(lines, projectile_size_multiplier - 1.0, "x%.2f Shot Size" % projectile_size_multiplier)
+	if shot_style:
+		lines.append({"text": "Changes your shot", "good": true, "neutral": true})
+	if shot_pattern_modifier:
+		lines.append({"text": "Changes your shot pattern", "good": true, "neutral": true})
+	if charge_shot:
+		lines.append({"text": "Charge shot", "good": true, "neutral": true})
+	if orbital_scene:
+		lines.append({"text": "Adds an orbital", "good": true, "neutral": true})
+	if follower_scene:
+		lines.append({"text": "Adds a follower", "good": true, "neutral": true})
+	return lines
+
+
+## `goodness` > 0 means the change helps the player, < 0 hurts, 0 = not listed.
+func _add_line(lines: Array[Dictionary], goodness: float, text: String) -> void:
+	if is_zero_approx(goodness):
+		return
+	lines.append({"text": text, "good": goodness > 0.0, "neutral": false})

@@ -7,6 +7,6 @@
 script = ExtResource("1_4wr2s")
 max_hearts_bonus = 1
 item_name = "Egg"
-description = "+1 Heart"
+description = "An egg a day keeps death away. Health up."
 icon = ExtResource("1_tghay")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_2bwcx")
 shot_style = ExtResource("3_ptddd")
-item_name = "Laser hole"
-description = "Fire a laser"
+item_name = "Laser Hole"
+description = "Concentrated embarrassment. Replace your shots with an instant laser."
 icon = ExtResource("1_qjd67")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

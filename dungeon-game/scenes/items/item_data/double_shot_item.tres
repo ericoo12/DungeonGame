@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_28e0a")
 shot_pattern_modifier = ExtResource("3_u4j8r")
-item_name = "Double shiit"
-description = "Fires an extra turd"
+item_name = "Double Shiit"
+description = "Double the laundry. Fire two underwear projectiles at once."
 icon = ExtResource("1_ufpg5")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

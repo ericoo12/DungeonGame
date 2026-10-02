@@ -9,6 +9,6 @@ speed_bonus = 30.0
 range_bonus = 1.5
 shot_speed_bonus = 0.2
 item_name = "Green Syringe"
-description = "Damage Up"
+description = "Everything moves faster. Movement speed, shot speed and range up."
 icon = ExtResource("1_ccgyq")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

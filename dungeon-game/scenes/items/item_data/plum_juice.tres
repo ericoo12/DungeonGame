@@ -9,6 +9,6 @@ fire_rate_multiplier = 5.5
 damage_multiplier = 0.2
 projectile_size_multiplier = 0.5
 item_name = "Plum Juice"
-description = "Fire rate Up but lowers damage"
+description = "Open the floodgates. Fire rate way up, damage and shot size down."
 icon = ExtResource("1_ehbpv")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"
