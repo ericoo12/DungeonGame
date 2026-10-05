@@ -1,25 +1,25 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://ugg350ihf3u4"]
 
-[ext_resource type="Script" path="res://scripts/obstacles/Obstacle.gd" id="1_obst"]
-[ext_resource type="Texture2D" path="res://assets/sprites/objects/trash_bag.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://dbpkv6tk7l2wh" path="res://scripts/obstacles/Obstacle.gd" id="1_obst"]
+[ext_resource type="Resource" uid="uid://c3velaaosw68n" path="res://scenes/dungeon/drops/obstacle_drops.tres" id="2_jkhps"]
+[ext_resource type="Texture2D" uid="uid://cuvpt68e6e327" path="res://assets/sprites/objects/trash_bag.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_obst"]
 size = Vector2(14, 12)
 
-[node name="TrashBag" type="StaticBody2D"]
+[node name="TrashBag" type="StaticBody2D" unique_id=1114946380]
 collision_layer = 9
 collision_mask = 0
 script = ExtResource("1_obst")
-breakable = true
-hits_to_break = 3
+drop_table = ExtResource("2_jkhps")
 damage_frames = 4
 leave_remains = true
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1531121229]
 position = Vector2(0, -2)
 texture = ExtResource("2_tex")
 hframes = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=391194124]
 position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_obst")

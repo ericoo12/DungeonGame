@@ -42,6 +42,11 @@ var item_pool: Array[ItemBase] = []
 @export var enemy_spawn_samples: int = 8           # best-candidate samples per enemy (higher = more spread out)
 @export_group("")
 
+@export_group("Drops")
+## Rolled once when a normal room is cleared (luck-scaled, see DropTable).
+@export var room_clear_drops: DropTable
+@export_group("")
+
 var breakable_obstacle_scenes: Array[PackedScene] = []
 var solid_obstacle_scenes: Array[PackedScene] = []
 

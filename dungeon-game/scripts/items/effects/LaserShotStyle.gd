@@ -33,6 +33,9 @@ func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
 	player.laser_ray.force_raycast_update()
 
 
+	# Luck-scaled shot effects (e.g. slow) roll per laser shot, same as projectiles.
+	var triggered_procs := player.roll_shot_procs()
+
 	var start_point: Vector2 = player.weapon_marker.global_position + dir * start_offset
 	var end_point: Vector2 = start_point + dir * max_range
 
@@ -41,9 +44,13 @@ func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
 		var collider: Object = player.laser_ray.get_collider()
 		if collider and collider.has_method("take_damage"):
 			collider.take_damage(player.get_effective_damage(), dir, player.projectile_knockback)
+			for proc in triggered_procs:
+				proc.on_hit(collider, player)
 	# Purely cosmetic — the visual beam is spawned after damage is alreadys
 	# resolved above, since this is a hitscan (instant), not a travelling shot.
 	var beam: LaserBeamVisual = BEAM_VISUAL_SCENE.instantiate()
 	player.add_child(beam)
 	beam.setup(start_point, end_point, beam_width, visual_duration,
 		dir, max_range, player.laser_ray.collision_mask, [player.get_rid()])
+	for proc in triggered_procs:
+		proc.decorate_projectile(beam)  # tints the beam, so a proc'd shot is visible

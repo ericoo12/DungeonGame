@@ -4,6 +4,15 @@ class_name EnemyBase
 # --- Enemies sprites ---
 @export var sprite_sheet_path: String
 @export var is_static_visual: bool = false
+## > 0: the sheet is ONE row of this many frames, side view facing left (e.g. Rat).
+## The enemy only ever faces left/right (mirrored), also while moving up/down.
+@export var side_view_frames: int = 0
+## Set = sprite_sheet_path is a single-row IDLE sheet and this is a single-row ATTACK
+## sheet (square frames, front-facing). See AnimSheetLoader.build_idle_attack_frames().
+## Can be the same file as sprite_sheet_path for enemies with one looping cycle (flies).
+@export_file("*.png") var attack_sheet_path: String = ""
+## Frame rate of the idle/run loop for attack_sheet_path enemies (wings flap fast).
+@export var idle_fps: float = 6.0
 
 # --- shadow ---
 const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
@@ -29,9 +38,17 @@ var shadow: Shadow = null
 @export var spawn_grace_period: float = 0.5
 
 @export var movement_behavior: MovementBehavior
+## How many of this enemy spawn together per spawn slot (min, max). (1, 1) = alone.
+## Swarm enemies (rats) use e.g. (3, 5); the extras appear on free tiles next to the first.
+@export var pack_size: Vector2i = Vector2i(1, 1)
 @export var attack_behavior: AttackBehavior
 
 var spawn_timer: float = 0.0
+
+# --- Slow (SlowShotProc) ---
+const SLOW_TINT := Color(0.55, 0.75, 1.0)
+var _slow_factor: float = 1.0
+var _slow_timer: float = 0.0
 # --- State ---
 var health: float
 var player: Node2D = null
@@ -60,6 +77,13 @@ func _ready() -> void:
 	contact_damage = int(round(contact_damage * GameState.get_damage_multiplier()))
 	health = max_health
 
+	# Behaviours are shared .tres resources; give each enemy its own copy so state like
+	# cooldown timers (RangedAttack) or wander direction (WanderMovement) isn't shared.
+	if movement_behavior:
+		movement_behavior = movement_behavior.duplicate()
+	if attack_behavior:
+		attack_behavior = attack_behavior.duplicate()
+
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 	hitbox.area_exited.connect(_on_hitbox_area_exited)
 	player = get_tree().get_first_node_in_group("player")
@@ -68,7 +92,11 @@ func _ready() -> void:
 		add_to_group("boss")
 		EventBus.boss_spawned.emit(max_health)
 
-	if is_static_visual:
+	if attack_sheet_path != "":
+		sprite.sprite_frames = AnimSheetLoader.build_idle_attack_frames(sprite_sheet_path, attack_sheet_path, idle_fps)
+	elif side_view_frames > 0:
+		sprite.sprite_frames = AnimSheetLoader.build_side_view_enemy_frames(sprite_sheet_path, side_view_frames)
+	elif is_static_visual:
 		sprite.sprite_frames = AnimSheetLoader.build_static_enemy_frames(sprite_sheet_path)
 	else:
 		sprite.sprite_frames = AnimSheetLoader.build_enemy_frames(sprite_sheet_path)
@@ -93,12 +121,11 @@ func _physics_process(delta: float) -> void:
 			contact_tick_timer = contact_damage_interval
 			_deal_contact_damage()
 
+	# Movement and attack are independent: an enemy can walk AND shoot. Knockback
+	# takes over movement while it's active (it used to be overwritten every frame).
 	if knockback_velocity.length() > 1.0:
 		velocity = knockback_velocity
 		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
-	
-	if attack_behavior and action_state == "":
-		attack_behavior.try_attack(self, delta)
 	elif movement_behavior:
 		velocity = movement_behavior.get_velocity(self, delta)
 	elif player:
@@ -110,6 +137,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity = Vector2.ZERO
 
+	if attack_behavior and action_state == "":
+		attack_behavior.try_attack(self, delta)
+
+	_apply_slow_to_velocity(delta)
 	move_and_slide()
 
 	if action_state == "":
@@ -126,6 +157,15 @@ func set_visual_scale(value: float) -> void:
 
 
 func _update_facing_direction(dir: Vector2) -> void:
+	if side_view_frames > 0:
+		# Side-view sheets: always the left cycle, mirrored when heading right. Nearly
+		# vertical movement keeps the current facing instead of flickering.
+		facing_direction = "left"
+		if absf(dir.x) > 0.2:
+			facing_right = dir.x > 0.0
+		sprite.flip_h = facing_right
+		return
+
 	if abs(dir.x) > abs(dir.y):
 		if dir.x > 0.0:
 			facing_direction = "right"
@@ -292,3 +332,25 @@ func get_player_aim_point() -> Vector2:
 	if player.has_method("get_hurtbox_center"):
 		return player.call("get_hurtbox_center")  # player is typed Node2D here
 	return player.global_position
+
+
+## Slows movement to `factor` (0.5 = half speed) for `duration` seconds. A stronger
+## slow replaces a weaker one; re-applying refreshes the timer.
+func apply_slow(factor: float, duration: float) -> void:
+	if is_dying:
+		return
+	_slow_factor = minf(factor, _slow_factor) if _slow_timer > 0.0 else factor
+	_slow_timer = maxf(_slow_timer, duration)
+	sprite.self_modulate = SLOW_TINT  # self_modulate, so the red damage flash (modulate) still works
+
+
+## Call right before move_and_slide(). Knockback isn't slowed, only own movement.
+func _apply_slow_to_velocity(delta: float) -> void:
+	if _slow_timer <= 0.0:
+		return
+	_slow_timer -= delta
+	if knockback_velocity.length() <= 1.0:
+		velocity *= _slow_factor
+	if _slow_timer <= 0.0:
+		_slow_factor = 1.0
+		sprite.self_modulate = Color.WHITE

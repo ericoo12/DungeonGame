@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DropTable" format=3 uid="uid://c3velaaosw68n"]
+
+[ext_resource type="Script" uid="uid://voder0mw7gaa" path="res://scripts/dungeon/DropEntry.gd" id="1_15igy"]
+[ext_resource type="PackedScene" uid="uid://btesao6qvspbr" path="res://scenes/pickups/HeartPickup.tscn" id="2_ajv5g"]
+[ext_resource type="Script" uid="uid://e2o4jr4848mt" path="res://scripts/dungeon/DropTable.gd" id="2_s0xwh"]
+
+[sub_resource type="Resource" id="Resource_6bqqo"]
+script = ExtResource("1_15igy")
+scene = ExtResource("2_ajv5g")
+metadata/_custom_type_script = "uid://voder0mw7gaa"
+
+[resource]
+script = ExtResource("2_s0xwh")
+drop_chance = 0.05
+drop_chance_per_luck = 0.01
+entries = Array[ExtResource("1_15igy")]([SubResource("Resource_6bqqo")])
+metadata/_custom_type_script = "uid://e2o4jr4848mt"

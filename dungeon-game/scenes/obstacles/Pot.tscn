@@ -1,24 +1,25 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://b7g081hli3cry"]
 
-[ext_resource type="Script" path="res://scripts/obstacles/Obstacle.gd" id="1_obst"]
-[ext_resource type="Texture2D" path="res://assets/Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://dbpkv6tk7l2wh" path="res://scripts/obstacles/Obstacle.gd" id="1_obst"]
+[ext_resource type="Resource" uid="uid://c3velaaosw68n" path="res://scenes/dungeon/drops/obstacle_drops.tres" id="2_pn1kt"]
+[ext_resource type="Texture2D" uid="uid://xgts5mcf2fxl" path="res://assets/Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_obst"]
 size = Vector2(14, 12)
 
-[node name="Pot" type="StaticBody2D"]
+[node name="Pot" type="StaticBody2D" unique_id=2076933752]
 collision_layer = 9
 collision_mask = 0
 script = ExtResource("1_obst")
-breakable = true
 hits_to_break = 1
+drop_table = ExtResource("2_pn1kt")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1054288578]
 position = Vector2(0, -1)
 texture = ExtResource("2_tex")
 region_enabled = true
 region_rect = Rect2(496, 272, 16, 18)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=89576760]
 position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_obst")

@@ -6,8 +6,8 @@
 
 [resource]
 script = ExtResource("1_6x4rq")
+orbital_scene = ExtResource("2_ve0hk")
 item_name = "Another One Poop"
 description = "A friend with poor boundaries. Orbits you and damages enemies on contact."
 icon = ExtResource("1_xm2je")
-orbital_scene = ExtResource("2_ve0hk")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

@@ -164,6 +164,75 @@ static func build_toilet_brush_frames(base_path: String) -> SpriteFrames:
 
 
 # ============================================================
+# ENEMY - SIDE VIEW (one horizontal run cycle facing LEFT, e.g. Rat)
+# ============================================================
+
+## A single row of `frame_count` equal frames, drawn facing left. Every direction uses
+## that cycle; there's deliberately no "_right" animation, so EnemyBase mirrors "left"
+## (flip_h) when moving right. attack_/damage_ reuse the run cycle so EnemyBase's
+## shared sprite.play(...) calls always find an animation.
+static func build_side_view_enemy_frames(path: String, frame_count: int, fps: float = 12.0) -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+
+	var tex := load(path) as Texture2D
+	if tex == null:
+		push_error("AnimSheetLoader: could not load side-view enemy texture: " + path)
+		return frames
+
+	var frame_width := tex.get_width() / frame_count
+	for prefix in ["run", "attack", "damage"]:
+		for dir in ["down", "left", "up"]:
+			var anim_name: String = "%s_%s" % [prefix, dir]
+			frames.add_animation(anim_name)
+			frames.set_animation_speed(anim_name, fps)
+			frames.set_animation_loop(anim_name, prefix == "run")
+			for i in frame_count:
+				var atlas := AtlasTexture.new()
+				atlas.atlas = tex
+				atlas.region = Rect2(i * frame_width, 0, frame_width, tex.get_height())
+				frames.add_frame(anim_name, atlas)
+	return frames
+
+
+# ============================================================
+# ENEMY - IDLE + ATTACK SHEETS (front-facing, e.g. sewer turret)
+# ============================================================
+
+## Two single-row sheets of square frames (frame count = width / height):
+##   idle_path   -> "run_<dir>" (looping) and "damage_<dir>" (one play, the hit flash
+##                  is EnemyBase's red modulate)
+##   attack_path -> "attack_<dir>" (one play)
+## Same frames for every direction, including "_right" so nothing gets mirrored.
+static func build_idle_attack_frames(idle_path: String, attack_path: String,
+		idle_fps: float = 6.0, attack_fps: float = 10.0) -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+	var idle := load(idle_path) as Texture2D
+	var attack := load(attack_path) as Texture2D
+	if idle == null or attack == null:
+		push_error("AnimSheetLoader: could not load idle/attack sheets: %s, %s" % [idle_path, attack_path])
+		return frames
+	for dir in ["down", "left", "right", "up"]:
+		_add_row_animation(frames, "run_" + dir, idle, idle_fps, true)
+		_add_row_animation(frames, "damage_" + dir, idle, idle_fps * 2.0, false)
+		_add_row_animation(frames, "attack_" + dir, attack, attack_fps, false)
+	return frames
+
+
+static func _add_row_animation(frames: SpriteFrames, anim_name: String, tex: Texture2D, fps: float, loop: bool) -> void:
+	var size := tex.get_height()  # square frames
+	frames.add_animation(anim_name)
+	frames.set_animation_speed(anim_name, fps)
+	frames.set_animation_loop(anim_name, loop)
+	for i in tex.get_width() / size:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(i * size, 0, size, size)
+		frames.add_frame(anim_name, atlas)
+
+
+# ============================================================
 # ENEMY - STATIC (no real animation, e.g. Smiley)
 # ============================================================
 

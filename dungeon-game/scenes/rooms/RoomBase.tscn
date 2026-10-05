@@ -120,14 +120,15 @@ position = Vector2(0, -93)
 scale = Vector2(1, 0.65)
 
 [node name="CollisionShape2D" parent="Doors/North" index="1" unique_id=2113766507]
-position = Vector2(0, -24.915)
+position = Vector2(0, -1.5385)
+scale = Vector2(1.5789, 1.0475)
 
 [node name="PhysicalBlocker" parent="Doors/North" index="2" unique_id=1472804281]
-position = Vector2(0, -22.25)
 collision_mask = 10
+position = Vector2(0, 1.5385)
 
 [node name="CollisionShape2D" parent="Doors/North/PhysicalBlocker" index="0" unique_id=2093098370]
-scale = Vector2(1.695, 1)
+scale = Vector2(1.8947, 1.0651)
 
 [node name="South" parent="Doors" unique_id=1481538488 instance=ExtResource("4_oo7mm")]
 position = Vector2(0, 93.00001)
@@ -135,13 +136,14 @@ rotation = 3.1415927
 scale = Vector2(1, 0.68)
 
 [node name="CollisionShape2D" parent="Doors/South" index="1" unique_id=2113766507]
-position = Vector2(1.7484624e-07, 2.941188)
+position = Vector2(0, 2.9412)
+scale = Vector2(1.5789, 1.0013)
 
 [node name="PhysicalBlocker" parent="Doors/South" index="2" unique_id=1472804281]
-position = Vector2(0, 6.147)
+position = Vector2(0, 5.8824)
 
 [node name="CollisionShape2D" parent="Doors/South/PhysicalBlocker" index="0" unique_id=2093098370]
-scale = Vector2(1.685, 1)
+scale = Vector2(1.8947, 1.0181)
 
 [node name="East" parent="Doors" unique_id=953514927 instance=ExtResource("4_oo7mm")]
 position = Vector2(193, 0)
@@ -149,13 +151,14 @@ rotation = 1.5707964
 scale = Vector2(1, 0.7)
 
 [node name="CollisionShape2D" parent="Doors/East" index="1" unique_id=2113766507]
-position = Vector2(1.3113402e-07, 4.2857103)
+position = Vector2(0, 4.2857)
+scale = Vector2(1.5789, 0.9726)
 
 [node name="PhysicalBlocker" parent="Doors/East" index="2" unique_id=1472804281]
-position = Vector2(0, 7.009)
+position = Vector2(0, 7.1429)
 
 [node name="CollisionShape2D" parent="Doors/East/PhysicalBlocker" index="0" unique_id=2093098370]
-scale = Vector2(1.685, 1)
+scale = Vector2(1.8947, 0.989)
 
 [node name="West" parent="Doors" unique_id=1414241096 instance=ExtResource("4_oo7mm")]
 position = Vector2(-195, 0)
@@ -163,13 +166,14 @@ rotation = -1.5707964
 scale = Vector2(1, 0.775)
 
 [node name="CollisionShape2D" parent="Doors/West" index="1" unique_id=2113766507]
-position = Vector2(-4.371111e-08, 1.2903147)
+position = Vector2(0, 6.4516)
+scale = Vector2(1.5789, 0.8785)
 
 [node name="PhysicalBlocker" parent="Doors/West" index="2" unique_id=1472804281]
-position = Vector2(0, 7.608)
+position = Vector2(0, 9.0323)
 
 [node name="CollisionShape2D" parent="Doors/West/PhysicalBlocker" index="0" unique_id=2093098370]
-scale = Vector2(1.685, 1)
+scale = Vector2(1.8947, 0.8933)
 
 [node name="EnemySpawnPoints" type="Node2D" parent="." unique_id=2016783228]
 

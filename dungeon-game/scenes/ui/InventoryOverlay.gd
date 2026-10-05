@@ -32,6 +32,7 @@ var _active_name: Label
 var _passive_grid: GridContainer
 var _passive_empty: Label
 var _count_label: Label
+var _seed_label: Label
 var _detail_name: Label
 var _detail_tag: Label
 var _detail_desc: Label
@@ -54,6 +55,7 @@ func _ready() -> void:
 
 func open() -> void:
 	visible = true
+	_seed_label.text = "Seed: %d" % GameState.run_seed
 	if _active_item:
 		_active_slot.grab_focus()
 	elif _passive_grid.get_child_count() > 0:
@@ -273,9 +275,14 @@ func _build_ui() -> void:
 
 	# Footer
 	root.add_child(_divider())
-	var footer := _label("Arrows: browse      %s / Esc: close" % _action_key_text("toggle_items"), 12, COL_MUTED)
-	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var footer := HBoxContainer.new()
 	root.add_child(footer)
+	_seed_label = _label("", 12, COL_MUTED)
+	footer.add_child(_seed_label)
+	var footer_spacer := Control.new()
+	footer_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	footer.add_child(footer_spacer)
+	footer.add_child(_label("Arrows: browse      %s / Esc: close" % _action_key_text("toggle_items"), 12, COL_MUTED))
 
 
 func _make_slot(size_px: int, icon: Texture2D, border: Color) -> Button:

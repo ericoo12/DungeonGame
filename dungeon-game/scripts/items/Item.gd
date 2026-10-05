@@ -15,7 +15,7 @@ extends ItemBase
 @export var size_bonus: float = 0.0	# common +0.15, uncommon +0.3, rare +0.5, bad -0.2
 @export var player_size_bonus: float = 0.0	# common -0.1, rare -0.2, bad 0.2
 @export var shot_speed_bonus: float = 0.0
-
+@export var luck_bonus: float = 0.0
 # --- Multiplicative stat bonuses
 @export var fire_rate_multiplier: float = 1.0       # >1 = fires faster, e.g. 5.5 = 5.5x faster
 @export var damage_multiplier: float = 1.0          # <1 = weaker shots, e.g. 0.2 = keep 20% (-80%)
@@ -38,6 +38,8 @@ extends ItemBase
 @export var shot_style: ShotStyleModifier
 @export var shot_pattern_modifier: ShotPatternModifier
 @export var charge_shot: ChargeShotSettings
+## Luck-scaled chance-per-shot effect (e.g. SlowShotProc). Stacks with everything.
+@export var shot_proc: ShotProcEffect
 
 #--- Cosmetics ---
 @export var cosmetic_scene: PackedScene
@@ -98,7 +100,12 @@ func apply(player: Player) -> void:
 	
 	if charge_shot:
 		player.charge_shot = charge_shot
+	
+	if luck_bonus != 0.0:
+		player.luck += luck_bonus
 
+	if shot_proc:
+		player.shot_procs.append(shot_proc)
 
 
 ## Builds the "+2 Damage" / "+0.5 Speed" style summary shown in the item overlay's
@@ -129,12 +136,15 @@ func get_stat_lines() -> Array[Dictionary]:
 	_add_line(lines, fire_rate_multiplier - 1.0, "x%.2f Fire Rate" % fire_rate_multiplier)
 	_add_line(lines, damage_multiplier - 1.0, "x%.2f Damage" % damage_multiplier)
 	_add_line(lines, projectile_size_multiplier - 1.0, "x%.2f Shot Size" % projectile_size_multiplier)
+	_add_line(lines, luck_bonus, "%+d Luck" % int(luck_bonus))
 	if shot_style:
 		lines.append({"text": "Changes your shot", "good": true, "neutral": true})
 	if shot_pattern_modifier:
 		lines.append({"text": "Changes your shot pattern", "good": true, "neutral": true})
 	if charge_shot:
 		lines.append({"text": "Charge shot", "good": true, "neutral": true})
+	if shot_proc:
+		lines.append({"text": shot_proc.get_stat_text(), "good": true, "neutral": true})
 	if orbital_scene:
 		lines.append({"text": "Adds an orbital", "good": true, "neutral": true})
 	if follower_scene:

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SlowShotProc" format=3 uid="uid://c3ehn1cl0enee"]
+
+[ext_resource type="Script" uid="uid://dikxg277lftvv" path="res://scripts/items/SlowShotProc.gd" id="1_wiu4j"]
+
+[resource]
+script = ExtResource("1_wiu4j")
+tint = Color(0.9183987, 0.6950226, 0.18894795, 1)
+metadata/_custom_type_script = "uid://1o4uf04bq6va"

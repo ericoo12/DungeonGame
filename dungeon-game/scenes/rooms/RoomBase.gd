@@ -14,6 +14,7 @@ var _enemy_count: int = 0
 var _is_boss_room: bool = false
 var _entities_container: Node2D = null
 var _current_room_data: RoomData = null
+var _dungeon: Dungeon = null
 const ITEM_PICKUP_SCENE := preload("res://scenes/items/ItemPickup.tscn")
 
 ## Walkability grid built from WallBlockers + live obstacles.
@@ -34,6 +35,7 @@ func _ready() -> void:
 func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
 	_current_room_data = room_data
 	_entities_container = entities_container
+	_dungeon = dungeon
 	_apply_floor_variant(dungeon.current_floor_variant)
 
 	grid = RoomGrid.new(self, grid_rect)
@@ -56,6 +58,7 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	# Before the cleared-check: obstacles persist after a room is cleared.
 	if room_data.type == RoomData.Type.NORMAL:
 		_spawn_obstacles(room_data, dungeon)
+	_respawn_pending_drops()
 
 	if room_data.cleared or room_data.type == RoomData.Type.START:
 		return
@@ -88,13 +91,46 @@ func _spawn_enemies(distance: int, dungeon: Dungeon, entities_container: Node2D)
 
 	for i in scenes.size():
 		var enemy := scenes[i].instantiate()
-		entities_container.add_child(enemy)
-		enemy.global_position = positions[i]
-		enemy.tree_exiting.connect(_on_enemy_removed)
-		_enemy_count += 1
+		var extra := _pack_extra_count(enemy)
+		_add_enemy(enemy, positions[i], entities_container)
+		for pack_pos in _pack_positions(positions[i], extra):
+			_add_enemy(scenes[i].instantiate(), pack_pos, entities_container)
 
 	if _enemy_count == 0:
 		_unlock_all_doors()
+
+
+func _add_enemy(enemy: Node, pos: Vector2, entities_container: Node2D) -> void:
+	entities_container.add_child(enemy)
+	enemy.global_position = pos
+	enemy.tree_exiting.connect(_on_enemy_removed)
+	_enemy_count += 1
+
+
+## Extra members to spawn alongside `enemy` (EnemyBase.pack_size), 0 for solo enemies.
+func _pack_extra_count(enemy: Node) -> int:
+	var e := enemy as EnemyBase
+	if e == null or e.pack_size.y <= 1:
+		return 0
+	return maxi(randi_range(e.pack_size.x, e.pack_size.y) - 1, 0)
+
+
+## `count` spawn points on the free tiles closest to `center` (walking distance on the
+## grid, so pack members never end up behind a wall), with a little jitter.
+func _pack_positions(center: Vector2, count: int) -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	if count <= 0:
+		return result
+	var cells: Array = []
+	if grid:
+		var dist := grid.bfs(grid.global_to_cell(center))
+		cells = dist.keys()
+		cells.sort_custom(func(a, b): return dist[a] < dist[b])
+		cells = cells.slice(1)  # first one is the leader's own tile
+	for i in count:
+		var base := grid.cell_to_global(cells[i]) if i < cells.size() else center
+		result.append(base + Vector2(randf_range(-4.0, 4.0), randf_range(-4.0, 4.0)))
+	return result
 
 
 ## Chance per enemy of being drawn from [easy, medium, hard], by the room's tier
@@ -155,6 +191,7 @@ func _on_enemy_removed() -> void:
 	if _enemy_count <= 0:
 		_unlock_all_doors()
 		room_cleared.emit()
+		_roll_room_clear_reward()
 		if stage_door:
 			stage_door.activate()
 			_current_room_data.stage_door_activated = true
@@ -297,6 +334,8 @@ func _spawn_obstacles(room_data: RoomData, dungeon: Dungeon) -> void:
 			entry.broken = true  # persists on RoomData: stays broken on revisit
 			grid.set_obstacle(cell, false)
 			obstacle_layout_changed.emit()
+			if obstacle.drop_table:
+				_spawn_drop(obstacle.drop_table.roll(), grid.cell_to_global(cell))
 		)
 
 
@@ -370,3 +409,66 @@ func _local_group_nodes(group: String) -> Array:
 		if is_ancestor_of(node):
 			result.append(node)
 	return result
+
+
+# --- Drops (luck-scaled rewards) -------------------------------------------------
+
+## Normal rooms roll Dungeon.room_clear_drops once, when the last enemy dies.
+func _roll_room_clear_reward() -> void:
+	if _current_room_data == null or _current_room_data.type != RoomData.Type.NORMAL:
+		return
+	if _dungeon == null or _dungeon.room_clear_drops == null:
+		return
+	if not is_inside_tree() or is_queued_for_deletion():
+		return  # enemies also "die" when the room/scene is torn down
+	_spawn_drop(_dungeon.room_clear_drops.roll(), _free_cell_near(global_position))
+
+
+## Spawns a drop into the Entities container. If the scene has a `collected` signal it's
+## remembered on RoomData until picked up, so it's still there when you come back.
+## `existing_entry` is passed when respawning a remembered drop.
+func _spawn_drop(scene: PackedScene, global_pos: Vector2, existing_entry: Dictionary = {}) -> void:
+	if scene == null or _entities_container == null:
+		return
+	var drop := scene.instantiate()
+	if drop is Node2D:
+		(drop as Node2D).position = _entities_container.to_local(global_pos)
+	# Deferred: this runs from physics callbacks (obstacle hit) and tree_exiting (enemy died).
+	_entities_container.add_child.call_deferred(drop)
+
+	if not drop.has_signal("collected"):
+		return
+	var entry := existing_entry
+	if entry.is_empty():
+		entry = {"scene_path": scene.resource_path, "position": to_local(global_pos)}
+		_current_room_data.pending_drops.append(entry)
+	var room_data := _current_room_data
+	drop.connect("collected", func(): room_data.pending_drops.erase(entry))
+
+
+func _respawn_pending_drops() -> void:
+	for entry in _current_room_data.pending_drops.duplicate():
+		var scene := load(entry.scene_path) as PackedScene
+		if scene == null:
+			_current_room_data.pending_drops.erase(entry)
+			continue
+		_spawn_drop(scene, to_global(entry.position), entry)
+
+
+## Walkable grid cell closest to `global_pos` (not in a wall or obstacle).
+func _free_cell_near(global_pos: Vector2) -> Vector2:
+	if grid == null:
+		return global_pos
+	var target := grid.global_to_cell(global_pos)
+	var best := target
+	var best_dist := INF
+	for x in range(grid.rect.position.x, grid.rect.end.x):
+		for y in range(grid.rect.position.y, grid.rect.end.y):
+			var cell := Vector2i(x, y)
+			if not grid.is_walkable(cell):
+				continue
+			var d := Vector2(cell - target).length_squared()
+			if d < best_dist:
+				best_dist = d
+				best = cell
+	return grid.cell_to_global(best)

@@ -14,8 +14,10 @@ signal broken
 ## Breakables count HITS, not damage: every projectile / laser shot / beam tick is one hit,
 ## no matter how much damage the player does.
 @export var hits_to_break: int = 3
-## Optional: spawned where the obstacle broke. Empty = no drop.
-@export var drop_scene: PackedScene
+## Optional luck-scaled drop table, rolled when this breaks. Empty = never drops.
+## The roll + spawn happen in RoomController (on `broken`), so drops are remembered
+## per room like room-clear rewards.
+@export var drop_table: DropTable
 ## Damage states: number of horizontal frames in the sprite sheet (Sprite2D.hframes).
 ## 1 = no damage states. Frames go from intact (0) to most damaged.
 @export var damage_frames: int = 1
@@ -67,11 +69,6 @@ func _hit_flash() -> void:
 func _break() -> void:
 	_is_broken = true
 	broken.emit()
-	if drop_scene:
-		var drop: Node2D = drop_scene.instantiate()
-		drop.position = position
-		# Deferred: _break() usually runs inside a physics callback (projectile hit).
-		get_parent().add_child.call_deferred(drop)
 	if leave_remains:
 		show_as_broken()
 	else:

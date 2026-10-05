@@ -72,6 +72,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity = lunge_direction * lunge_speed if is_lunging else Vector2.ZERO
 
+	_apply_slow_to_velocity(delta)
 	move_and_slide()
 
 	if action_state == "":

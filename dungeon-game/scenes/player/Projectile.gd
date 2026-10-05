@@ -32,6 +32,11 @@ var velocity: Vector2 = Vector2.ZERO
 var elapsed: float = 0.0
 var has_landed: bool = false
 
+## Set by Player._fire_projectile(): who fired it, and which ShotProcEffects
+## triggered for this shot (applied to whatever it hits).
+var shooter: Player = null
+var procs: Array[ShotProcEffect] = []
+
 const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
 const SPLASH_SCENE := preload("res://scenes/effects/ProjectileSplash.tscn")
 const PROJECTILE_SPLASH_BASE_SCALE := 0.3
@@ -122,6 +127,8 @@ func _try_deal_damage(target: Node) -> void:
 		return
 	if target.has_method("take_damage"):
 		target.take_damage(damage, velocity.normalized(), knockback_strength)
+		for proc in procs:
+			proc.on_hit(target, shooter)
 		_land()
 	elif target.is_in_group("walls"):
 		_land()

@@ -17,7 +17,13 @@ class_name EnemyProjectile
 # --- Visuals ---
 @export var shadow_scale: float = 0.3
 @export var splash_scale: float = 0.2
-@export var splash_modulate: Color = Color(1.0, 0.45, 0.45)  # tints the (pink) player splash red
+@export var splash_modulate: Color = Color.WHITE
+## Played where the shot lands/hits. Empty = the player's splash.
+@export var splash_scene: PackedScene
+## The sprite art points LEFT (blob in front, droplets trailing right); it's rotated to
+## match the flight direction. Set to 0 for art pointing right, or turn rotation off.
+@export var rotate_to_velocity: bool = true
+@export var sprite_angle_offset_deg: float = 180.0
 
 const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
 const SPLASH_SCENE := preload("res://scenes/effects/ProjectileSplash.tscn")
@@ -44,6 +50,8 @@ func _ready() -> void:
 
 func launch(dir: Vector2, _shooter_velocity: Vector2 = Vector2.ZERO) -> void:
 	velocity = dir.normalized() * speed
+	if rotate_to_velocity:
+		sprite.rotation = velocity.angle() + deg_to_rad(sprite_angle_offset_deg)
 
 
 func _physics_process(delta: float) -> void:
@@ -98,7 +106,7 @@ func _land() -> void:
 
 
 func _spawn_splash() -> void:
-	var splash: ProjectileSplash = SPLASH_SCENE.instantiate()
+	var splash: ProjectileSplash = (splash_scene if splash_scene else SPLASH_SCENE).instantiate()
 	var ground_layer := get_tree().get_first_node_in_group("ground_effects")
 	var target_parent: Node = ground_layer if ground_layer else get_parent()
 	target_parent.add_child(splash)  # plain Node2D (no physics), safe inside a physics callback

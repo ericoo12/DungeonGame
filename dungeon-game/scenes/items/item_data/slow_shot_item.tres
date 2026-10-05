@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://4i021t52hvpn"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_gcuj7"]
+[ext_resource type="Texture2D" uid="uid://dx56lhrfaetld" path="res://assets/sprites/items/items_icons/pisspants.png" id="1_nmnsy"]
+[ext_resource type="Resource" uid="uid://c3ehn1cl0enee" path="res://scenes/items/modifiers/slow_shot_proc.tres" id="3_dm8e2"]
+
+[resource]
+script = ExtResource("1_gcuj7")
+shot_proc = ExtResource("3_dm8e2")
+item_name = "Sticky Briefs"
+description = "They really cling"
+icon = ExtResource("1_nmnsy")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

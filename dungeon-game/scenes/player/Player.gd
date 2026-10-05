@@ -53,6 +53,7 @@ var charge_knockback_mult: float = 1.0
 var charge_speed_mult: float = 1.0
 const CHARGE_GLOW_COLOR := Color(1.6, 1.3, 0.6)
 var charge_projectile_scene: PackedScene = null
+
 # --- Projectile modifiers ---
 @export var projectile_range: float = 1.0
 const RANGE_MIN := 0.3
@@ -69,6 +70,7 @@ const KNOCKBACK_MAX := 500.0
 @export var shot_speed: float = 1.0
 const SHOT_SPEED_MIN := 0.3
 const SHOT_SPEED_MAX := 3.0
+
 # --- Damage ---
 @export var base_damage: float = 3.5
 var damage_ups: int = 0
@@ -78,6 +80,10 @@ var damage_multiplier: float = 1.0
 var shot_style: ShotStyleModifier = null
 var shot_pattern_modifiers: Array[ShotPatternModifier] = []
 
+#--- Luck ---
+var luck: float = 0.0
+## Chance-per-shot effects (slow shot, ...). Stack freely; each rolls once per shot.
+var shot_procs: Array[ShotProcEffect] = []
 
 # --- Passive items ---
 var damage_ups_items: Array[Item] = []
@@ -524,12 +530,31 @@ func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true) -> void:
 	projectile.lifetime = projectile_range
 	projectile.speed_multiplier = shot_speed * charge_speed_mult
 	projectile.scale = Vector2.ONE * projectile_size * charge_size_mult
+	projectile.shooter = self
+	projectile.procs = roll_shot_procs()
+	for proc in projectile.procs:
+		proc.decorate_projectile(projectile)
 
 	get_parent().add_child(projectile)
 	projectile.global_position = weapon_marker.global_position + aim_dir * 10
 
 	var shooter_velocity: Vector2 = velocity if apply_momentum else Vector2.ZERO
 	projectile.launch(aim_dir, shooter_velocity)
+
+
+## Rolls every equipped ShotProcEffect once (luck-scaled) and returns the ones that
+## triggered for this shot.
+func roll_shot_procs() -> Array[ShotProcEffect]:
+	var triggered: Array[ShotProcEffect] = []
+	for proc in shot_procs:
+		if Luck.roll(proc.get_chance()):
+			triggered.append(proc)
+	return triggered
+
+
+func heal(amount: int) -> void:
+	current_hearts = mini(current_hearts + amount, max_hearts)
+	EventBus.player_health_changed.emit(current_hearts, max_hearts)
 
 
 func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback_strength: float = 0.0) -> void:
@@ -547,8 +572,13 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 			knockback_velocity = knockback_dir.normalized() * knockback_strength
 
 
+const ENEMY_COLLISION_LAYER := 3  # "enemies" physics layer (value 4)
+
+
 func _start_invulnerability() -> void:
 	invulnerable = true
+	# Walk through enemies while invulnerable, so a swarm can't pin you in a corner.
+	set_collision_mask_value(ENEMY_COLLISION_LAYER, false)
 	var tween := create_tween()
 	tween.set_loops(5)
 	tween.tween_property(lower_sprite, "modulate:a", 0.3, 0.1)
@@ -559,6 +589,27 @@ func _start_invulnerability() -> void:
 	invulnerable = false
 	lower_sprite.modulate.a = 1.0
 	body_root.modulate.a = 1.0
+	_restore_enemy_collision()
+
+
+## Turns enemy collision back on, but only once the player isn't standing inside an
+## enemy (switching it on mid-overlap would trap or jitter the player). While still
+## overlapping you can keep walking out; contact damage applies as normal again.
+func _restore_enemy_collision() -> void:
+	while _overlaps_enemy_body():
+		await get_tree().physics_frame
+		if invulnerable or is_dying:
+			return  # hit again: that invulnerability window restores it when it ends
+	set_collision_mask_value(ENEMY_COLLISION_LAYER, true)
+
+
+func _overlaps_enemy_body() -> bool:
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = body_collision.shape
+	query.transform = body_collision.global_transform
+	query.collision_mask = 1 << (ENEMY_COLLISION_LAYER - 1)
+	query.exclude = [get_rid()]
+	return not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
 
 
 func _die() -> void:

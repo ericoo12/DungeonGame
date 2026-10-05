@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://btesao6qvspbr"]
+
+[ext_resource type="Script" uid="uid://c6x5p12ywxpy8" path="res://scenes/pickups/HeartPickup.gd" id="1_66kps"]
+[ext_resource type="Texture2D" uid="uid://ol8im8whevlv" path="res://scenes/pickups/heart_pickup_64.png" id="1_bfkkm"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ng0gt"]
+radius = 22.42
+
+[node name="HeartPickup" type="Area2D" unique_id=1100511034]
+scale = Vector2(0.15, 0.15)
+script = ExtResource("1_66kps")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=295042644]
+shape = SubResource("CircleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1387592167]
+texture = ExtResource("1_bfkkm")

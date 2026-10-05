@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="SwarmChaseMovement" format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/SwarmChaseMovement.gd" id="1_swarm"]
+
+[resource]
+script = ExtResource("1_swarm")
+swarm_group = &"rats"
