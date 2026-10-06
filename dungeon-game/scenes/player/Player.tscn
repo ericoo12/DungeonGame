@@ -22,7 +22,7 @@ size = Vector2(130, 63)
 y_sort_enabled = true
 scale = Vector2(0.15, 0.15)
 collision_layer = 2
-collision_mask = 5
+collision_mask = 133
 motion_mode = 1
 script = ExtResource("1_wr5hl")
 player_scale = 1.0
@@ -62,7 +62,7 @@ rotation = 1.5707964
 shape = SubResource("RectangleShape2D_ovr6g")
 
 [node name="LaserRay" type="RayCast2D" parent="." unique_id=655673405]
-collision_mask = 5
+collision_mask = 261
 
 [node name="PiercingRay" type="RayCast2D" parent="." unique_id=1047255717]
 

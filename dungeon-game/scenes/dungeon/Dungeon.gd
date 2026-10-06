@@ -18,7 +18,6 @@ var boss_scenes: Array[PackedScene] = []
 
 @export var easy_max_distance: int = 2    # rooms this close to start only pull from easy_enemy_scenes
 @export var hard_min_distance: int = 5    # rooms this far or farther can pull from hard_enemy_scenes
-@export var room_world_size := Vector2(432, 224)
 var room_distances: Dictionary = {}
 @export var floor_variants: Array[RoomFloorVariant] = []
 var current_floor_variant: RoomFloorVariant = null
@@ -30,7 +29,7 @@ const STAGE_DOOR_SCENE := preload("res://scenes/dungeon/StageDoor.tscn")
 
 var layout: Dictionary = {}
 var current_grid_pos: Vector2i = Vector2i.ZERO
-var current_room: Node2D = null
+var current_room: RoomController = null
 var player: Player
 var can_travel: bool = true
 const TRAVEL_COOLDOWN := 0.3
@@ -78,8 +77,8 @@ func _generate_and_load_floor() -> void:
 	current_room = null
 	_load_room(Vector2i.ZERO, DungeonGenerator.SOUTH)
 	
-	player.global_position = current_room.global_position  # true initial spawn only — centers the player
-	player.set_camera_bounds(current_room.global_position, room_world_size)
+	player.global_position = current_room.get_arena_bounds().get_center()
+	_apply_room_camera_bounds()
 
 
 func _on_boss_defeated() -> void:
@@ -124,17 +123,18 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	current_grid_pos = grid_pos
 
 	
-	var entrance_direction := entered_from * -1
-	var half_size := room_world_size / 2.0
-	var distance_from_wall := 40.0
+	player.global_position = current_room.get_entry_position(entered_from)
+	_apply_room_camera_bounds()
 
-	var spawn_offset := Vector2(
-		entrance_direction.x * (half_size.x - distance_from_wall),
-		entrance_direction.y * (half_size.y - distance_from_wall)
-	)
 
-	player.global_position = current_room.global_position + spawn_offset
-	player.set_camera_bounds(current_room.global_position, room_world_size)
+func get_arena_bounds() -> Rect2:
+	return current_room.get_arena_bounds() if is_instance_valid(current_room) else Rect2()
+
+
+func _apply_room_camera_bounds() -> void:
+	var bounds := current_room.get_arena_bounds()
+	player.set_camera_bounds(bounds.get_center(), bounds.size)
+
 
 
 func advance_to_next_stage() -> void:

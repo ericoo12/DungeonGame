@@ -2,6 +2,11 @@
 
 [ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://scenes/enemies/enemy_base/EnemyBase.tscn" id="1_hjwlr"]
 [ext_resource type="Texture2D" uid="uid://v8snqfthhg5l" path="res://assets/sprites/enemies/doktor_mugg/DoktorMugg-Sheet.png" id="2_lwkor"]
+[ext_resource type="Script" uid="uid://clko5cat4l0kk" path="res://scenes/enemies/bosses/doktor_mugg/DoktorMugg.gd" id="3_ai"]
+[ext_resource type="Script" uid="uid://ydgbm6n3x04g" path="res://scripts/ai/mugg/MuggStateMachine.gd" id="4_fsm"]
+[ext_resource type="Script" uid="uid://b8vh6kl7ef56i" path="res://scripts/ai/mugg/MuggBehaviorTree.gd" id="5_bt"]
+[ext_resource type="Script" uid="uid://cg5hs8owxfrdj" path="res://scripts/ai/mugg/ArenaNavigator.gd" id="6_nav"]
+[ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://scenes/enemies/EnemyProjectile.tscn" id="7_shot"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4wd1e"]
 atlas = ExtResource("2_lwkor")
@@ -16,11 +21,54 @@ radius = 25.0
 height = 60.0
 
 [node name="Enemy" unique_id=1579853284 instance=ExtResource("1_hjwlr")]
+script = ExtResource("3_ai")
+homing_windup = 0.45
+cluster_windup = 0.32
+decision_interval = 0.1
+preferred_distance = 155.0
+close_distance = 85.0
+attack_range = 350.0
+memory_duration = 3.0
+movement_commitment = 0.65
+movement_timeout = 1.6
+reposition_cooldown = 0.8
+navigation_radius = 20.0
+random_seed = 0
+debug_ai = false
+projectile_scene = ExtResource("7_shot")
+projectile_damage = 1.0
+projectile_speed = 240.0
+windup_duration = 0.22
+fire_duration = 0.08
+recovery_duration = 0.3
+attack_cooldown = 0.95
+dodge_enabled = true
+dodge_chance = 0.65
+dodge_lookahead = 0.65
+dodge_detection_range = 180.0
+dodge_threat_radius = 30.0
+dodge_cooldown = 2.5
+dodge_speed = 320.0
+dodge_duration = 0.22
+dodge_recovery = 0.25
+dodge_left_weight = 1.0
+dodge_right_weight = 1.0
+dodge_away_weight = 0.5
+dodge_diagonal_weight = 0.75
+clear_position_weight = 5.0
+blocked_position_weight = 0.5
+position_distance_scale = 150.0
+basic_shot_weight = 3.0
+tactical_move_weight = 1.0
+tactic_choice_interval = 0.3
+cooldown_variation = 0.2
 sprite_sheet_path = "res://assets/sprites/enemies/doktor_mugg/DoktorMugg-Sheet.png"
 max_health = 100.0
-move_speed = 50.0
+move_speed = 120.0
 contact_knockback_strength = 200.0
+knockback_immune = true
 is_boss = true
+visual_scale = 0.6
 
 [node name="testsprite" parent="." index="0" unique_id=963101555]
 scale = Vector2(1.5, 1)
@@ -38,3 +86,12 @@ shape = SubResource("CapsuleShape2D_auikw")
 [node name="Label" parent="." index="4" unique_id=1371920992]
 offset_top = -36.0
 offset_bottom = -11.49
+
+[node name="StateMachine" type="Node" parent="." index="5" unique_id=568371198]
+script = ExtResource("4_fsm")
+
+[node name="BehaviorTree" type="Node" parent="." index="6" unique_id=1174051508]
+script = ExtResource("5_bt")
+
+[node name="Navigation" type="Node" parent="." index="7" unique_id=607225970]
+script = ExtResource("6_nav")

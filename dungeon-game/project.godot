@@ -102,6 +102,9 @@ use_active_item={
 2d_physics/layer_5="player_hurtbox"
 2d_physics/layer_6="enemy_hitbox"
 2d_physics/layer_7="enemy_projectile"
+2d_physics/layer_8="movement_blocker"
+2d_physics/layer_9="projectile_blocker"
+2d_physics/layer_10="sight_blocker"
 
 [physics]
 

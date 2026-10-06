@@ -114,5 +114,5 @@ func _try_deal_damage(target: Node) -> void:
 	if target.has_method("take_damage"):
 		target.take_damage(damage, velocity.normalized(), knockback_strength)
 		_land()
-	elif target.is_in_group("walls"):
+	elif target.is_in_group("walls") or target.is_in_group("projectile_blockers"):
 		_land()

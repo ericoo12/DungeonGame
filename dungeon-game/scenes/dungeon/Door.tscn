@@ -25,6 +25,7 @@ shape = SubResource("RectangleShape2D_jlufg")
 
 [node name="PhysicalBlocker" type="StaticBody2D" parent="." unique_id=1472804281]
 position = Vector2(0, -39)
+collision_layer = 513
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PhysicalBlocker" unique_id=2093098370]

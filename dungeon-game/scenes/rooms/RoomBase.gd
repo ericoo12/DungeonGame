@@ -3,6 +3,35 @@ class_name RoomController
 
 signal room_cleared
 
+## Local room rectangle in gameplay units. Keep it aligned with the room walls.
+@export var arena_bounds := Rect2(-216.0, -112.0, 432.0, 224.0)
+const SIGHT_BLOCKER_MASK: int = 1 << 9
+
+
+func get_arena_bounds() -> Rect2:
+	return global_transform * arena_bounds
+
+
+func clamp_to_arena(world_position: Vector2, margin: float = 0.0) -> Vector2:
+	var bounds := get_arena_bounds()
+	var inset := Vector2.ONE * maxf(margin, 0.0)
+	inset = inset.min(bounds.size * 0.5)
+	return world_position.clamp(bounds.position + inset, bounds.end - inset)
+
+
+func get_entry_position(travel_direction: Vector2i, margin: float = 40.0) -> Vector2:
+	var bounds := get_arena_bounds()
+	var half_size := (bounds.size * 0.5 - Vector2.ONE * margin).max(Vector2.ZERO)
+	return bounds.get_center() - Vector2(travel_direction) * half_size
+
+
+## Call during physics processing. Green blocks are transparent to this query.
+func has_clear_sight(from: Vector2, to: Vector2) -> bool:
+	var query := PhysicsRayQueryParameters2D.create(from, to, SIGHT_BLOCKER_MASK)
+	query.hit_from_inside = true
+	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
+
+
 var doors: Dictionary = {}
 var _enemy_count: int = 0
 
@@ -118,6 +147,8 @@ func _spawn_boss(dungeon: Dungeon, entities_container: Node2D) -> void:
 	var boss := scene.instantiate()
 	entities_container.add_child(boss)
 	boss.global_position = spawn_pos
+	if boss.has_method("set_arena"):
+		boss.set_arena(self)
 	boss.tree_exiting.connect(_on_enemy_removed)
 	_enemy_count += 1
 

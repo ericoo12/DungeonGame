@@ -32,7 +32,18 @@ var knockback_velocity: Vector2 = Vector2.ZERO
 
 var facing_direction: String = "down"  # down / left / right / up
 
-var action_state: String = ""  # "", "attack", "damage" — prevents run animation from overriding attack/damage
+# Read-only outside the action lifecycle methods below.
+var action_state: String:
+	get:
+		return _action_state
+var _action_state: String = ""
+var _action_id: int = 0
+var action_elapsed: float = 0.0
+var _action_duration: float = 0.0
+var _flash_remaining: float = 0.0
+
+signal action_finished(action: String)
+signal action_cancelled(action: String)
 
 # --- Contact damage ticking ---
 var overlapping_hurtboxes: Array[Area2D] = []
@@ -51,60 +62,178 @@ func _ready() -> void:
 	max_health *= GameState.get_health_multiplier()
 	contact_damage = int(round(contact_damage * GameState.get_damage_multiplier()))
 	health = max_health
-
+	# Configured resources may be shared; runtime cooldowns/directions must not be.
+	if movement_behavior:
+		movement_behavior = movement_behavior.duplicate()
+	if attack_behavior:
+		attack_behavior = attack_behavior.duplicate()
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 	hitbox.area_exited.connect(_on_hitbox_area_exited)
 	player = get_tree().get_first_node_in_group("player")
-
+	_setup_animations()
+	_play_run_animation()
+	spawn_timer = spawn_grace_period
+	set_visual_scale(visual_scale)
+	_update_label()
 	if is_boss:
 		add_to_group("boss")
 		EventBus.boss_spawned.emit(max_health)
 
+
+## Visual customization hook. Subclasses should not replace _ready().
+func _setup_animations() -> void:
 	if is_static_visual:
 		sprite.sprite_frames = AnimSheetLoader.build_static_enemy_frames(sprite_sheet_path)
 	else:
 		sprite.sprite_frames = AnimSheetLoader.build_enemy_frames(sprite_sheet_path)
-	sprite.play("run_down")
-	spawn_timer = spawn_grace_period
-	set_visual_scale(visual_scale)
-	_update_label()
 
 
-
+## Sole owner of enemy physics and move_and_slide(). AI hooks set velocity only.
 func _physics_process(delta: float) -> void:
-	if spawn_timer > 0.0:
-		spawn_timer -= delta
-		velocity = Vector2.ZERO
-		move_and_slide()
+	velocity = Vector2.ZERO
+	if _flash_remaining > 0.0:
+		_flash_remaining = maxf(0.0, _flash_remaining - delta)
+		if _flash_remaining == 0.0:
+			sprite.modulate = Color.WHITE
+	if is_dying:
+		_advance_action(delta)
 		return
-		
-	if overlapping_hurtboxes.size() > 0:
-		contact_tick_timer -= delta
-		if contact_tick_timer <= 0.0:
-			contact_tick_timer = contact_damage_interval
-			_deal_contact_damage()
+	if spawn_timer > 0.0:
+		spawn_timer = maxf(0.0, spawn_timer - delta)
+	else:
+		_update_cooldowns(delta)
+		_advance_action(delta)
+		if is_dying:
+			return
+		_tick_contact_damage(delta)
+		if knockback_velocity.length() > 1.0:
+			velocity = knockback_velocity
+			knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
+		else:
+			knockback_velocity = Vector2.ZERO
+			if action_state == "":
+				_update_behavior(delta)
+			elif action_state == "damage":
+				velocity = Vector2.ZERO
+	if is_dying:
+		return
+	move_and_slide()
+	if action_state == "":
+		if velocity.length() > 0.5:
+			_play_run_animation()
+		else:
+			sprite.stop()
 
-	if knockback_velocity.length() > 1.0:
-		velocity = knockback_velocity
-		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
-	
-	if attack_behavior and action_state == "":
+
+## Runs while alive after spawn protection, including during hurt/attack actions.
+func _update_cooldowns(delta: float) -> void:
+	if attack_behavior:
+		attack_behavior.update_cooldown(delta)
+
+
+## AI hook: called only when free to decide (not hurt, attacking or knocked back).
+## Future boss FSM/BT code must not also self-tick or call move_and_slide().
+func _update_behavior(delta: float) -> void:
+	if attack_behavior:
 		attack_behavior.try_attack(self, delta)
-	elif movement_behavior:
+	if action_state != "" or is_dying:
+		return
+	if movement_behavior:
 		velocity = movement_behavior.get_velocity(self, delta)
-	elif player:
-		# legacy fallback — old hardcoded chase, so DoktorMugg etc. keep working
-		# without needing a MovementBehavior assigned
-		var dir := (player.global_position - global_position).normalized()
+	elif is_instance_valid(player):
+		var dir := global_position.direction_to(player.global_position)
 		velocity = dir * move_speed
 		_update_facing_direction(dir)
-	else:
-		velocity = Vector2.ZERO
 
-	move_and_slide()
 
+## Starts one bounded action and invalidates the previous action's handle.
+## Durations follow the animation's frame timing; min_duration covers late events.
+func begin_action(action: String, animation: String, min_duration: float = 0.0) -> int:
+	if is_dying or not is_inside_tree():
+		return -1
+	cancel_action()
+	_action_state = action
+	action_elapsed = 0.0
+	_action_duration = maxf(min_duration, _animation_duration(animation))
+	_play_action_animation(animation)
+	return _action_id
+
+
+## Cancels pending effects immediately, including lunge movement and queued shots.
+func cancel_action() -> void:
+	# Death is terminal; external interruption must not strand a dying enemy.
+	if is_dying and _action_state == "death":
+		return
+	_cancel_current_action()
+
+
+func _cancel_current_action() -> void:
+	var previous := _action_state
+	_action_id += 1
+	_action_state = ""
+	action_elapsed = 0.0
+	_action_duration = 0.0
+	velocity = Vector2.ZERO
+	if previous != "":
+		_on_action_ended(previous, true)
+		action_cancelled.emit(previous)
+
+
+func is_action_current(handle: int) -> bool:
+	return handle >= 0 and handle == _action_id and _action_state != "" and is_inside_tree()
+
+
+func finish_action(handle: int) -> void:
+	if not is_action_current(handle):
+		return
+	var previous := _action_state
+	_action_id += 1
+	_action_state = ""
+	action_elapsed = 0.0
+	_action_duration = 0.0
+	velocity = Vector2.ZERO
+	_on_action_ended(previous, false)
+	action_finished.emit(previous)
+	if previous == "death":
+		if is_boss:
+			EventBus.boss_defeated.emit()
+		queue_free()
+
+
+func _advance_action(delta: float) -> void:
 	if action_state == "":
-		_play_run_animation()
+		return
+	var handle := _action_id
+	action_elapsed += delta
+	_update_action(delta)
+	if is_action_current(handle) and action_elapsed >= _action_duration:
+		finish_action(handle)
+
+
+## Action execution hook: evaluate pending effects using action_elapsed.
+func _update_action(_delta: float) -> void:
+	pass
+
+
+## Cleanup hook, called on completion AND cancellation. Never launch effects here.
+func _on_action_ended(_action: String, _cancelled: bool) -> void:
+	pass
+
+
+func _animation_duration(animation: String) -> float:
+	var frames := sprite.sprite_frames
+	if not frames or not frames.has_animation(animation):
+		return 0.1
+	var duration := 0.0
+	for i in frames.get_frame_count(animation):
+		duration += frames.get_frame_duration(animation, i)
+	return maxf(0.01, duration / maxf(0.01, frames.get_animation_speed(animation) * absf(sprite.speed_scale)))
+
+
+func _play_action_animation(animation: String) -> void:
+	if sprite.sprite_frames and sprite.sprite_frames.has_animation(animation):
+		sprite.stop()
+		sprite.play(animation)
 
 
 func set_visual_scale(value: float) -> void:
@@ -123,107 +252,88 @@ func _update_facing_direction(dir: Vector2) -> void:
 
 func _play_run_animation() -> void:
 	var animation_name := "run_" + facing_direction
-	if sprite.animation != animation_name:
-		sprite.play(animation_name)
+	if sprite.sprite_frames.has_animation(animation_name):
+		if sprite.animation != animation_name or not sprite.is_playing():
+			sprite.play(animation_name)
 
 
 func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback_strength: float = 0.0) -> void:
 	if is_dying:
 		return
-
 	health -= amount
 	_update_label()
-
 	if is_boss:
 		EventBus.boss_health_changed.emit(health)
-
 	if health <= 0:
-		is_dying = true
 		die()
 		return
-
 	_play_damage_animation()
 	_flash()
-
 	if knockback_strength > 0.0 and not knockback_immune:
 		knockback_velocity = knockback_dir.normalized() * knockback_strength
 
 
 func _play_damage_animation() -> void:
-	if is_dying:
-		return
-
-	action_state = "damage"
-	var animation_name := "damage_" + facing_direction
-	sprite.stop()
-	sprite.play(animation_name)
-
-	await sprite.animation_finished
-
-	if is_dying:
-		return
-	if action_state != "damage":  # another state may have taken over while we waited
-		return
-
-	action_state = ""
-	_play_run_animation()
+	begin_action("damage", "damage_" + facing_direction)
 
 
 func _play_attack_animation() -> void:
-	if is_dying:
-		return
-	if action_state == "damage":  # don't interrupt damage
-		return
-	if action_state == "attack":  # already attacking, don't restart
-		return
-
-	action_state = "attack"
-	var animation_name := "attack_" + facing_direction
-	sprite.play(animation_name)
-
-	await sprite.animation_finished
-
-	if is_dying:
-		return
-	if action_state != "attack":  # damage animation may have interrupted
-		return
-
-	action_state = ""
-	_play_run_animation()
+	if action_state == "" and not is_dying:
+		begin_action("attack", "attack_" + facing_direction)
 
 
 func die() -> void:
-	set_physics_process(false)
+	if is_dying:
+		return
+	# Keep only the bounded death action ticking; no AI, contacts or movement.
+	is_dying = true
+	_cancel_current_action()
+	knockback_velocity = Vector2.ZERO
+	overlapping_hurtboxes.clear()
 	hitbox.set_deferred("monitoring", false)
-	velocity = Vector2.ZERO
+	hitbox.set_deferred("monitorable", false)
+	body_collision.set_deferred("disabled", true)
+	var animation := "death_" + facing_direction
+	_action_state = "death"
+	_action_duration = _animation_duration(animation)
+	_play_action_animation(animation)
+	if not sprite.sprite_frames.has_animation(animation):
+		finish_action(_action_id)
 
-	var death_animation := "death_" + facing_direction
-	if sprite.sprite_frames.has_animation(death_animation):
-		sprite.play(death_animation)
-		await sprite.animation_finished
 
-	if is_boss:
-		EventBus.boss_defeated.emit()
-
-	queue_free()
+func _exit_tree() -> void:
+	_cancel_current_action()
 
 
 func _flash() -> void:
 	sprite.modulate = Color(1.0, 0.3, 0.3)
-	await get_tree().create_timer(0.1).timeout
-	if is_instance_valid(sprite):
-		sprite.modulate = Color.WHITE
+	_flash_remaining = 0.1
 
 
 func _update_label() -> void:
 	label.text = str(health)
 
 
+func _tick_contact_damage(delta: float) -> void:
+	if overlapping_hurtboxes.is_empty():
+		return
+	contact_tick_timer -= delta
+	if contact_tick_timer <= 0.0:
+		contact_tick_timer = contact_damage_interval
+		_deal_contact_damage()
+
+
 func _on_hitbox_area_entered(area: Area2D) -> void:
-	if spawn_timer > 0.0:
+	if is_dying or not is_instance_valid(area):
+		return
+	var target := area.get_parent()
+	if not target or not target.has_method("take_damage"):
 		return
 	if not overlapping_hurtboxes.has(area):
 		overlapping_hurtboxes.append(area)
+	# Remember overlaps during grace; begin damage once grace ends.
+	if spawn_timer > 0.0:
+		return
 	contact_tick_timer = contact_damage_interval
 	_play_attack_animation()
 	_deal_damage_to(area)
@@ -234,9 +344,7 @@ func _on_hitbox_area_exited(area: Area2D) -> void:
 
 
 func _deal_contact_damage() -> void:
-	if spawn_timer > 0.0:
-		return
-	if overlapping_hurtboxes.is_empty():
+	if is_dying or spawn_timer > 0.0:
 		return
 	_play_attack_animation()
 	for area in overlapping_hurtboxes:
@@ -244,7 +352,7 @@ func _deal_contact_damage() -> void:
 
 
 func _deal_damage_to(area: Area2D) -> void:
-	if not is_instance_valid(area):
+	if is_dying or not is_instance_valid(area):
 		return
 	var target := area.get_parent()
 	if target and target.has_method("take_damage"):

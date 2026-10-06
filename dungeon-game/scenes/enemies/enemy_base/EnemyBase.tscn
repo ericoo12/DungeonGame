@@ -9,7 +9,7 @@
 
 [node name="Enemy" type="CharacterBody2D" unique_id=1579853284]
 collision_layer = 4
-collision_mask = 11
+collision_mask = 139
 motion_mode = 1
 script = ExtResource("1_6m61i")
 

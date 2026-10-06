@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://b1a0s06n4owc4"]
+
+[ext_resource type="Script" uid="uid://xj8fk33eco4a" path="res://scenes/test/DoktorMuggArena.gd" id="1_test"]
+[ext_resource type="PackedScene" uid="uid://b4glh88c57oo2" path="res://scenes/rooms/BoosRoom.tscn" id="2_room"]
+[ext_resource type="PackedScene" uid="uid://drrxiowem0goy" path="res://scenes/player/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://dbd6c2cbwu7jb" path="res://scenes/enemies/bosses/DoktorMugg.tscn" id="4_boss"]
+[ext_resource type="PackedScene" uid="uid://bng62ay6px8iq" path="res://scenes/ui/HUD.tscn" id="5_hud"]
+
+[node name="DoktorMuggArena" type="Node2D" unique_id=733196463]
+script = ExtResource("1_test")
+
+[node name="Room" parent="." unique_id=402600733 instance=ExtResource("2_room")]
+
+[node name="GroundEffects" type="Node2D" parent="." unique_id=234454828 groups=["ground_effects"]]
+
+[node name="Entities" type="Node2D" parent="." unique_id=404505724]
+y_sort_enabled = true
+
+[node name="Player" parent="Entities" unique_id=1373802097 instance=ExtResource("3_player")]
+position = Vector2(-250, -70)
+
+[node name="DoktorMugg" parent="Entities" unique_id=1844403515 instance=ExtResource("4_boss")]
+position = Vector2(120, -70)
+decision_interval = 0.2
+attack_range = 280.0
+debug_ai = true
+cover_enabled = true
+cover_search_distance = 180.0
+cover_hold_duration = 0.6
+cover_cooldown = 3.5
+area_enabled = true
+area_radius = 60.0
+area_warning = 0.9
+area_lifetime = 1.4
+area_damage = 1.0
+area_recovery = 0.5
+area_cooldown = 5.0
+area_range = 300.0
+area_defensive_distance = 95.0
+area_cover_delay = 0.6
+area_anti_cover_chance = 0.8
+area_defensive_chance = 0.5
+area_choice_interval = 1.2
+
+[node name="HUD" parent="." unique_id=1673068038 instance=ExtResource("5_hud")]
+
+[node name="Instructions" type="CanvasLayer" parent="." unique_id=389576108]
+
+[node name="Info" type="Label" parent="Instructions" unique_id=2004002000]
+offset_left = 20.0
+offset_top = 590.0
+offset_right = 1250.0
+offset_bottom = 665.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18

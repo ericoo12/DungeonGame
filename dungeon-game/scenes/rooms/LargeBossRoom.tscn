@@ -1,0 +1,124 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://scenes/rooms/RoomBase.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/rooms/LargeBossRoom.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tiles/sewer.png" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/StageDoor.tscn" id="4"]
+[sub_resource type="AtlasTexture" id="Quarter"]
+atlas = ExtResource("3")
+region = Rect2(10, 0, 202, 112)
+[sub_resource type="AtlasTexture" id="FloorPatch"]
+atlas = ExtResource("3")
+region = Rect2(80, 48, 64, 48)
+[sub_resource type="RectangleShape2D" id="Horizontal"]
+size = Vector2(408, 32)
+[sub_resource type="RectangleShape2D" id="Vertical"]
+size = Vector2(32, 200)
+[node name="LargeBossRoom" instance=ExtResource("1")]
+script = ExtResource("2")
+arena_bounds = Rect2(-432, -224, 864, 448)
+[node name="Walls" parent="."]
+layer_0/tile_data = PackedInt32Array()
+[node name="Background" parent="."]
+visible = false
+[node name="North" parent="Doors"]
+position = Vector2(0, -205)
+[node name="South" parent="Doors"]
+position = Vector2(0, 205)
+[node name="East" parent="Doors"]
+position = Vector2(409, 0)
+[node name="West" parent="Doors"]
+position = Vector2(-411, 0)
+[node name="StageDoor" parent="Doors" instance=ExtResource("4")]
+position = Vector2(0, -90)
+scale = Vector2(0.05, 0.05)
+[node name="BossSpawn" type="Marker2D" parent="EnemySpawnPoints"]
+position = Vector2(120, 0)
+[node name="QuarterArt" type="Node2D" parent="."]
+z_index = -2
+[node name="FloorFill" type="TextureRect" parent="QuarterArt"]
+offset_left = -432.0
+offset_top = -224.0
+offset_right = 432.0
+offset_bottom = 224.0
+mouse_filter = 2
+texture = SubResource("FloorPatch")
+stretch_mode = 1
+[node name="TopLeft" type="Node2D" parent="QuarterArt"]
+position = Vector2(-432, -224)
+scale = Vector2(1, 1)
+[node name="Art" type="NinePatchRect" parent="QuarterArt/TopLeft"]
+offset_right = 432.0
+offset_bottom = 224.0
+mouse_filter = 2
+texture = SubResource("Quarter")
+draw_center = false
+patch_margin_left = 32
+patch_margin_top = 32
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+[node name="TopRight" type="Node2D" parent="QuarterArt"]
+position = Vector2(432, -224)
+scale = Vector2(-1, 1)
+[node name="Art" type="NinePatchRect" parent="QuarterArt/TopRight"]
+offset_right = 432.0
+offset_bottom = 224.0
+mouse_filter = 2
+texture = SubResource("Quarter")
+draw_center = false
+patch_margin_left = 32
+patch_margin_top = 32
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+[node name="BottomLeft" type="Node2D" parent="QuarterArt"]
+position = Vector2(-432, 224)
+scale = Vector2(1, -1)
+[node name="Art" type="NinePatchRect" parent="QuarterArt/BottomLeft"]
+offset_right = 432.0
+offset_bottom = 224.0
+mouse_filter = 2
+texture = SubResource("Quarter")
+draw_center = false
+patch_margin_left = 32
+patch_margin_top = 32
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+[node name="BottomRight" type="Node2D" parent="QuarterArt"]
+position = Vector2(432, 224)
+scale = Vector2(-1, -1)
+[node name="Art" type="NinePatchRect" parent="QuarterArt/BottomRight"]
+offset_right = 432.0
+offset_bottom = 224.0
+mouse_filter = 2
+texture = SubResource("Quarter")
+draw_center = false
+patch_margin_left = 32
+patch_margin_top = 32
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+[node name="Perimeter" type="StaticBody2D" parent="." groups=["walls"]]
+collision_layer = 513
+collision_mask = 0
+[node name="NW" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(-228, -208)
+shape = SubResource("Horizontal")
+[node name="NE" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(228, -208)
+shape = SubResource("Horizontal")
+[node name="SW" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(-228, 208)
+shape = SubResource("Horizontal")
+[node name="SE" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(228, 208)
+shape = SubResource("Horizontal")
+[node name="WN" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(-416, -124)
+shape = SubResource("Vertical")
+[node name="WS" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(-416, 124)
+shape = SubResource("Vertical")
+[node name="EN" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(416, -124)
+shape = SubResource("Vertical")
+[node name="ES" type="CollisionShape2D" parent="Perimeter"]
+position = Vector2(416, 124)
+shape = SubResource("Vertical")

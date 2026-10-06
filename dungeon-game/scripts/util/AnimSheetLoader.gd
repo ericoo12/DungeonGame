@@ -181,8 +181,8 @@ static func build_static_enemy_frames(path: String) -> SpriteFrames:
 		for dir in directions:
 			var anim_name: String = "%s_%s" % [prefix, dir]
 			frames.add_animation(anim_name)
-			frames.set_animation_speed(anim_name, 1.0)
-			frames.set_animation_loop(anim_name, true)
+			frames.set_animation_speed(anim_name, 1.0 if prefix == "run" else 8.0)
+			frames.set_animation_loop(anim_name, prefix == "run")
 			frames.add_frame(anim_name, tex)
 
 	return frames

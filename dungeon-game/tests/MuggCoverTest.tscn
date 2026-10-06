@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/mugg_cover_test.gd" id="1"]
+[node name="MuggCoverTest" type="Node"]
+script = ExtResource("1")
