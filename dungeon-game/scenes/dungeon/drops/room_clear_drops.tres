@@ -3,6 +3,10 @@
 [ext_resource type="Script" uid="uid://voder0mw7gaa" path="res://scripts/dungeon/DropEntry.gd" id="1_80vyo"]
 [ext_resource type="Script" uid="uid://e2o4jr4848mt" path="res://scripts/dungeon/DropTable.gd" id="2_oj08x"]
 [ext_resource type="PackedScene" uid="uid://btesao6qvspbr" path="res://scenes/pickups/HeartPickup.tscn" id="2_qyo1y"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/DuckPickup1.tscn" id="d1_scene"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/DuckPickup5.tscn" id="d5_scene"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/DuckPickup10.tscn" id="d10_scene"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/DeclogPickup.tscn" id="dc_scene"]
 
 [sub_resource type="Resource" id="Resource_ajv5g"]
 script = ExtResource("1_80vyo")
@@ -10,9 +14,31 @@ scene = ExtResource("2_qyo1y")
 weight = 4.0
 metadata/_custom_type_script = "uid://voder0mw7gaa"
 
+[sub_resource type="Resource" id="Resource_duck1"]
+script = ExtResource("1_80vyo")
+scene = ExtResource("d1_scene")
+weight = 6.0
+
+[sub_resource type="Resource" id="Resource_duck5"]
+script = ExtResource("1_80vyo")
+scene = ExtResource("d5_scene")
+weight = 2.0
+weight_per_luck = 0.2
+
+[sub_resource type="Resource" id="Resource_duck10"]
+script = ExtResource("1_80vyo")
+scene = ExtResource("d10_scene")
+weight = 0.5
+weight_per_luck = 0.15
+
+[sub_resource type="Resource" id="Resource_declog"]
+script = ExtResource("1_80vyo")
+scene = ExtResource("dc_scene")
+weight = 3.0
+
 [resource]
 script = ExtResource("2_oj08x")
-drop_chance = 0.2
+drop_chance = 0.5
 drop_chance_per_luck = 0.03
-entries = Array[ExtResource("1_80vyo")]([SubResource("Resource_ajv5g")])
+entries = Array[ExtResource("1_80vyo")]([SubResource("Resource_ajv5g"), SubResource("Resource_duck1"), SubResource("Resource_duck5"), SubResource("Resource_duck10"), SubResource("Resource_declog")])
 metadata/_custom_type_script = "uid://e2o4jr4848mt"

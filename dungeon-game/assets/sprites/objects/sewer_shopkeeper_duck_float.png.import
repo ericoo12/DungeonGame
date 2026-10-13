@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b405uclpmmbw3"
-path="res://.godot/imported/omniturd.png-fc8c24986e8a24b18d7e9c9b6962b554.ctex"
+uid="uid://bktmbd1doqlvd"
+path="res://.godot/imported/sewer_shopkeeper_duck_float.png-89dddb5b6c623ce95f2bfc45bc98d0b5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/active_items/omniturd.png"
-dest_files=["res://.godot/imported/omniturd.png-fc8c24986e8a24b18d7e9c9b6962b554.ctex"]
+source_file="res://assets/sprites/objects/sewer_shopkeeper_duck_float.png"
+dest_files=["res://.godot/imported/sewer_shopkeeper_duck_float.png-89dddb5b6c623ce95f2bfc45bc98d0b5.ctex"]
 
 [params]
 

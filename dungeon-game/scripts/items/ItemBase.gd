@@ -7,3 +7,5 @@ extends Resource
 @export var item_name: String = ""
 @export var description: String = ""
 @export var icon: Texture2D
+## Shop price in ducks. 0 = the default (Dungeon.shop_item_price / shop_active_item_price).
+@export var shop_price: int = 0

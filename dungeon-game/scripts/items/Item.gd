@@ -42,6 +42,11 @@ extends ItemBase
 ## Luck-scaled chance-per-shot effect (e.g. SlowShotProc). Stacks with everything.
 @export var shot_proc: ShotProcEffect
 
+#--- When hurt ---
+## Drops this pickup (e.g. DuckPickup1.tscn) every time the player takes damage.
+@export var hurt_drop_scene: PackedScene
+@export var hurt_drop_count: Vector2i = Vector2i(1, 2)   # min, max per hit
+
 #--- Arm sprites ---
 ## Replace the player's arm art while holding this item (e.g. Mirror Shot: the off-hand
 ## holds a second gun). Leave empty to keep the normal art. Use the SAME canvas as the
@@ -128,6 +133,9 @@ func apply(player: Player) -> void:
 	if shot_proc:
 		player.shot_procs.append(shot_proc)
 
+	if hurt_drop_scene:
+		player.hurt_drops.append({"scene": hurt_drop_scene, "count": hurt_drop_count})
+
 	player.override_arm_textures(
 		{"down": arm_down, "left": arm_left, "up": arm_up},
 		{"down": offarm_down, "left": offarm_left, "up": offarm_up})
@@ -184,6 +192,10 @@ func get_stat_lines() -> Array[Dictionary]:
 		lines.append({"text": "Adds an orbital", "good": true, "neutral": true})
 	if follower_scene:
 		lines.append({"text": "Adds a follower", "good": true, "neutral": true})
+	if hurt_drop_scene:
+		var n: String = "%d" % hurt_drop_count.x if hurt_drop_count.x == hurt_drop_count.y \
+			else "%d-%d" % [hurt_drop_count.x, hurt_drop_count.y]
+		lines.append({"text": "Drops %s pickups when hurt" % n, "good": true, "neutral": true})
 	return lines
 
 

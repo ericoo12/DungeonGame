@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bu2hprdcy6fqt"]
 
 [ext_resource type="Script" uid="uid://dchcemaxt6x4b" path="res://scenes/rooms/RoomBase.gd" id="1_oo7mm"]
-[ext_resource type="Texture2D" uid="uid://b0r1megtltvhm" path="res://assets/sprites/tiles/sewer.png" id="4_j71mv"]
+[ext_resource type="Texture2D" uid="uid://da18duoyx5g88" path="res://assets/sprites/tiles/sewer.png" id="4_j71mv"]
 [ext_resource type="PackedScene" uid="uid://b5e7hergm1vcs" path="res://scenes/dungeon/Door.tscn" id="4_oo7mm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_northwall"]
@@ -36,11 +36,11 @@ position = Vector2(108, -107)
 shape = SubResource("RectangleShape2D_northwall")
 
 [node name="SouthLeft" type="CollisionShape2D" parent="WallBlockers" unique_id=1407733961]
-position = Vector2(-108, 104)
+position = Vector2(-108, 103)
 shape = SubResource("RectangleShape2D_southwall")
 
 [node name="SouthRight" type="CollisionShape2D" parent="WallBlockers" unique_id=1625409187]
-position = Vector2(108, 104)
+position = Vector2(108, 103)
 shape = SubResource("RectangleShape2D_southwall")
 
 [node name="WestTop" type="CollisionShape2D" parent="WallBlockers" unique_id=1119482306]
@@ -83,10 +83,10 @@ shape = SubResource("RectangleShape2D_projwall_v")
 
 [node name="TopLeft" type="Sprite2D" parent="Background" unique_id=790014058]
 position = Vector2(-108, -56)
-scale = Vector2(1.069, 1)
+scale = Vector2(1.0691534, 1)
 texture = ExtResource("4_j71mv")
 region_enabled = true
-region_rect = Rect2(10, 0, 202, 112)
+region_rect = Rect2(0.971, 0, 202, 112)
 
 [node name="TopRigth" type="Sprite2D" parent="Background" unique_id=287535255]
 position = Vector2(108, -56)
@@ -94,7 +94,7 @@ scale = Vector2(1.069, 1)
 texture = ExtResource("4_j71mv")
 flip_h = true
 region_enabled = true
-region_rect = Rect2(10, 0, 201.999, 112)
+region_rect = Rect2(1.039, 0, 202, 112)
 
 [node name="BotLeft" type="Sprite2D" parent="Background" unique_id=516633177]
 position = Vector2(-107.99999, 56.000004)
@@ -102,7 +102,7 @@ scale = Vector2(1.0689286, 0.99999994)
 texture = ExtResource("4_j71mv")
 flip_v = true
 region_enabled = true
-region_rect = Rect2(10, 0, 201.999, 112)
+region_rect = Rect2(1.044, 0, 202, 112)
 
 [node name="BotRigth" type="Sprite2D" parent="Background" unique_id=703316082]
 position = Vector2(107.9, 56)
@@ -111,36 +111,36 @@ texture = ExtResource("4_j71mv")
 flip_h = true
 flip_v = true
 region_enabled = true
-region_rect = Rect2(10, 0, 201.999, 112)
+region_rect = Rect2(1.023, 0, 202, 112)
 
 [node name="Doors" type="Node2D" parent="." unique_id=1675798878]
 
 [node name="North" parent="Doors" unique_id=158042467 instance=ExtResource("4_oo7mm")]
-position = Vector2(0, -93)
-scale = Vector2(1, 0.65)
+position = Vector2(0, -92)
+scale = Vector2(1, 0.73)
 
 [node name="CollisionShape2D" parent="Doors/North" index="1" unique_id=2113766507]
 position = Vector2(0, -1.5385)
 scale = Vector2(1.5789, 1.0475)
 
 [node name="PhysicalBlocker" parent="Doors/North" index="2" unique_id=1472804281]
+position = Vector2(0, -2.88)
 collision_mask = 10
-position = Vector2(0, 1.5385)
 
 [node name="CollisionShape2D" parent="Doors/North/PhysicalBlocker" index="0" unique_id=2093098370]
 scale = Vector2(1.8947, 1.0651)
 
 [node name="South" parent="Doors" unique_id=1481538488 instance=ExtResource("4_oo7mm")]
-position = Vector2(0, 93.00001)
+position = Vector2(0, 92)
 rotation = 3.1415927
-scale = Vector2(1, 0.68)
+scale = Vector2(1, 0.7)
 
 [node name="CollisionShape2D" parent="Doors/South" index="1" unique_id=2113766507]
 position = Vector2(0, 2.9412)
 scale = Vector2(1.5789, 1.0013)
 
 [node name="PhysicalBlocker" parent="Doors/South" index="2" unique_id=1472804281]
-position = Vector2(0, 5.8824)
+position = Vector2(0, 2.5)
 
 [node name="CollisionShape2D" parent="Doors/South/PhysicalBlocker" index="0" unique_id=2093098370]
 scale = Vector2(1.8947, 1.0181)
@@ -155,7 +155,7 @@ position = Vector2(0, 4.2857)
 scale = Vector2(1.5789, 0.9726)
 
 [node name="PhysicalBlocker" parent="Doors/East" index="2" unique_id=1472804281]
-position = Vector2(0, 7.1429)
+position = Vector2(0, 5.71)
 
 [node name="CollisionShape2D" parent="Doors/East/PhysicalBlocker" index="0" unique_id=2093098370]
 scale = Vector2(1.8947, 0.989)
@@ -170,7 +170,7 @@ position = Vector2(0, 6.4516)
 scale = Vector2(1.5789, 0.8785)
 
 [node name="PhysicalBlocker" parent="Doors/West" index="2" unique_id=1472804281]
-position = Vector2(0, 9.0323)
+position = Vector2(0, 7.74)
 
 [node name="CollisionShape2D" parent="Doors/West/PhysicalBlocker" index="0" unique_id=2093098370]
 scale = Vector2(1.8947, 0.8933)

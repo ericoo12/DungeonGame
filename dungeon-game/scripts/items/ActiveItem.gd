@@ -6,4 +6,10 @@ class_name ActiveItem
 extends ItemBase
 
 @export var effect: ActiveItemEffect
-@export var cooldown: float = 5.0
+## Charges needed to use it. Full when picked up; only usable when full, and a use
+## spends ALL of them; clearing a combat room gives one back
+## (Player.add_active_item_charge), up to this max.
+@export_range(1, 12) var max_charges: int = 1
+## Short lockout after a use. Charges are the real limiter now; this only matters
+## if an item ever recharges instantly.
+@export var cooldown: float = 0.5

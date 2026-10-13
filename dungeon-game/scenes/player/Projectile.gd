@@ -12,14 +12,19 @@ class_name Projectile
 var direction: Vector2 = Vector2.RIGHT
 
 const PROJECTILE_SHADOW_BASE_SCALE := 0.2
-const PROJECTILE_SHADOW_OFFSET := Vector2(0, 8)
+const PROJECTILE_SHADOW_OFFSET := Vector2(0, 8)  # used when fall_depth isn't set
 
-# --- Falling arc: hovers at flight_height during flight, then descends to 0
-# over the final (1 - fall_start_ratio) portion of its lifetime, landing
-# exactly where its own shadow already is. ---
+# --- Falling arc: flies at gun height, then over the final (1 - fall_start_ratio) of its
+# lifetime it falls (accelerating, like gravity) by fall_depth and lands on the ground
+# line where its shadow is. The WHOLE projectile falls, collision included, so a shot
+# that's about to land can still hit an enemy low down, e.g. one hugging the south wall.
+# Player sets fall_depth = gun height above the feet; sink_depth is the minimum. ---
 @export var flight_height: float = 1.0
 @export var sink_depth: float = 6.0
-@export var fall_start_ratio: float = 0.75
+@export var fall_start_ratio: float = 0.7
+var fall_depth: float = 0.0
+var _fallen: float = 0.0
+var _shadow: Shadow
 
 
 # --- Visuals (override these in inherited scenes like ChargedProjectile.tscn) ---
@@ -75,13 +80,17 @@ func _physics_process(delta: float) -> void:
 	global_position += velocity * delta
 
 	var progress: float = elapsed / lifetime
-	var y_offset: float = 0.0
+	var depth: float = maxf(fall_depth, sink_depth)
 
 	if progress >= fall_start_ratio:
-		var fall_t: float = (progress - fall_start_ratio) / max(1.0 - fall_start_ratio, 0.0001)
-		y_offset = lerp(0.0, sink_depth, clamp(fall_t, 0.0, 1.0))
+		var fall_t: float = clampf((progress - fall_start_ratio) / max(1.0 - fall_start_ratio, 0.0001), 0.0, 1.0)
+		var target_fall: float = depth * fall_t * fall_t  # accelerating drop
+		global_position.y += target_fall - _fallen       # moves the collision down too
+		_fallen = target_fall
 
-	hover_pivot.position.y = y_offset
+	# Shadow stays on the ground line while the projectile drops towards it.
+	if _shadow and fall_depth > 0.0:
+		_shadow.offset = Vector2(0, depth - _fallen)
 
 	if elapsed >= lifetime:
 		_land()
@@ -89,6 +98,7 @@ func _physics_process(delta: float) -> void:
 
 func _spawn_shadow() -> void:
 	var shadow: Shadow = SHADOW_SCENE.instantiate()
+	_shadow = shadow
 	var ground_layer := get_tree().get_first_node_in_group("ground_effects")
 	var target_parent: Node = ground_layer if ground_layer else get_parent()
 	target_parent.add_child(shadow)

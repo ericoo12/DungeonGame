@@ -105,7 +105,8 @@ func _show_details(item: ItemBase) -> void:
 	if item is ActiveItem:
 		_set_tag("ACTIVE", COL_ACTIVE)
 		var active := item as ActiveItem
-		lines.append("[color=#%s]Cooldown: %ss[/color]" % [COL_TEXT.to_html(false), _fmt(active.cooldown)])
+		lines.append("[color=#%s]Charges: %d[/color]  [color=#%s](+1 per room cleared, uses all)[/color]" % [
+			COL_TEXT.to_html(false), active.max_charges, COL_MUTED.to_html(false)])
 		lines.append("[color=#%s]Use: %s[/color]" % [COL_MUTED.to_html(false), _action_key_text("use_active_item")])
 	elif item is Item:
 		var passive := item as Item

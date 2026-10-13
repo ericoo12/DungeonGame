@@ -24,33 +24,52 @@ func apply_player_stats(player: Player) -> void:
 	beam_width = base_beam_width * player.projectile_size
 
 
-func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
-	# Move the player's shared LaserRay out to the muzzle point and cast along
-	# the aim direction — this ray is reused across shots, not per-instance.
-	var marker_offset: Vector2 = player.weapon_marker.position
-	player.laser_ray.position = marker_offset + dir * start_offset
-	player.laser_ray.target_position = dir * max_range
-	player.laser_ray.force_raycast_update()
+## Physics layers the laser cares about: layer 1 = walls + obstacles (stop the beam),
+## layer 3 = enemy bodies (pierced: every enemy on the line gets hit once).
+const STOP_MASK := 1
+const ENEMY_MASK := 4
+const MAX_PIERCE := 32
 
+
+func fire(player: Player, dir: Vector2, apply_momentum: bool) -> void:
+	var start_point: Vector2 = player.get_muzzle_position(dir) + dir * start_offset
+	var space := player.get_world_2d().direct_space_state
 
 	# Luck-scaled shot effects (e.g. slow) roll per laser shot, same as projectiles.
 	var triggered_procs := player.roll_shot_procs()
+	var damage := player.get_effective_damage()
 
-	var start_point: Vector2 = player.weapon_marker.global_position + dir * start_offset
+	# 1. Where the beam stops: first wall or obstacle. Obstacles still take the hit
+	#    (breakables count it like any other shot).
 	var end_point: Vector2 = start_point + dir * max_range
+	var stop_query := PhysicsRayQueryParameters2D.create(start_point, end_point, STOP_MASK, [player.get_rid()])
+	var stop_hit := space.intersect_ray(stop_query)
+	if stop_hit:
+		end_point = stop_hit.position
+		var blocker: Object = stop_hit.collider
+		if blocker and blocker.has_method("take_damage"):
+			blocker.take_damage(damage, dir, player.projectile_knockback)
 
-	if player.laser_ray.is_colliding():
-		end_point = player.laser_ray.get_collision_point()
-		var collider: Object = player.laser_ray.get_collider()
-		if collider and collider.has_method("take_damage"):
-			collider.take_damage(player.get_effective_damage(), dir, player.projectile_knockback)
+	# 2. Pierce: every enemy between the muzzle and that point gets hit once. Each ray
+	#    excludes the enemies already hit, so it finds the next one along the line.
+	var exclude: Array[RID] = [player.get_rid()]
+	for _i in MAX_PIERCE:
+		var query := PhysicsRayQueryParameters2D.create(start_point, end_point, ENEMY_MASK, exclude)
+		var hit := space.intersect_ray(query)
+		if hit.is_empty():
+			break
+		exclude.append(hit.rid)
+		var enemy: Object = hit.collider
+		if enemy and enemy.has_method("take_damage"):
+			enemy.take_damage(damage, dir, player.projectile_knockback)
 			for proc in triggered_procs:
-				proc.on_hit(collider, player)
+				proc.on_hit(enemy, player)
+
 	# Purely cosmetic — the visual beam is spawned after damage is alreadys
 	# resolved above, since this is a hitscan (instant), not a travelling shot.
 	var beam: LaserBeamVisual = BEAM_VISUAL_SCENE.instantiate()
 	player.add_child(beam)
 	beam.setup(start_point, end_point, beam_width, visual_duration,
-		dir, max_range, player.laser_ray.collision_mask, [player.get_rid()])
+		dir, max_range, STOP_MASK, [player.get_rid()])  # visual also only stops at walls/obstacles
 	for proc in triggered_procs:
 		proc.decorate_projectile(beam)  # tints the beam, so a proc'd shot is visible

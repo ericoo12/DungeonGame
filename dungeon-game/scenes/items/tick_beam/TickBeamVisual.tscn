@@ -21,8 +21,7 @@ texture = ExtResource("3_xhe45")
 [node name="SplashPivot" type="Node2D" parent="." unique_id=890161729]
 
 [node name="SplashSprite" type="AnimatedSprite2D" parent="SplashPivot" unique_id=1674689660]
-scale = Vector2(1.25, 1.25)
-flip_h = true
+scale = Vector2(0.4, 0.4)
 
 [node name="DamageArea" type="Area2D" parent="." unique_id=362598279]
 collision_mask = 5

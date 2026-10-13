@@ -5,6 +5,7 @@ signal room_cleared
 
 var doors: Dictionary = {}
 var _enemy_count: int = 0
+var _combat_cleared: bool = false  # so the active-item charge is only given once
 
 @onready var floor_top_left: Sprite2D = $Background/TopLeft
 @onready var floor_top_right: Sprite2D = $Background/TopRigth
@@ -16,6 +17,11 @@ var _entities_container: Node2D = null
 var _current_room_data: RoomData = null
 var _dungeon: Dungeon = null
 const ITEM_PICKUP_SCENE := preload("res://scenes/items/ItemPickup.tscn")
+const SHOP_ITEM_SCENE := preload("res://scenes/shop/ShopItem.tscn")
+const TOILET_SCENE := preload("res://scenes/toilet/Toilet.tscn")
+
+## The clogged toilet in this room, if RoomData says there is one (see _spawn_toilet).
+var toilet: Toilet = null
 
 ## Walkability grid built from WallBlockers + live obstacles.
 ## Shared with enemy pathfinding: grid.to_astar(), grid.is_walkable(cell), etc.
@@ -23,6 +29,9 @@ var grid: RoomGrid = null
 ## Cells (16px, room-local) the grid covers: the interior plus the wall ring around it.
 ## Cells outside are treated as solid.
 @export var grid_rect: Rect2i = Rect2i(-12, -7, 24, 13)
+## On: this room keeps the Background art set in its own scene (e.g. the shop).
+## Off (default): the floor's random RoomFloorVariant texture is applied on setup.
+@export var use_own_background: bool = false
 signal obstacle_layout_changed  # emitted when an obstacle breaks (grid already updated)
 
 func _ready() -> void:
@@ -47,7 +56,8 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 		var has_connection: bool = room_data.doors[dir]
 		door.visible = has_connection
 		if has_connection:
-			door.set_unlocked(room_data.cleared or room_data.type == RoomData.Type.ITEM)
+			door.set_unlocked(room_data.cleared or room_data.type == RoomData.Type.ITEM \
+				or room_data.type == RoomData.Type.SHOP)
 			door.set_style(_door_style(room_data.type, dungeon.get_neighbor_type(dir)))
 		else:
 			door.set_unlocked(false)
@@ -59,6 +69,12 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	if room_data.type == RoomData.Type.NORMAL:
 		_spawn_obstacles(room_data, dungeon)
 	_respawn_pending_drops()
+	# After obstacles (needs their cells), before enemies (they must not spawn on it).
+	_spawn_toilet(room_data, dungeon)
+
+	# Shops count as cleared (no fight), so stock them before the cleared-check.
+	if room_data.type == RoomData.Type.SHOP:
+		_spawn_shop(room_data, dungeon)
 
 	if room_data.cleared or room_data.type == RoomData.Type.START:
 		return
@@ -67,6 +83,8 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 		_spawn_boss(dungeon, entities_container)
 	elif room_data.type == RoomData.Type.ITEM:
 		_spawn_pickup(room_data, dungeon)
+	elif room_data.type == RoomData.Type.SHOP:
+		pass  # stocked above; no enemies here
 	else:
 		_spawn_enemies(distance, dungeon, entities_container)
 		
@@ -235,6 +253,9 @@ func _on_enemy_removed() -> void:
 	if _enemy_count <= 0:
 		_unlock_all_doors()
 		room_cleared.emit()
+		if not _combat_cleared:
+			_combat_cleared = true
+			EventBus.combat_room_cleared.emit()
 		_roll_room_clear_reward()
 		if stage_door:
 			stage_door.activate()
@@ -277,7 +298,7 @@ func _spawn_boss(dungeon: Dungeon, entities_container: Node2D) -> void:
 
 
 func _apply_floor_variant(variant: RoomFloorVariant) -> void:
-	if not variant or not variant.texture:
+	if use_own_background or not variant or not variant.texture:
 		return
 	floor_top_left.texture = variant.texture
 	floor_top_right.texture = variant.texture
@@ -334,12 +355,152 @@ func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
 	)
 	
 
+# --- Shop ----------------------------------------------------------------------
+
+## One item for sale on every Marker2D in the shop room (the table spots; no group or
+## naming needed). Stock is rolled once and kept on RoomData, so a revisit shows the
+## same items minus the ones already bought.
+func _spawn_shop(room_data: RoomData, dungeon: Dungeon) -> void:
+	var spots := _shop_spots()
+	if spots.is_empty():
+		push_warning("Shop room has no Marker2D item spots")
+		return
+
+	if not room_data.shop_rolled:
+		room_data.shop_rolled = true
+		var available: Array[ItemBase] = []
+		for candidate in dungeon.item_pool:
+			if not GameState.picked_up_items.has(candidate):
+				available.append(candidate)
+		available.shuffle()
+		var item_spots := spots.size() - 1 if spots.size() >= 2 else spots.size()
+		for i in mini(item_spots, available.size()):
+			var item: ItemBase = available[i]
+			GameState.picked_up_items.append(item)  # reserved: won't show up elsewhere
+			room_data.shop_stock.append({"item": item, "price": _shop_price(item, dungeon), "sold": false})
+		if spots.size() >= 2:  # last (rightmost) spot: a declogger
+			room_data.shop_stock.append({"item": null, "decloggers": 1,
+				"price": dungeon.shop_declogger_price, "sold": false})
+
+	for i in mini(spots.size(), room_data.shop_stock.size()):
+		var entry: Dictionary = room_data.shop_stock[i]
+		if entry.sold:
+			continue
+		var shop_item: ShopItem = SHOP_ITEM_SCENE.instantiate()
+		shop_item.setup(entry.item, entry.price, entry.get("decloggers", 0))
+		_entities_container.add_child(shop_item)
+		shop_item.global_position = spots[i].global_position
+		shop_item.purchased.connect(func(): entry.sold = true)
+
+
+# --- Toilet --------------------------------------------------------------------
+
+## Spawns the room's clogged toilet (RoomData.toilet_kind). Its spot is picked once and
+## kept on RoomData. A Marker2D named "ToiletSpot" in the room scene decides the spot
+## (use it in hand-made rooms like the shop); otherwise a free grid cell is picked.
+func _spawn_toilet(room_data: RoomData, dungeon: Dungeon) -> void:
+	if room_data.toilet_kind == RoomData.ToiletKind.NONE or grid == null:
+		return
+
+	var pos: Vector2
+	var spot := find_child("ToiletSpot", true, false) as Node2D
+	if spot:
+		pos = spot.global_position
+	else:
+		if not room_data.toilet_placed:
+			room_data.toilet_cell = _pick_toilet_cell(room_data, dungeon)
+			room_data.toilet_placed = true
+		pos = grid.cell_to_global(room_data.toilet_cell)
+	grid.set_obstacle(grid.global_to_cell(pos), true)  # enemies/drops stay off it
+
+	toilet = TOILET_SCENE.instantiate()
+	toilet.setup(self, room_data, dungeon)
+	_entities_container.add_child(toilet)  # y-sorted with the player
+	toilet.global_position = pos
+
+
+## Random walkable cell with free cells all around it (never blocks a path), away from
+## the doors. Special rooms (no doors, hand-made layouts) fall back to below the centre.
+func _pick_toilet_cell(room_data: RoomData, dungeon: Dungeon) -> Vector2i:
+	if room_data.type != RoomData.Type.NORMAL:
+		return _special_room_toilet_cell()
+	var entries := _entry_cells(dungeon)
+	var center := grid.global_to_cell(global_position)
+	var candidates: Array[Vector2i] = []
+	for x in range(grid.rect.position.x + 1, grid.rect.end.x - 1):
+		for y in range(grid.rect.position.y + 1, grid.rect.end.y - 1):
+			var cell := Vector2i(x, y)
+			if not grid.is_walkable(cell) or Vector2(cell - center).length() < 3.0:
+				continue
+			var ok := true
+			for dx in range(-1, 2):
+				for dy in range(-1, 2):
+					if not grid.is_walkable(cell + Vector2i(dx, dy)):
+						ok = false
+			for e in entries:
+				if Vector2(cell - e).length() < 4.0:
+					ok = false
+			if ok:
+				candidates.append(cell)
+	if candidates.is_empty():
+		return grid.global_to_cell(_free_cell_near(global_position + Vector2(0, -48)))
+	return candidates[randi() % candidates.size()]
+
+
+## Item/shop rooms without a ToiletSpot marker: the free cell closest to just below the
+## centre that is at least 3 cells from every Marker2D (shop spots, item pedestal).
+func _special_room_toilet_cell() -> Vector2i:
+	var markers: Array[Vector2i] = []
+	for m in find_children("*", "Marker2D", true, false):
+		markers.append(grid.global_to_cell(m.global_position))
+	var target := grid.global_to_cell(global_position + Vector2(0, 40))
+	var best := target
+	var best_d := INF
+	for x in range(grid.rect.position.x + 1, grid.rect.end.x - 1):
+		for y in range(grid.rect.position.y + 1, grid.rect.end.y - 1):
+			var cell := Vector2i(x, y)
+			if not grid.is_walkable(cell) or not grid.is_walkable(cell + Vector2i(0, 1)):
+				continue
+			var near_marker := false
+			for m in markers:
+				if Vector2(cell - m).length() < 3.0:
+					near_marker = true
+			if near_marker:
+				continue
+			var d := Vector2(cell - target).length()
+			if d < best_d:
+				best_d = d
+				best = cell
+	return best
+
+
+func _shop_price(item: ItemBase, dungeon: Dungeon) -> int:
+	if item.shop_price > 0:
+		return item.shop_price
+	return dungeon.shop_active_item_price if item is ActiveItem else dungeon.shop_item_price
+
+
+## Marker2D nodes in this room that aren't enemy/obstacle spawn points, left to right
+## (stable order, so revisits put each item back on the same spot).
+func _shop_spots() -> Array:
+	var spots: Array = []
+	for node in find_children("*", "Marker2D", true, false):
+		if node.is_in_group("enemy_spawn_points") or node.is_in_group("obstacle_spawn_points"):
+			continue
+		if node.name == "ToiletSpot":
+			continue
+		spots.append(node)
+	spots.sort_custom(func(a, b): return a.global_position.x < b.global_position.x)
+	return spots
+
+
 ## Neighbor's type wins, so a door INTO a special room shows its style. If the neighbor
 ## is normal, the current room's type is used, so doors INSIDE a special room match it.
 func _door_style(own_type: int, neighbor_type: int) -> Door.Style:
 	for t in [neighbor_type, own_type]:
 		if t == RoomData.Type.BOSS: return Door.Style.BOSS
 		if t == RoomData.Type.ITEM: return Door.Style.ITEM
+		if t == RoomData.Type.SHOP: return Door.Style.SHOP
 	return Door.Style.NORMAL
 
 

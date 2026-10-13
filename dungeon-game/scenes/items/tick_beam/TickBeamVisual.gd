@@ -13,10 +13,13 @@ class_name TickBeamVisual
 @onready var damage_shape: CollisionShape2D = $DamageArea/CollisionShape2D
 @onready var wall_ray: RayCast2D = $WallRay
 
-# Offset (per unit of SplashSprite scale) that pins the splash's wall-facing edge in
-# place while it shrinks — see SplashPivot's role in _ready()/_update_beam_geometry().
+# The splash art (32x64 frames) sprays UPWARD from a base near the bottom of the frame.
+# Rotated -90° it sprays back along -x, i.e. from the wall toward the player.
+# SPLASH_BASE_OFFSET = frame centre -> bottom of the art (px, unscaled); it pins the
+# base on SplashPivot's origin (the wall hit point) while the splash shrinks.
 # Resize the splash by changing SplashSprite's scale in the scene; this follows it.
-const SPLASH_EDGE_OFFSET := 6.0
+const SPLASH_ROTATION := -PI / 2.0
+const SPLASH_BASE_OFFSET := 23.0
 
 var duration: float = 1.5
 var shrink_duration: float = 0.3
@@ -25,6 +28,7 @@ var timer: float = 0.0
 var damage: float = 0.0
 var damage_interval: float = 0.3
 var tick_timer: float = 0.0
+var knockback_strength: float = 0.0  # push along the beam per damage tick
 var overlapping_bodies: Array[Node] = []
 
 var base_width: float = 6.0
@@ -35,16 +39,15 @@ func _ready() -> void:
 	damage_area.body_entered.connect(_on_body_entered)
 	damage_area.body_exited.connect(_on_body_exited)
 	splash_sprite.sprite_frames = AnimSheetLoader.build_single_animation(
-		"res://assets/sprites/items/active_items/lazerturdsplash2.png", 2, 12.0
+		"res://assets/sprites/items/active_items/lazerturdsplash2.png", 3, 12.0
 	)
-	# Sprite sits fully to the left of SplashPivot's own origin, so the pivot's
-	# (0,0) point lines up with the sprite's right (wall-facing) edge — see
-	# _update_beam_geometry(), where splash_pivot itself is positioned at the
-	# true wall-collision point.
-	splash_sprite.position = Vector2(-SPLASH_EDGE_OFFSET * splash_sprite.scale.x, 0)
+	# Base of the spray on SplashPivot's origin, which _update_beam_geometry() puts at
+	# the true wall-collision point; the spray points back along the beam.
+	splash_sprite.rotation = SPLASH_ROTATION
+	splash_sprite.position = Vector2(-SPLASH_BASE_OFFSET * splash_sprite.scale.y, 0)
 
 
-func setup(start: Vector2, direction: Vector2, range_limit: float, width: float, vis_duration: float, dmg: float, tick_interval: float, shrink_time: float = 0.3) -> void:
+func setup(start: Vector2, direction: Vector2, range_limit: float, width: float, vis_duration: float, dmg: float, tick_interval: float, shrink_time: float = 0.3, knockback: float = 0.0) -> void:
 	global_position = start
 	rotation = direction.angle()
 	max_range = range_limit
@@ -57,6 +60,7 @@ func setup(start: Vector2, direction: Vector2, range_limit: float, width: float,
 	shrink_duration = min(shrink_time, vis_duration)
 	damage = dmg
 	damage_interval = tick_interval
+	knockback_strength = knockback
 
 	_update_beam_geometry()
 
@@ -83,7 +87,7 @@ func _physics_process(delta: float) -> void:
 			tick_timer = damage_interval
 			for body in overlapping_bodies:
 				if is_instance_valid(body) and body.has_method("take_damage"):
-					body.take_damage(damage)
+					_hit(body)
 
 	if timer >= duration:
 		queue_free()
@@ -124,7 +128,12 @@ func _on_body_entered(body: Node) -> void:
 	overlapping_bodies.append(body)
 	if damage > 0.0 and body.has_method("take_damage"):
 		tick_timer = damage_interval
-		body.take_damage(damage)
+		_hit(body)
+
+
+## Damage + push along the beam (the jet's direction follows the beam's rotation).
+func _hit(body: Node) -> void:
+	body.take_damage(damage, Vector2.RIGHT.rotated(global_rotation), knockback_strength)
 
 
 func _on_body_exited(body: Node) -> void:

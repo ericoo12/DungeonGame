@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ddsx2utq041d5"
-path="res://.godot/imported/bathroom.png-53869c0c6833532181121a8d9d717a91.ctex"
+uid="uid://bswvl0n6jui7s"
+path="res://.godot/imported/kiddie_pool_water.png-25bb671abebf1383bbc0cda469269b97.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/tiles/bathroom.png"
-dest_files=["res://.godot/imported/bathroom.png-53869c0c6833532181121a8d9d717a91.ctex"]
+source_file="res://assets/sprites/objects/kiddie_pool_water.png"
+dest_files=["res://.godot/imported/kiddie_pool_water.png-25bb671abebf1383bbc0cda469269b97.ctex"]
 
 [params]
 

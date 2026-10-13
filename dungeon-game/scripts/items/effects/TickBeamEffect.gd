@@ -12,14 +12,17 @@ extends ActiveItemEffect
 @export var visual_duration: float = 1.0
 @export var start_offset: float = 2.0
 @export var shrink_time: float = 0.4
+## Push along the beam on every damage tick (enemy knockback speed, px/s). 0 = none.
+## Bosses scale/cap this themselves (EnemyBase.boss_knockback_multiplier/max).
+@export var knockback_strength: float = 200.0
 
 const TICK_BEAM_VISUAL_SCENE := preload("res://scenes/items/tick_beam/TickBeamVisual.tscn")
 
 
 func activate(player: Player) -> void:
 	var dir: Vector2 = player.last_true_aim_dir
-	var start_point: Vector2 = player.weapon_marker.global_position + dir * start_offset
+	var start_point: Vector2 = player.get_muzzle_position(dir) + dir * start_offset
 
 	var beam: TickBeamVisual = TICK_BEAM_VISUAL_SCENE.instantiate()
 	player.add_child(beam)
-	beam.setup(start_point, dir, max_range, beam_width, visual_duration, damage, damage_interval, shrink_time)
+	beam.setup(start_point, dir, max_range, beam_width, visual_duration, damage, damage_interval, shrink_time, knockback_strength)

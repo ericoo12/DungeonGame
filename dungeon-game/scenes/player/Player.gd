@@ -38,6 +38,12 @@ var last_true_aim_dir: Vector2 = Vector2.DOWN  # actual shooting direction, kept
 # --- Shooting ---
 @export var fire_rate: float = 0.55
 @export var allow_diagonal_shooting: bool = false
+
+const SHOOT_ACTIONS := {
+	&"shoot_left": Vector2.LEFT, &"shoot_right": Vector2.RIGHT,
+	&"shoot_up": Vector2.UP, &"shoot_down": Vector2.DOWN,
+}
+var _shoot_key_order: Array = []  # held shoot actions, oldest -> newest
 var shoot_timer: float = 0.0
 var shoot_cooldown: float = 0.0
 const SHOOT_POSE_DURATION := 0.33  # how long he keeps facing the shot direction after firing
@@ -92,6 +98,11 @@ var items: Array[Item] = []
 # --- Active item ---
 var active_item: ActiveItem = null
 var active_item_cooldown_timer: float = 0.0
+var active_item_charges: int = 0
+var ducks: int = 0  # rubber duck currency (DuckPickup); shown in the HUD
+## Decloggers: like keys — one unclogs a clogged toilet (Toilet.gd). Shown in the HUD.
+@export var start_decloggers: int = 1
+var decloggers: int = 0
 
 # --- Orbitals ---
 var orbitals: Array[Node2D] = []
@@ -136,6 +147,23 @@ const ARM_PIVOT := {
 	"left": Vector2(-246, -8),
 	"up":   Vector2(-13, -143),
 }
+
+# Gun muzzle tip in each arm texture, in texture pixels relative to the canvas centre
+# (same space as ARM_PIVOT; "left" art, mirrored for right). Measured from the art —
+# the outermost pixel of the glowing barrel. "back" = the rear barrel of a two-ended
+# gun (Mirror Shot), used for shots fired opposite the aim. Keyed by texture path so
+# item arm overrides get their own muzzles; NEW ARM ART NEEDS AN ENTRY HERE (unknown
+# textures fall back to the default arm's muzzle for that direction).
+const DEFAULT_ARM_TEXTURE := "res://assets/sprites/player/Filling3/arm_%s.png"
+const ARM_MUZZLES := {
+	"res://assets/sprites/player/Filling3/arm_down.png": {"front": Vector2(38, 295)},
+	"res://assets/sprites/player/Filling3/arm_left.png": {"front": Vector2(-371, -55)},
+	"res://assets/sprites/player/Filling3/arm_up.png":   {"front": Vector2(6, -347)},
+	"res://assets/sprites/player/mirror_shot/arm_down.png": {"front": Vector2(12, 516), "back": Vector2(14, 168)},
+	"res://assets/sprites/player/mirror_shot/arm_left.png": {"front": Vector2(-407, -54), "back": Vector2(54, -54)},
+	"res://assets/sprites/player/mirror_shot/arm_up.png":   {"front": Vector2(5, -536), "back": Vector2(6, -132)},
+}
+const MUZZLE_WALL_MASK := 1  # walls + obstacles: shots never spawn behind them
 
 # Arm reaction when shooting
 const ARM_KICK_DISTANCE := 6.0        # head-pixels, pushed opposite the aim direction
@@ -222,6 +250,9 @@ var _arm_tween: Tween
 # --- Cosmetics ---
 const COSMETIC_SLOTS := ["Head", "Face", "Neck", "Body", "Back", "LeftHand", "RightHand", "Feet", "Aura", "Trail"]
 var body_overlays: Array[Node2D] = []   # Body-slot cosmetics, drawn over the torso
+var head_overlays: Array[Node2D] = []   # Head-slot cosmetics, drawn over the head
+## Items that drop pickups when you get hurt: [{ "scene": PackedScene, "count": Vector2i }].
+var hurt_drops: Array[Dictionary] = []
 # Placeholder positions — tune each by eye per direction, same process as every
 # other offset in this file. Values are LEFT-facing canonical positions;
 # X is automatically mirrored when facing right.
@@ -243,12 +274,16 @@ var equipped_cosmetics: Dictionary = {}     # slot name -> Array[Node2D] instanc
 
 func _ready() -> void:
 	add_to_group("player")
+	EventBus.combat_room_cleared.connect(add_active_item_charge.bind(1))
 	body_collision_base_position = body_collision.position
 	hurtbox_collision_base_position = hurtbox_collision.position
 	hurtbox_base_position = hurtbox.position
 	set_player_scale(player_scale)
 	current_hearts = max_hearts
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
+	EventBus.ducks_changed.emit.call_deferred(ducks)  # deferred: HUD may not be ready yet
+	decloggers = start_decloggers
+	EventBus.decloggers_changed.emit.call_deferred(decloggers)
 
 	lower_sprite.sprite_frames = AnimSheetLoader.build_lower_body_frames()
 	lower_base_position = lower_sprite.position
@@ -284,16 +319,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_record_position_history()
 
-	var aim_vec := Vector2(
-		Input.get_axis("shoot_left", "shoot_right"),
-		Input.get_axis("shoot_up", "shoot_down")
-	)
-
-	if not allow_diagonal_shooting and aim_vec.x != 0.0 and aim_vec.y != 0.0:
-		if abs(aim_vec.x) >= abs(aim_vec.y):
-			aim_vec.y = 0.0
-		else:
-			aim_vec.x = 0.0
+	var aim_vec := _read_aim_input()
 
 	var is_shooting := aim_vec.length() > 0.0
 
@@ -321,12 +347,45 @@ func _physics_process(delta: float) -> void:
 	if active_item_cooldown_timer > 0.0:
 		active_item_cooldown_timer = max(active_item_cooldown_timer - delta, 0.0)
 
-	if Input.is_action_just_pressed("use_active_item") and active_item and active_item_cooldown_timer <= 0.0:
+	if Input.is_action_just_pressed("use_active_item") and active_item \
+			and active_item_cooldown_timer <= 0.0 and active_item_charges >= active_item.max_charges:
+		# Only usable when fully charged; one use spends every charge.
 		shoot_timer = SHOOT_POSE_DURATION
 		active_item.effect.activate(self)
 		active_item_cooldown_timer = active_item.cooldown
+		_set_active_item_charges(0)
 
 	_update_animation(move_vec)
+
+
+## Shoot direction from the arrow keys. The most recently pressed key wins, so holding
+## left and then also pressing right aims right (and back to left when right is let go)
+## instead of the two cancelling out — which used to read as "no key held" and fired a
+## held charge shot. With diagonal shooting, the newest horizontal and newest vertical
+## key combine.
+func _read_aim_input() -> Vector2:
+	for action in SHOOT_ACTIONS:
+		if Input.is_action_just_pressed(action):
+			_shoot_key_order.erase(action)
+			_shoot_key_order.append(action)
+	_shoot_key_order = _shoot_key_order.filter(func(a): return Input.is_action_pressed(a))
+	for action in SHOOT_ACTIONS:  # held but missed the press (e.g. pressed while paused)
+		if Input.is_action_pressed(action) and not _shoot_key_order.has(action):
+			_shoot_key_order.push_front(action)
+	if _shoot_key_order.is_empty():
+		return Vector2.ZERO
+
+	if not allow_diagonal_shooting:
+		return SHOOT_ACTIONS[_shoot_key_order[-1]]
+
+	var aim := Vector2.ZERO
+	for i in range(_shoot_key_order.size() - 1, -1, -1):  # newest first
+		var dir: Vector2 = SHOOT_ACTIONS[_shoot_key_order[i]]
+		if dir.x != 0.0 and aim.x == 0.0:
+			aim.x = dir.x
+		elif dir.y != 0.0 and aim.y == 0.0:
+			aim.y = dir.y
+	return aim
 
 
 func _update_facing(move_vec: Vector2) -> void:
@@ -466,6 +525,9 @@ func _update_body(anim_dir: String, flip: bool) -> void:
 		if is_instance_valid(overlay):
 			order.append(overlay)
 	order.append(head_sprite)
+	for overlay in head_overlays:
+		if is_instance_valid(overlay):
+			order.append(overlay)
 	if not _pose(anim_dir, "offarm_behind"): order.append(offarm_sprite)
 	if not _pose(anim_dir, "arm_behind"): order.append(arm_sprite)
 	for i in order.size():
@@ -568,7 +630,11 @@ func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true) -> void:
 		proc.decorate_projectile(projectile)
 
 	get_parent().add_child(projectile)
-	projectile.global_position = weapon_marker.global_position + aim_dir * 10
+	var muzzle := get_muzzle_position(aim_dir)
+	projectile.global_position = muzzle
+	# At the end of its flight it falls from gun height down to the feet line, collision
+	# included, so landing shots can hit enemies right against the south wall.
+	projectile.fall_depth = maxf(body_collision.global_position.y - muzzle.y, 0.0)
 
 	var shooter_velocity: Vector2 = velocity if apply_momentum else Vector2.ZERO
 	projectile.launch(aim_dir, shooter_velocity)
@@ -600,11 +666,34 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 		_die()
 	else:
 		_start_invulnerability()
+		_spawn_hurt_drops()
 		if knockback_strength > 0.0 and not knockback_immune:
 			knockback_velocity = knockback_dir.normalized() * knockback_strength
 
 
 const ENEMY_COLLISION_LAYER := 3  # "enemies" physics layer (value 4)
+
+
+## Hurt-drop items (Item.hurt_drop_scene): pickups pop out around the player. Spawned
+## through the room, so they're remembered like any other drop if you leave them.
+func _spawn_hurt_drops() -> void:
+	if hurt_drops.is_empty():
+		return
+	var dungeon := get_tree().get_first_node_in_group("dungeon") as Dungeon
+	var room: RoomController = dungeon.current_room if dungeon else null
+	for entry in hurt_drops:
+		var count: Vector2i = entry.count
+		for i in randi_range(count.x, count.y):
+			var pos := global_position + Vector2.RIGHT.rotated(randf() * TAU) * randf_range(14.0, 24.0)
+			if room == null:
+				# No dungeon room (e.g. the test room): just drop it next to us.
+				var drop := (entry.scene as PackedScene).instantiate()
+				get_parent().add_child.call_deferred(drop)
+				drop.set_deferred("global_position", pos)
+				continue
+			if room.grid and not room.grid.is_walkable(room.grid.global_to_cell(pos)):
+				pos = room._free_cell_near(pos)
+			room._spawn_drop(entry.scene, pos)
 
 
 func _start_invulnerability() -> void:
@@ -668,6 +757,47 @@ func add_active_item(item: ActiveItem) -> void:
 	active_item = item
 	active_item_cooldown_timer = 0.0
 	EventBus.active_item_changed.emit(item)
+	_set_active_item_charges(item.max_charges)  # picked up fully charged
+
+
+func add_ducks(amount: int) -> void:
+	ducks += amount
+	EventBus.ducks_changed.emit(ducks)
+
+
+func add_decloggers(amount: int) -> void:
+	decloggers += amount
+	EventBus.decloggers_changed.emit(decloggers)
+
+
+## Uses one declogger if we have one. Returns false (nothing spent) if not.
+func use_declogger() -> bool:
+	if decloggers <= 0:
+		return false
+	decloggers -= 1
+	EventBus.decloggers_changed.emit(decloggers)
+	return true
+
+
+## For shops etc.: spends `amount` if we have it. Returns false (and spends nothing) if not.
+func spend_ducks(amount: int) -> bool:
+	if ducks < amount:
+		return false
+	ducks -= amount
+	EventBus.ducks_changed.emit(ducks)
+	return true
+
+
+## +amount charges (capped). Called when a combat room is cleared.
+func add_active_item_charge(amount: int = 1) -> void:
+	if active_item:
+		_set_active_item_charges(active_item_charges + amount)
+
+
+func _set_active_item_charges(value: int) -> void:
+	var max_charges: int = active_item.max_charges if active_item else 0
+	active_item_charges = clampi(value, 0, max_charges)
+	EventBus.active_item_charges_changed.emit(active_item_charges, max_charges)
 
 
 func add_orbital(scene: PackedScene) -> void:
@@ -685,6 +815,40 @@ func _recalculate_orbital_spacing() -> void:
 
 ## Center of the HurtBox (chest-down) in world space. Enemies aim here instead of the
 ## player's origin, which sits higher up on the body.
+## Where shots in `shot_dir` leave the gun, in global coordinates. Computed from the
+## arm POSE (facing, per-direction arm_pos/arm_scale, ARM_PIVOT, player_scale), not
+## from arm_sprite, because shooting happens before _update_body() in the same frame
+## (the sprite would still show last frame's direction). Arm kick is ignored on purpose.
+## Shots opposite the aim use the gun's rear barrel when the art has one (Mirror Shot).
+func get_muzzle_position(shot_dir: Vector2 = Vector2.ZERO) -> Vector2:
+	var anim_dir := _facing_suffix()
+	var flip := facing == Facing.RIGHT
+	var tex_dir := "left" if flip else anim_dir
+
+	var tex: Texture2D = body_textures.arm.get(tex_dir) if body_textures.has("arm") else null
+	var path: String = tex.resource_path if tex else ""
+	var entry: Dictionary = ARM_MUZZLES.get(path, ARM_MUZZLES[DEFAULT_ARM_TEXTURE % tex_dir])
+
+	var tip: Vector2 = entry.front
+	if entry.has("back") and shot_dir != Vector2.ZERO and shot_dir.dot(last_true_aim_dir) < 0.0:
+		tip = entry.back
+	var pivot: Vector2 = ARM_PIVOT[tex_dir]
+	if flip:  # flip_h mirrors the art, and _update_body() mirrors the pivot
+		tip.x = -tip.x
+		pivot.x = -pivot.x
+
+	var arm_scale: float = BODY_TEXTURE_SCALE * float(_pose(anim_dir, "arm_scale"))
+	var in_body: Vector2 = _pose(anim_dir, "arm_pos") + (tip + pivot) * arm_scale
+	var muzzle := to_global((body_offset + in_body) * player_scale)
+
+	# Gun poking through a wall (player hugging it): spawn just on our side instead.
+	var query := PhysicsRayQueryParameters2D.create(global_position, muzzle, MUZZLE_WALL_MASK, [get_rid()])
+	var hit := get_world_2d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty():
+		muzzle = hit.position + (global_position - muzzle).normalized() * 2.0
+	return muzzle
+
+
 func get_hurtbox_center() -> Vector2:
 	return hurtbox_collision.global_position
 
@@ -791,6 +955,14 @@ func add_cosmetic(scene: PackedScene, slot: String) -> void:
 		body_root.add_child(overlay)
 		body_overlays.append(overlay)
 		equipped_cosmetics[slot].append(overlay)
+		return
+	# Head: also inside the body rig (like Body), drawn right after the head sprite and
+	# copying its transform (HeadCosmetic.gd), so hats sit on the head in every direction.
+	if slot == "Head" and body_root:
+		var hat := scene.instantiate()
+		body_root.add_child(hat)
+		head_overlays.append(hat)
+		equipped_cosmetics[slot].append(hat)
 		return
 
 	var instance := scene.instantiate()

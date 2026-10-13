@@ -1,8 +1,25 @@
 [gd_scene format=3 uid="uid://bwl5grm0ecqfm"]
 
 [ext_resource type="PackedScene" uid="uid://bu2hprdcy6fqt" path="res://scenes/rooms/RoomBase.tscn" id="1_rhx33"]
+[ext_resource type="Texture2D" uid="uid://h7k0fjslg4ny" path="res://assets/sprites/tiles/specialrooms/bathroom_itemroom.png" id="2_vki6e"]
 
 [node name="RoomBase" unique_id=1502560529 instance=ExtResource("1_rhx33")]
+use_own_background = true
+
+[node name="TopLeft" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="0" unique_id=790014058]
+texture = ExtResource("2_vki6e")
+
+[node name="TopRigth" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="1" unique_id=287535255]
+texture = ExtResource("2_vki6e")
+
+[node name="BotLeft" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="2" unique_id=516633177]
+texture = ExtResource("2_vki6e")
+
+[node name="BotRigth" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="3" unique_id=703316082]
+texture = ExtResource("2_vki6e")
+
+[node name="ToiletSpot" type="Marker2D" parent="." index="5" unique_id=929853200]
+position = Vector2(-76, 0)
 
 [editable path="Doors/North"]
 [editable path="Doors/South"]

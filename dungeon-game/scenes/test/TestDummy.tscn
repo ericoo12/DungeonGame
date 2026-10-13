@@ -7,7 +7,7 @@
 size = Vector2(140.00003, 140.00003)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
-size = Vector2(21.333336, 21.333334)
+size = Vector2(23.33333, 23.33333)
 
 [sub_resource type="LabelSettings" id="LabelSettings_vmp5v"]
 font_size = 46
@@ -25,12 +25,12 @@ shape = SubResource("RectangleShape2D_vmp5v")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=1860661425]
 scale = Vector2(0.99999994, 0.99999994)
-collision_layer = 4
+collision_layer = 32
 collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1429594750]
-position = Vector2(0, -2.8610234e-06)
-scale = Vector2(6.000001, 6.000001)
+position = Vector2(2.6822092e-06, 0)
+scale = Vector2(6.0000014, 6.0000014)
 shape = SubResource("RectangleShape2D_ng0gt")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=966979140]

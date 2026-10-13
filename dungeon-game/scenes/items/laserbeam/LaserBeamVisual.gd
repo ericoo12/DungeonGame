@@ -2,7 +2,7 @@
 ## raycast BEFORE spawning this; it only draws the fading beam line.
 ## The beam is a child of the player, so it follows the muzzle while fading.
 ## Its length is re-raycast every physics frame (visual only, no extra damage),
-## so it stops at walls/obstacles/enemies instead of sliding through them.
+## so it stops at walls/obstacles (it pierces enemies) instead of sliding through them.
 extends Node2D
 class_name LaserBeamVisual
 

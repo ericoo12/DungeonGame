@@ -21,6 +21,12 @@
 [ext_resource type="Resource" uid="uid://c5ttmqjoq74x8" path="res://scenes/items/item_data/paper_armour.tres" id="19_xg2r1"]
 [ext_resource type="Resource" uid="uid://dus84rqolvfrl" path="res://scenes/items/item_data/charge_shot.tres" id="20_7xisw"]
 [ext_resource type="Resource" uid="uid://ba2bibxm1qyey" path="res://scenes/items/item_data/mirror_shot.tres" id="20_kefgr"]
+[ext_resource type="Resource" uid="uid://bevmiwidq1ok0" path="res://scenes/items/item_data/duck_hat.tres" id="21_20tjt"]
+[ext_resource type="Texture2D" uid="uid://ggn18ti0m01x" path="res://assets/sprites/items/items_icons/poop_projectile.png" id="22_kefgr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6rt4j"]
 
 [node name="TestRoom" type="Node2D" unique_id=1306159203]
 
@@ -109,5 +115,24 @@ item = ExtResource("20_7xisw")
 position = Vector2(-46, 134)
 item = ExtResource("20_kefgr")
 
+[node name="DuckHat" parent="Entities" unique_id=1027803561 instance=ExtResource("6_32oie")]
+position = Vector2(-15, 134)
+item = ExtResource("21_20tjt")
+
 [node name="Hud" parent="." unique_id=1547169626 instance=ExtResource("5_euy64")]
 visible = false
+
+[node name="ProjectileWalls" type="StaticBody2D" parent="." unique_id=1288341319 groups=["walls"]]
+position = Vector2(500, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileWalls" unique_id=657429606]
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Sprite2D" type="Sprite2D" parent="ProjectileWalls" unique_id=2015485758]
+texture = ExtResource("22_kefgr")
+
+[node name="WallBlockers" type="StaticBody2D" parent="." unique_id=2108552365 groups=["walls"]]
+position = Vector2(500, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallBlockers" unique_id=639729588]
+shape = SubResource("RectangleShape2D_6rt4j")

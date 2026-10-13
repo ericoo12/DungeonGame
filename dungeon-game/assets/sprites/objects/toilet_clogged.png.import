@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dk540c3jsiasm"
-path="res://.godot/imported/sewer_basic.png-03ada458780e61ad667a925e79b49772.ctex"
+uid="uid://lypj3fsoyr2p"
+path="res://.godot/imported/toilet_clogged.png-4374b1e8329a8a06b39083ee9fd11003.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/tiles/sewer_basic.png"
-dest_files=["res://.godot/imported/sewer_basic.png-03ada458780e61ad667a925e79b49772.ctex"]
+source_file="res://assets/sprites/objects/toilet_clogged.png"
+dest_files=["res://.godot/imported/toilet_clogged.png-4374b1e8329a8a06b39083ee9fd11003.ctex"]
 
 [params]
 

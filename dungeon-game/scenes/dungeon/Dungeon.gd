@@ -18,6 +18,7 @@ var boss_scenes: Array[PackedScene] = []
 @export var normal_room_scenes: Array[PackedScene] = []
 @export var boss_room_scene: PackedScene
 @export var item_room_scene: PackedScene
+@export var shop_room_scene: PackedScene
 @export var item_pool_folder: String = "res://scenes/items/item_data/"
 
 var item_pool: Array[ItemBase] = []
@@ -45,7 +46,21 @@ var item_pool: Array[ItemBase] = []
 @export_range(0.0, 1.0) var enemy_family_affinity: float = 0.75
 @export_group("")
 
+@export_group("Shop")
+## Default prices in ducks (an item's own ItemBase.shop_price overrides these).
+## Economy: a cleared room drops ~0.85 ducks on average, plus pots/trash bags.
+@export var shop_item_price: int = 7
+@export var shop_active_item_price: int = 8
+## The rightmost shop spot sells a declogger (when the shop has 2+ spots).
+@export var shop_declogger_price: int = 3
+@export_group("")
+
 @export_group("Drops")
+## Clogged chest-toilets (Toilet.gd): this table is rolled chest_toilet_drops times.
+@export var toilet_chest_drops: DropTable = preload("res://scenes/dungeon/drops/toilet_chest_drops.tres")
+@export var chest_toilet_drops: Vector2i = Vector2i(2, 3)
+## Share of normal rooms that get a chest-toilet (DungeonGenerator).
+@export_range(0.0, 1.0) var chest_toilet_chance: float = 0.15
 ## Rolled once when a normal room is cleared (luck-scaled, see DropTable).
 @export var room_clear_drops: DropTable
 @export_group("")
@@ -117,7 +132,8 @@ func _generate_and_load_floor() -> void:
 	if not floor_variants.is_empty():
 		current_floor_variant = floor_variants[randi() % floor_variants.size()]
 
-	var result := DungeonGenerator.generate(get_room_count_for_stage(GameState.current_stage))
+	var result := DungeonGenerator.generate(get_room_count_for_stage(GameState.current_stage),
+		0.1, 1, chest_toilet_chance)
 	layout = result.layout
 	room_distances = result.distances
 	current_room = null
@@ -142,6 +158,16 @@ func travel(direction: Vector2i) -> void:
 		_load_room(next_pos, direction)
 		get_tree().create_timer(TRAVEL_COOLDOWN).timeout.connect(func(): can_travel = true)
 
+## Through an unclogged toilet (Toilet.gd): to the linked room, arriving at its toilet.
+func travel_through_toilet(target: Vector2i) -> void:
+	if not can_travel or not layout.has(target):
+		return
+	can_travel = false
+	_load_room.call_deferred(target, Vector2i.ZERO)  # deferred: called from a physics callback
+	get_tree().create_timer(TRAVEL_COOLDOWN).timeout.connect(func(): can_travel = true)
+
+
+## entered_from = direction travelled (door), or ZERO when arriving through a toilet.
 func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	for proj in get_tree().get_nodes_in_group("projectiles"):
 		proj.queue_free()
@@ -159,6 +185,8 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	# so they don't die with the room and must be cleared here.
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
 		obstacle.queue_free()
+	for prop in get_tree().get_nodes_in_group("room_props"):  # toilets
+		prop.queue_free()
 
 	var data: RoomData = layout[grid_pos]
 
@@ -171,6 +199,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 		RoomData.Type.START: scene = start_room_scene
 		RoomData.Type.BOSS: scene = boss_room_scene
 		RoomData.Type.ITEM: scene = item_room_scene
+		RoomData.Type.SHOP: scene = shop_room_scene
 		_: 
 			if data.scene_path == "":
 				scene = normal_room_scenes[randi() % normal_room_scenes.size()]
@@ -187,7 +216,10 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 
 	
 	var entrance_direction := entered_from * -1
-	player.global_position = current_room.global_position + get_entry_offset(entrance_direction)
+	if entered_from == Vector2i.ZERO and current_room.toilet:
+		player.global_position = current_room.toilet.get_arrival_point()
+	else:
+		player.global_position = current_room.global_position + get_entry_offset(entrance_direction)
 	player.set_camera_bounds(current_room.global_position, room_world_size)
 	player.reset_position_history()
 	player.reset_followers_position()

@@ -34,6 +34,8 @@ func _draw() -> void:
 		match data.type:
 			RoomData.Type.START: color = Color(0.3, 0.7, 1.0)
 			RoomData.Type.BOSS: color = Color(0.9, 0.2, 0.2)
+			RoomData.Type.ITEM: color = Color(1.0, 0.85, 0.2)
+			RoomData.Type.SHOP: color = Color(0.3, 0.85, 0.4)
 			_: color = Color(0.6, 0.6, 0.6) if data.cleared else Color(0.9, 0.8, 0.3)
 
 		if grid_pos == dungeon.current_grid_pos:

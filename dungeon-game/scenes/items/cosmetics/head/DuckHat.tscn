@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dwfp2dvun7kl1"]
+
+[ext_resource type="PackedScene" path="res://scenes/items/cosmetics/head/HeadCosmetic.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://eqshyotaydqd" path="res://assets/sprites/player/cosmetics/duck_hat/duck_hat_front.png" id="2_n6j3d"]
+[ext_resource type="Texture2D" uid="uid://b5iw7m8aoj5lk" path="res://assets/sprites/player/cosmetics/duck_hat/duck_hat_left.png" id="3_i3a0t"]
+[ext_resource type="Texture2D" uid="uid://byrp76s2lrepu" path="res://assets/sprites/player/cosmetics/duck_hat/duck_hat_back.png" id="4_ot0m5"]
+
+[node name="DuckHat" unique_id=1101158242 instance=ExtResource("1_base")]
+texture_down = ExtResource("2_n6j3d")
+texture_left = ExtResource("3_i3a0t")
+texture_up = ExtResource("4_ot0m5")
+offset_down = Vector2(0, 20)
+offset_left = Vector2(0, 20)
+offset_right = Vector2(0, 20)
+offset_up = Vector2(0, 20)

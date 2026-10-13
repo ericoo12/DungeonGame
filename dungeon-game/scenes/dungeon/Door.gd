@@ -3,7 +3,7 @@ class_name Door
 
 ## Which texture pair the door uses. Set by RoomBase each time a room loads,
 ## based on the room on the other side (or this room, if it's the special one).
-enum Style { NORMAL, ITEM, BOSS }
+enum Style { NORMAL, ITEM, BOSS, SHOP }
 
 @export var direction: Vector2i = Vector2i.ZERO
 
@@ -21,6 +21,10 @@ enum Style { NORMAL, ITEM, BOSS }
 @export_group("Boss Room")
 @export var boss_closed_texture: Texture2D
 @export var boss_open_texture: Texture2D
+
+@export_group("Shop Room")
+@export var shop_closed_texture: Texture2D
+@export var shop_open_texture: Texture2D
 
 @export_group("")
 
@@ -63,6 +67,9 @@ func _update_visual() -> void:
 		Style.BOSS:
 			if boss_closed_texture: closed = boss_closed_texture
 			if boss_open_texture: open = boss_open_texture
+		Style.SHOP:
+			if shop_closed_texture: closed = shop_closed_texture
+			if shop_open_texture: open = shop_open_texture
 
 	sprite.texture = open if unlocked else closed
 
