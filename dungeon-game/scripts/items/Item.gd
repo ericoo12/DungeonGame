@@ -20,6 +20,7 @@ extends ItemBase
 @export var fire_rate_multiplier: float = 1.0       # >1 = fires faster, e.g. 5.5 = 5.5x faster
 @export var damage_multiplier: float = 1.0          # <1 = weaker shots, e.g. 0.2 = keep 20% (-80%)
 @export var projectile_size_multiplier: float = 1.0 # <1 = smaller shots, e.g. 0.5 = half size
+@export var knockback_multiplier: float = 1.0       # 0 = removes knockback (later knockback ups still add on top)
 
 # --- Orbital companion (spawns a persistent Orbital instance) ---
 @export var orbital_scene: PackedScene
@@ -40,6 +41,22 @@ extends ItemBase
 @export var charge_shot: ChargeShotSettings
 ## Luck-scaled chance-per-shot effect (e.g. SlowShotProc). Stacks with everything.
 @export var shot_proc: ShotProcEffect
+
+#--- Arm sprites ---
+## Replace the player's arm art while holding this item (e.g. Mirror Shot: the off-hand
+## holds a second gun). Leave empty to keep the normal art. Use the SAME canvas as the
+## originals in assets/sprites/player/Filling3/:
+##   gun arm  = arm_*.png    (1254x1254, same shoulder spot -> Player.ARM_PIVOT)
+##   off-hand = offarm_*.png (256x256, top of the shoulder at the canvas centre)
+## "left" art is mirrored for facing right, like the originals.
+@export_group("Arm sprites")
+@export var arm_down: Texture2D
+@export var arm_left: Texture2D
+@export var arm_up: Texture2D
+@export var offarm_down: Texture2D
+@export var offarm_left: Texture2D
+@export var offarm_up: Texture2D
+@export_group("")
 
 #--- Cosmetics ---
 @export var cosmetic_scene: PackedScene
@@ -91,6 +108,10 @@ func apply(player: Player) -> void:
 
 	if projectile_size_multiplier != 1.0:
 		player.projectile_size = clamp(player.projectile_size * projectile_size_multiplier, Player.PROJECTILE_SIZE_MIN, Player.PROJECTILE_SIZE_MAX)
+
+	if knockback_multiplier != 1.0:
+		player.projectile_knockback = clamp(player.projectile_knockback * knockback_multiplier, Player.KNOCKBACK_MIN, Player.KNOCKBACK_MAX)
+		player.resync_shot_style()
 	
 	if shot_speed_bonus != 0.0:
 		player.shot_speed = clamp(player.shot_speed + shot_speed_bonus, Player.SHOT_SPEED_MIN, Player.SHOT_SPEED_MAX)
@@ -106,6 +127,10 @@ func apply(player: Player) -> void:
 
 	if shot_proc:
 		player.shot_procs.append(shot_proc)
+
+	player.override_arm_textures(
+		{"down": arm_down, "left": arm_left, "up": arm_up},
+		{"down": offarm_down, "left": offarm_left, "up": offarm_up})
 
 
 ## Builds the "+2 Damage" / "+0.5 Speed" style summary shown in the item overlay's
@@ -136,11 +161,21 @@ func get_stat_lines() -> Array[Dictionary]:
 	_add_line(lines, fire_rate_multiplier - 1.0, "x%.2f Fire Rate" % fire_rate_multiplier)
 	_add_line(lines, damage_multiplier - 1.0, "x%.2f Damage" % damage_multiplier)
 	_add_line(lines, projectile_size_multiplier - 1.0, "x%.2f Shot Size" % projectile_size_multiplier)
+	if is_zero_approx(knockback_multiplier):
+		lines.append({"text": "No Knockback", "good": false, "neutral": false})
+	else:
+		_add_line(lines, knockback_multiplier - 1.0, "x%.2f Knockback" % knockback_multiplier)
 	_add_line(lines, luck_bonus, "%+d Luck" % int(luck_bonus))
 	if shot_style:
 		lines.append({"text": "Changes your shot", "good": true, "neutral": true})
 	if shot_pattern_modifier:
-		lines.append({"text": "Changes your shot pattern", "good": true, "neutral": true})
+		var extra := shot_pattern_modifier.extra_shots
+		var text := "Changes your shot pattern"
+		if extra > 0:
+			text = "+%d Shot%s" % [extra, "" if extra == 1 else "s"]
+		elif shot_pattern_modifier is MirrorShotModifier:
+			text = "Also shoots backwards"
+		lines.append({"text": text, "good": true, "neutral": extra == 0})
 	if charge_shot:
 		lines.append({"text": "Charge shot", "good": true, "neutral": true})
 	if shot_proc:

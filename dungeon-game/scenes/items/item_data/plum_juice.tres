@@ -8,6 +8,7 @@ script = ExtResource("1_6fytt")
 fire_rate_multiplier = 5.5
 damage_multiplier = 0.2
 projectile_size_multiplier = 0.5
+knockback_multiplier = 0.0
 item_name = "Plum Juice"
 description = "Open the floodgates. Fire rate way up, damage and shot size down."
 icon = ExtResource("1_ehbpv")

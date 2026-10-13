@@ -5,3 +5,8 @@
 [resource]
 script = ExtResource("1_swarm")
 swarm_group = &"rats"
+surround_radius = 40.0
+neighbor_radius = 48.0
+separation_radius = 22.0
+w_separation = 2.4
+w_cohesion = 0.12

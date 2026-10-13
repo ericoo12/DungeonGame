@@ -150,9 +150,4 @@ static func _line_clear(grid: RoomGrid, from: Vector2, to: Vector2) -> bool:
 
 
 static func _current_grid() -> RoomGrid:
-	var tree := Engine.get_main_loop() as SceneTree
-	var dungeon := tree.get_first_node_in_group("dungeon") as Dungeon if tree else null
-	if dungeon == null:
-		return null
-	var room := dungeon.current_room as RoomController
-	return room.grid if room else null
+	return RoomGrid.current()

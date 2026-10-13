@@ -11,6 +11,7 @@
 [ext_resource type="Resource" uid="uid://d2jwn7datdj6e" path="res://scenes/items/item_data/plum_juice.tres" id="10_xg2r1"]
 [ext_resource type="Resource" uid="uid://bf4norc70i6ij" path="res://scenes/items/item_data/Poop_Friend.tres" id="11_nbkod"]
 [ext_resource type="Resource" uid="uid://dj1f7sjdpi8tq" path="res://scenes/items/item_data/radial_burst_item.tres" id="12_ktptm"]
+[ext_resource type="Resource" uid="uid://krmbdp2tth62" path="res://scenes/items/item_data/quad_shot_item.tres" id="12_xg2r1"]
 [ext_resource type="Resource" uid="uid://wxaqwxos8o62" path="res://scenes/items/item_data/laser_upgrade.tres" id="13_153g2"]
 [ext_resource type="Resource" uid="uid://cqdgc85nr4r7i" path="res://scenes/items/item_data/double_shot_item.tres" id="13_pbq83"]
 [ext_resource type="Resource" uid="uid://r13i4hdrodhn" path="res://scenes/items/item_data/tick_beam_item.tres" id="14_153g2"]
@@ -19,6 +20,7 @@
 [ext_resource type="Resource" uid="uid://dw6yfvk81vfdv" path="res://scenes/items/item_data/Plunger_boots.tres" id="18_xg2r1"]
 [ext_resource type="Resource" uid="uid://c5ttmqjoq74x8" path="res://scenes/items/item_data/paper_armour.tres" id="19_xg2r1"]
 [ext_resource type="Resource" uid="uid://dus84rqolvfrl" path="res://scenes/items/item_data/charge_shot.tres" id="20_7xisw"]
+[ext_resource type="Resource" uid="uid://ba2bibxm1qyey" path="res://scenes/items/item_data/mirror_shot.tres" id="20_kefgr"]
 
 [node name="TestRoom" type="Node2D" unique_id=1306159203]
 
@@ -71,6 +73,10 @@ item = ExtResource("13_153g2")
 position = Vector2(172, -30)
 item = ExtResource("13_pbq83")
 
+[node name="QuadShot" parent="Entities" unique_id=517051958 instance=ExtResource("6_32oie")]
+position = Vector2(202, -29)
+item = ExtResource("12_xg2r1")
+
 [node name="test" parent="Entities" unique_id=858377949 instance=ExtResource("6_32oie")]
 position = Vector2(-4, 74)
 item = ExtResource("14_n6vps")
@@ -98,6 +104,10 @@ item = ExtResource("19_xg2r1")
 [node name="Grannyspants" parent="Entities" unique_id=365757934 instance=ExtResource("6_32oie")]
 position = Vector2(-73, 134)
 item = ExtResource("20_7xisw")
+
+[node name="Mirrorshot" parent="Entities" unique_id=1538321405 instance=ExtResource("6_32oie")]
+position = Vector2(-46, 134)
+item = ExtResource("20_kefgr")
 
 [node name="Hud" parent="." unique_id=1547169626 instance=ExtResource("5_euy64")]
 visible = false

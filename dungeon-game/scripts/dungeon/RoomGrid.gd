@@ -102,3 +102,15 @@ func to_astar() -> AStarGrid2D:
 			if not is_walkable(cell):
 				astar.set_point_solid(cell, true)
 	return astar
+
+
+## The current room's grid (or null outside a dungeon). For movement behaviours.
+static func current() -> RoomGrid:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	var dungeon := tree.get_first_node_in_group("dungeon") as Dungeon
+	if dungeon == null:
+		return null
+	var room := dungeon.current_room as RoomController
+	return room.grid if room else null

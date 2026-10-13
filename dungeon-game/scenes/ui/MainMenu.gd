@@ -8,7 +8,7 @@ const GAME_SCENE := "res://scenes/dungeon/Dungeon.tscn"
 const BACKDROP := preload("res://assets/sprites/tiles/sewer.png")
 const BACKDROP_REGION := Rect2(10, 0, 202, 112)  # same crop RoomBase uses for its floor quarters
 
-const TITLE_TEXT := "POOPINATOR"
+const TITLE_TEXT := "Captain Filling"
 const SUBTITLE_TEXT := "Return of the Shit"
 const CREDITS_TEXT := "Eric Åhlén & Albin Will"
 const FADE_TIME := 0.35

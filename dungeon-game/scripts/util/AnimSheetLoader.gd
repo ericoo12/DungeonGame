@@ -171,28 +171,47 @@ static func build_toilet_brush_frames(base_path: String) -> SpriteFrames:
 ## that cycle; there's deliberately no "_right" animation, so EnemyBase mirrors "left"
 ## (flip_h) when moving right. attack_/damage_ reuse the run cycle so EnemyBase's
 ## shared sprite.play(...) calls always find an animation.
-static func build_side_view_enemy_frames(path: String, frame_count: int, fps: float = 12.0) -> SpriteFrames:
+static func build_side_view_enemy_frames(path: String, frame_count: int, fps: float = 12.0,
+		attack_path: String = "", up_path: String = "", down_path: String = "",
+		attack_up_path: String = "", attack_down_path: String = "") -> SpriteFrames:
 	var frames := SpriteFrames.new()
 	frames.remove_animation("default")
 
-	var tex := load(path) as Texture2D
-	if tex == null:
+	var side := load(path) as Texture2D
+	if side == null:
 		push_error("AnimSheetLoader: could not load side-view enemy texture: " + path)
 		return frames
+	var side_attack := _load_optional(attack_path)
+	# Up/down fall back to the side sheets when not given.
+	var run_sheets := {"left": side, "down": _load_optional(down_path), "up": _load_optional(up_path)}
+	var attack_sheets := {"left": side_attack, "down": _load_optional(attack_down_path), "up": _load_optional(attack_up_path)}
 
-	var frame_width := tex.get_width() / frame_count
-	for prefix in ["run", "attack", "damage"]:
-		for dir in ["down", "left", "up"]:
-			var anim_name: String = "%s_%s" % [prefix, dir]
-			frames.add_animation(anim_name)
-			frames.set_animation_speed(anim_name, fps)
-			frames.set_animation_loop(anim_name, prefix == "run")
-			for i in frame_count:
-				var atlas := AtlasTexture.new()
-				atlas.atlas = tex
-				atlas.region = Rect2(i * frame_width, 0, frame_width, tex.get_height())
-				frames.add_frame(anim_name, atlas)
+	for dir in ["down", "left", "up"]:
+		var run: Texture2D = run_sheets[dir] if run_sheets[dir] else side
+		var attack: Texture2D = attack_sheets[dir] if attack_sheets[dir] else (side_attack if side_attack else run)
+		_add_strip(frames, "run_" + dir, run, run.get_width() / frame_count, fps, true)
+		_add_strip(frames, "damage_" + dir, run, run.get_width() / frame_count, fps, false)
+		var attack_w := attack.get_height() if attack != run else run.get_width() / frame_count
+		_add_strip(frames, "attack_" + dir, attack, attack_w, fps, false)
 	return frames
+
+
+static func _load_optional(path: String) -> Texture2D:
+	if path == "":
+		return null
+	return load(path) as Texture2D
+
+
+## One row of equal-width frames as an animation.
+static func _add_strip(frames: SpriteFrames, anim_name: String, tex: Texture2D, frame_width: int, fps: float, loop: bool) -> void:
+	frames.add_animation(anim_name)
+	frames.set_animation_speed(anim_name, fps)
+	frames.set_animation_loop(anim_name, loop)
+	for i in tex.get_width() / frame_width:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(i * frame_width, 0, frame_width, tex.get_height())
+		frames.add_frame(anim_name, atlas)
 
 
 # ============================================================

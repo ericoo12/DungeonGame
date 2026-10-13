@@ -7,7 +7,7 @@
 size = Vector2(31, 32)
 
 [node name="Orbital" type="Area2D" unique_id=1423271772]
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.3, 0.3)
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_xm5qb")

@@ -40,6 +40,9 @@ var item_pool: Array[ItemBase] = []
 @export var extra_enemies_per_stage: float = 0.5   # +1 enemy every 2 stages by default
 @export var enemy_min_entry_distance: float = 5.0  # in cells (16px) from any door entry point
 @export var enemy_spawn_samples: int = 8           # best-candidate samples per enemy (higher = more spread out)
+## After a room's first enemy is picked, chance that each further pick is from the same
+## family (EnemyBase.family) if that family exists in the rolled tier. 0 = fully mixed rooms.
+@export_range(0.0, 1.0) var enemy_family_affinity: float = 0.75
 @export_group("")
 
 @export_group("Drops")
@@ -50,8 +53,12 @@ var item_pool: Array[ItemBase] = []
 var breakable_obstacle_scenes: Array[PackedScene] = []
 var solid_obstacle_scenes: Array[PackedScene] = []
 
-@export var easy_max_distance: int = 2    # rooms this close to start only pull from easy_enemy_scenes
-@export var hard_min_distance: int = 5    # rooms this far or farther can pull from hard_enemy_scenes
+## Enemy difficulty follows the STAGE, not how far a room is from the start (the player
+## only gets stronger from items, not from walking further into a floor).
+## Stage < medium_enemies_from_stage: easy only. From it: easy + medium. From
+## hard_enemies_from_stage: easy + medium + hard. Mix per tier in RoomBase (TIER_WEIGHTS_*).
+@export var medium_enemies_from_stage: int = 2
+@export var hard_enemies_from_stage: int = 3
 @export var room_world_size := Vector2(432, 224)
 var room_distances: Dictionary = {}
 @export var floor_variants: Array[RoomFloorVariant] = []
@@ -81,6 +88,7 @@ func _ready() -> void:
 	boss_scenes = _load_scenes_from_folder(boss_folder)
 	item_pool = _load_items_from_folder(item_pool_folder)
 	_load_obstacle_pools()
+	_cache_enemy_families()
 	
 	_generate_and_load_floor()
 
@@ -140,6 +148,12 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 		
 	for pickup in get_tree().get_nodes_in_group("item_pickups"):
 		pickup.queue_free()
+
+	# Floor effects left in the previous room (e.g. Nosebleed puddles). They live in the
+	# dungeon-wide GroundEffects layer, and every room loads at the same spot, so they'd
+	# otherwise show up in the new room.
+	for effect in get_tree().get_nodes_in_group("room_effects"):
+		effect.queue_free()
 
 	# Obstacles live in the Entities container (for y-sorting), not in the room scene,
 	# so they don't die with the room and must be cleared here.
@@ -220,6 +234,44 @@ func get_entry_offset(door_dir: Vector2i) -> Vector2:
 		door_dir.x * (half_size.x - ENTRY_DISTANCE_FROM_WALL),
 		door_dir.y * (half_size.y - ENTRY_DISTANCE_FROM_WALL)
 	)
+
+
+# resource_path -> family / spawn_weight, read once at startup so spawning doesn't
+# instantiate to ask.
+var _enemy_families: Dictionary = {}
+var _enemy_weights: Dictionary = {}
+
+
+func _cache_enemy_families() -> void:
+	_enemy_families.clear()
+	_enemy_weights.clear()
+	for pool in [easy_enemy_scenes, medium_enemy_scenes, hard_enemy_scenes]:
+		for scene: PackedScene in pool:  # typed: the outer list is untyped, so `scene` would be Variant
+			var instance: Node = scene.instantiate()
+			var enemy := instance as EnemyBase
+			_enemy_families[scene.resource_path] = enemy.family if enemy else &""
+			_enemy_weights[scene.resource_path] = enemy.spawn_weight if enemy else 1.0
+			instance.free()
+
+
+func get_enemy_weight(scene: PackedScene) -> float:
+	return _enemy_weights.get(scene.resource_path, 1.0)
+
+
+func get_enemy_family(scene: PackedScene) -> StringName:
+	return _enemy_families.get(scene.resource_path, &"")
+
+
+## Every regular enemy (any tier) of `family`.
+func get_family_scenes(family: StringName) -> Array[PackedScene]:
+	var result: Array[PackedScene] = []
+	if family == &"":
+		return result
+	for pool in [easy_enemy_scenes, medium_enemy_scenes, hard_enemy_scenes]:
+		for scene: PackedScene in pool:
+			if get_enemy_family(scene) == family:
+				result.append(scene)
+	return result
 
 
 func _load_obstacle_pools() -> void:

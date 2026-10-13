@@ -5,7 +5,7 @@ class_name EnemyProjectile
 ## shadow, then over the last part of its flight sinks down onto the shadow and
 ## splashes when it reaches max_range. Also splashes on hitting the player or a wall.
 
-@export var speed: float = 250.0
+@export var speed: float = 130.0
 @export var damage: float = 1.0
 @export var max_range: float = 140.0          # px travelled before it lands (lifetime = max_range / speed)
 @export var knockback_strength: float = 150.0

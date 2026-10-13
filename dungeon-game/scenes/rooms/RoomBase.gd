@@ -86,18 +86,37 @@ func _spawn_enemies(distance: int, dungeon: Dungeon, entities_container: Node2D)
 		for point in _local_group_nodes("enemy_spawn_points"):
 			positions.append(point.global_position)
 
-	# What: a mix of difficulty tiers, types drawn from a shuffle bag for variety.
+	# What: difficulty tiers by room distance; types biased toward one family per room.
 	var scenes := _pick_enemy_scenes(positions.size(), distance, dungeon)
 
 	for i in scenes.size():
 		var enemy := scenes[i].instantiate()
 		var extra := _pack_extra_count(enemy)
+		# Mixed packs (pack_mixes_family): extras are random members of the leader's family.
+		# pack_member_scene (escorts) wins over pack_mixes_family; otherwise copies.
+		var members: Array[PackedScene] = []
+		var leader := enemy as EnemyBase
+		if leader and leader.pack_member_scene:
+			members = [leader.pack_member_scene]
+		elif leader and leader.pack_mixes_family:
+			members = dungeon.get_family_scenes(leader.family)
 		_add_enemy(enemy, positions[i], entities_container)
 		for pack_pos in _pack_positions(positions[i], extra):
-			_add_enemy(scenes[i].instantiate(), pack_pos, entities_container)
+			var member_scene: PackedScene = members[randi() % members.size()] if not members.is_empty() else scenes[i]
+			_add_enemy(member_scene.instantiate(), pack_pos, entities_container)
 
 	if _enemy_count == 0:
 		_unlock_all_doors()
+
+
+## For enemies created mid-fight (e.g. a trash bin spawning flies): added to the room
+## like normal spawns, so the room isn't cleared until they're dead too.
+func spawn_enemy(scene: PackedScene, pos: Vector2) -> Node:
+	if scene == null or _entities_container == null:
+		return null
+	var enemy := scene.instantiate()
+	_add_enemy(enemy, pos, _entities_container)
+	return enemy
 
 
 func _add_enemy(enemy: Node, pos: Vector2, entities_container: Node2D) -> void:
@@ -134,32 +153,57 @@ func _pack_positions(center: Vector2, count: int) -> Array[Vector2]:
 
 
 ## Chance per enemy of being drawn from [easy, medium, hard], by the room's tier
-## (easy_max_distance / hard_min_distance on Dungeon). Empty pools are skipped automatically.
+## (by stage: medium_enemies_from_stage / hard_enemies_from_stage on Dungeon).
+## Empty pools are skipped automatically.
 const TIER_WEIGHTS_EASY_ROOM := [1.0, 0.0, 0.0]
-const TIER_WEIGHTS_MEDIUM_ROOM := [0.35, 0.65, 0.0]
-const TIER_WEIGHTS_HARD_ROOM := [0.15, 0.35, 0.5]
+const TIER_WEIGHTS_MEDIUM_ROOM := [0.7, 0.3, 0.0]    # applies to a whole floor now, so gentler
+const TIER_WEIGHTS_HARD_ROOM := [0.45, 0.35, 0.2]
 
 
 func _pick_enemy_scenes(count: int, distance: int, dungeon: Dungeon) -> Array[PackedScene]:
 	var tiers: Array = [dungeon.easy_enemy_scenes, dungeon.medium_enemy_scenes, dungeon.hard_enemy_scenes]
 	var weights: Array = TIER_WEIGHTS_EASY_ROOM
-	if distance >= dungeon.hard_min_distance:
+	# Stage-based, same mix for every room on a floor. (`distance` is no longer used here.)
+	var stage := GameState.current_stage
+	if stage >= dungeon.hard_enemies_from_stage:
 		weights = TIER_WEIGHTS_HARD_ROOM
-	elif distance > dungeon.easy_max_distance:
+	elif stage >= dungeon.medium_enemies_from_stage:
 		weights = TIER_WEIGHTS_MEDIUM_ROOM
 
-	# Shuffle bag per tier: every type in a tier appears once before any repeats.
-	var bags: Array = [[], [], []]
+	# Weighted picks (EnemyBase.spawn_weight): common enemies more often than specials.
+	# Family affinity: once the room's first enemy is picked, each further pick has an
+	# enemy_family_affinity chance to come from that family instead (themed rooms).
 	var result: Array[PackedScene] = []
+	var room_family: StringName = &""
 	for i in count:
 		var tier := _roll_tier(weights, tiers)
 		if tier == -1:
 			break
-		if bags[tier].is_empty():
-			bags[tier] = tiers[tier].duplicate()
-			bags[tier].shuffle()
-		result.append(bags[tier].pop_back())
+		var scene: PackedScene = null
+		if room_family != &"" and randf() < dungeon.enemy_family_affinity:
+			var same: Array = tiers[tier].filter(func(s): return dungeon.get_enemy_family(s) == room_family)
+			scene = _weighted_pick(same, dungeon)
+		if scene == null:
+			scene = _weighted_pick(tiers[tier], dungeon)
+		if room_family == &"":
+			room_family = dungeon.get_enemy_family(scene)
+		result.append(scene)
 	return result
+
+
+## Random scene from `scenes`, weighted by EnemyBase.spawn_weight. null if empty.
+func _weighted_pick(scenes: Array, dungeon: Dungeon) -> PackedScene:
+	var total := 0.0
+	for s in scenes:
+		total += maxf(dungeon.get_enemy_weight(s), 0.0)
+	if total <= 0.0:
+		return scenes[randi() % scenes.size()] if not scenes.is_empty() else null
+	var roll := randf() * total
+	for s in scenes:
+		roll -= maxf(dungeon.get_enemy_weight(s), 0.0)
+		if roll <= 0.0:
+			return s
+	return scenes.back()
 
 
 func _roll_tier(weights: Array, tiers: Array) -> int:

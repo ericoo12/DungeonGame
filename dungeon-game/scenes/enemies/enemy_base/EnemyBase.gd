@@ -7,6 +7,17 @@ class_name EnemyBase
 ## > 0: the sheet is ONE row of this many frames, side view facing left (e.g. Rat).
 ## The enemy only ever faces left/right (mirrored), also while moving up/down.
 @export var side_view_frames: int = 0
+## Side-view sheets are drawn facing left by default; tick this for art facing right
+## (e.g. the snake). With side_view_frames, attack_sheet_path becomes its attack cycle.
+@export var side_view_faces_right: bool = false
+## Optional extra sheets for side-view enemies moving mostly up/down (same frame layout).
+@export_file("*.png") var sheet_up_path: String = ""
+@export_file("*.png") var sheet_down_path: String = ""
+@export_file("*.png") var attack_sheet_up_path: String = ""
+@export_file("*.png") var attack_sheet_down_path: String = ""
+## Turn the Hitbox shape with the facing: horizontal side-on, vertical when facing up/down
+## (for long bodies like the snake; the shape is authored vertical, e.g. a capsule).
+@export var rotate_hitbox_with_facing: bool = false
 ## Set = sprite_sheet_path is a single-row IDLE sheet and this is a single-row ATTACK
 ## sheet (square frames, front-facing). See AnimSheetLoader.build_idle_attack_frames().
 ## Can be the same file as sprite_sheet_path for enemies with one looping cycle (flies).
@@ -25,6 +36,24 @@ var shadow: Shadow = null
 @export var max_health: float = 30.0
 @export var move_speed: float = 10.0
 
+@export_group("Speed bursts")
+## > 0: the enemy alternates between bursts at this speed and its normal move_speed
+## (e.g. purple fly: 60 for 3 s, then normal for 5 s, repeating). 0 = off.
+@export var burst_speed: float = 0.0
+@export var burst_duration: float = 3.0
+@export var burst_pause: float = 5.0          # time at normal speed between bursts
+@export var burst_anim_speed_scale: float = 2.0  # animation plays faster while bursting
+## Pulses between this colour and normal while bursting (on the enemy node itself, so it
+## doesn't fight the red hit flash / blue slow tint on the sprite). White = no flashing.
+@export var burst_flash_color: Color = Color(1.8, 1.4, 2.0)
+@export var burst_flash_period: float = 0.25     # seconds per pulse
+@export_group("")
+
+var _base_move_speed: float = 0.0
+var _bursting: bool = false
+var _burst_timer: float = 0.0
+var _burst_tween: Tween = null
+
 # --- Contact damage ---
 @export var contact_damage: int = 1
 @export var contact_damage_interval: float = 0.6
@@ -35,15 +64,44 @@ var shadow: Shadow = null
 @export var knockback_immune: bool = false
 
 @export var is_boss: bool = false
+## Bosses only (is_boss): incoming knockback is scaled by this, then capped at
+## boss_max_knockback (px/s), so high-knockback builds can't shove a boss around.
+## Bosses also skip the damage animation (only the white flash) so constant hits
+## can't stun-lock them.
+@export var boss_knockback_multiplier: float = 0.3
+@export var boss_max_knockback: float = 40.0
 @export var spawn_grace_period: float = 0.5
 
 @export var movement_behavior: MovementBehavior
 ## How many of this enemy spawn together per spawn slot (min, max). (1, 1) = alone.
 ## Swarm enemies (rats) use e.g. (3, 5); the extras appear on free tiles next to the first.
 @export var pack_size: Vector2i = Vector2i(1, 1)
+## Enemies of the same family ("fly", "rat", ...) tend to spawn together in a room
+## (Dungeon.enemy_family_affinity). Empty = no family.
+@export var family: StringName = &""
+## Pack members are random members of the same family instead of copies of this enemy
+## (e.g. a fly cluster with mixed colours).
+@export var pack_mixes_family: bool = false
+## If set, pack members are THIS scene instead (e.g. a special fly escorted by green
+## flies). Takes priority over pack_mixes_family.
+@export var pack_member_scene: PackedScene
+## Relative chance to be picked for a room spawn slot, vs other enemies in the same
+## pool (e.g. common = 3, special = 1).
+@export var spawn_weight: float = 1.0
+## Spawned where this enemy dies, e.g. FlyRed's explosion. Empty = nothing.
+@export var death_scene: PackedScene
 @export var attack_behavior: AttackBehavior
 
 var spawn_timer: float = 0.0
+
+## Direction the enemy's body points (last real movement direction). Used for
+## vision checks, e.g. LungeAttack only fires at things in front/to the sides.
+var heading: Vector2 = Vector2.DOWN
+
+## Set by attacks that move the body themselves (LungeAttack's strike): while active it
+## replaces the movement behaviour's velocity. Knockback still wins.
+var forced_velocity_active: bool = false
+var forced_velocity: Vector2 = Vector2.ZERO
 
 # --- Slow (SlowShotProc) ---
 const SLOW_TINT := Color(0.55, 0.75, 1.0)
@@ -92,10 +150,11 @@ func _ready() -> void:
 		add_to_group("boss")
 		EventBus.boss_spawned.emit(max_health)
 
-	if attack_sheet_path != "":
+	if side_view_frames > 0:
+		sprite.sprite_frames = AnimSheetLoader.build_side_view_enemy_frames(sprite_sheet_path, side_view_frames, 12.0,
+			attack_sheet_path, sheet_up_path, sheet_down_path, attack_sheet_up_path, attack_sheet_down_path)
+	elif attack_sheet_path != "":
 		sprite.sprite_frames = AnimSheetLoader.build_idle_attack_frames(sprite_sheet_path, attack_sheet_path, idle_fps)
-	elif side_view_frames > 0:
-		sprite.sprite_frames = AnimSheetLoader.build_side_view_enemy_frames(sprite_sheet_path, side_view_frames)
 	elif is_static_visual:
 		sprite.sprite_frames = AnimSheetLoader.build_static_enemy_frames(sprite_sheet_path)
 	else:
@@ -104,6 +163,9 @@ func _ready() -> void:
 	set_visual_scale(visual_scale)
 	_spawn_shadow()
 	spawn_timer = spawn_grace_period
+	_base_move_speed = move_speed
+	# Start somewhere in the normal phase so a group doesn't burst in sync.
+	_burst_timer = randf_range(1.0, maxf(burst_pause, 1.0))
 	_update_label()
 
 
@@ -126,7 +188,10 @@ func _physics_process(delta: float) -> void:
 	if knockback_velocity.length() > 1.0:
 		velocity = knockback_velocity
 		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
+	elif forced_velocity_active:
+		velocity = forced_velocity
 	elif movement_behavior:
+		_update_speed_burst(delta)
 		velocity = movement_behavior.get_velocity(self, delta)
 	elif player:
 		# legacy fallback — old hardcoded chase, so DoktorMugg etc. keep working
@@ -136,6 +201,9 @@ func _physics_process(delta: float) -> void:
 		_update_facing_direction(dir)
 	else:
 		velocity = Vector2.ZERO
+
+	if velocity.length_squared() > 1.0 and knockback_velocity.length() <= 1.0:
+		heading = velocity.normalized()
 
 	if attack_behavior and action_state == "":
 		attack_behavior.try_attack(self, delta)
@@ -160,10 +228,24 @@ func _update_facing_direction(dir: Vector2) -> void:
 	if side_view_frames > 0:
 		# Side-view sheets: always the left cycle, mirrored when heading right. Nearly
 		# vertical movement keeps the current facing instead of flickering.
-		facing_direction = "left"
-		if absf(dir.x) > 0.2:
-			facing_right = dir.x > 0.0
-		sprite.flip_h = facing_right
+		# Up/down art (if any) when moving mostly vertically. Hysteresis so diagonal
+		# movement / slither wobble doesn't flicker between side and vertical art.
+		var vertical := false
+		if sheet_up_path != "" or sheet_down_path != "":
+			if facing_direction == "up" or facing_direction == "down":
+				vertical = absf(dir.y) >= absf(dir.x) * 0.8
+			else:
+				vertical = absf(dir.y) > absf(dir.x) * 1.25
+		if vertical:
+			facing_direction = "down" if dir.y > 0.0 else "up"
+			sprite.flip_h = false
+		else:
+			facing_direction = "left"
+			if absf(dir.x) > 0.2:
+				facing_right = dir.x > 0.0
+			sprite.flip_h = facing_right != side_view_faces_right  # mirror when moving away from the art's facing
+		if rotate_hitbox_with_facing:
+			hitbox_collision.rotation = 0.0 if vertical else PI / 2.0
 		return
 
 	if abs(dir.x) > abs(dir.y):
@@ -206,11 +288,15 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 		die()
 		return
 
-	_play_damage_animation()
+	if not is_boss:
+		_play_damage_animation()  # bosses only flash: the hit anim would stun-lock them
 	_flash()
 
 	if knockback_strength > 0.0 and not knockback_immune:
-		knockback_velocity = knockback_dir.normalized() * knockback_strength
+		var strength := knockback_strength
+		if is_boss:
+			strength = minf(strength * boss_knockback_multiplier, boss_max_knockback)
+		knockback_velocity = knockback_dir.normalized() * strength
 
 
 func _play_damage_animation() -> void:
@@ -260,6 +346,12 @@ func die() -> void:
 	set_physics_process(false)
 	hitbox.set_deferred("monitoring", false)
 	velocity = Vector2.ZERO
+
+	if death_scene:
+		var effect := death_scene.instantiate()
+		if effect is Node2D:
+			(effect as Node2D).position = position
+		get_parent().add_child.call_deferred(effect)  # die() runs inside a physics callback (projectile hit)
 
 	var death_animation := "death_" + facing_direction
 	if sprite.sprite_frames.has_animation(death_animation):
@@ -354,3 +446,30 @@ func _apply_slow_to_velocity(delta: float) -> void:
 	if _slow_timer <= 0.0:
 		_slow_factor = 1.0
 		sprite.self_modulate = Color.WHITE
+
+
+## Alternates move_speed between burst_speed (burst_duration) and the normal speed
+## (burst_pause). Movement behaviours just read move_speed, so this works with any of them.
+func _update_speed_burst(delta: float) -> void:
+	if burst_speed <= 0.0:
+		return
+	_burst_timer -= delta
+	if _burst_timer > 0.0:
+		return
+	_bursting = not _bursting
+	_burst_timer = burst_duration if _bursting else burst_pause
+	move_speed = burst_speed if _bursting else _base_move_speed
+	sprite.speed_scale = burst_anim_speed_scale if _bursting else 1.0
+	_set_burst_flash(_bursting)
+
+
+func _set_burst_flash(on: bool) -> void:
+	if _burst_tween:
+		_burst_tween.kill()
+		_burst_tween = null
+	modulate = Color.WHITE
+	if not on or burst_flash_color == Color.WHITE:
+		return
+	_burst_tween = create_tween().set_loops().set_trans(Tween.TRANS_SINE)
+	_burst_tween.tween_property(self, "modulate", burst_flash_color, burst_flash_period / 2.0)
+	_burst_tween.tween_property(self, "modulate", Color.WHITE, burst_flash_period / 2.0)

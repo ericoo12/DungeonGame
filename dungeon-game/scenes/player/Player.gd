@@ -216,6 +216,7 @@ var offarm_sprite: Sprite2D   # empty-hand arm (his left)
 var body_textures: Dictionary = {}
 var arm_kick: Vector2 = Vector2.ZERO   # tweened back to zero after each shot
 var arm_kick_rot: float = 0.0
+var offarm_kick: Vector2 = Vector2.ZERO  # Mirror Shot: off-hand recoil, tweened back to zero
 var _arm_tween: Tween
 
 # --- Cosmetics ---
@@ -451,7 +452,7 @@ func _update_body(anim_dir: String, flip: bool) -> void:
 	# --- Off-hand arm ---
 	# Its art already has the top of the shoulder at the canvas center, so no pivot
 	# offset is needed and it's 256px like the head (no texture scale).
-	offarm_sprite.position = _pose(anim_dir, "offarm_pos")
+	offarm_sprite.position = _pose(anim_dir, "offarm_pos") + offarm_kick
 	offarm_sprite.scale = Vector2.ONE * _pose(anim_dir, "offarm_scale")
 	var off_shade: float = _pose(anim_dir, "offarm_shade")
 	offarm_sprite.self_modulate = Color(off_shade, off_shade, off_shade)
@@ -472,6 +473,25 @@ func _update_body(anim_dir: String, flip: bool) -> void:
 			body_root.move_child(order[i], i)
 
 
+## Swaps arm / off-hand art per direction ("down"/"left"/"up"); null entries keep the
+## current art. Used by items (Item "Arm sprites"), e.g. Mirror Shot's second gun.
+func override_arm_textures(arm: Dictionary, offarm: Dictionary) -> void:
+	for dir in arm:
+		if arm[dir]:
+			body_textures.arm[dir] = arm[dir]
+	for dir in offarm:
+		if offarm[dir]:
+			body_textures.offarm[dir] = offarm[dir]
+	# _update_body() runs every frame, so the new art shows from the next frame.
+
+
+func _has_mirror_shot() -> bool:
+	for m in shot_pattern_modifiers:
+		if m is MirrorShotModifier:
+			return true
+	return false
+
+
 func _play_arm_kick(aim_dir: Vector2) -> void:
 	if _arm_tween and _arm_tween.is_valid():
 		_arm_tween.kill()
@@ -487,6 +507,7 @@ func _play_arm_kick(aim_dir: Vector2) -> void:
 	_arm_tween.tween_property(self, "arm_kick", Vector2.ZERO, ARM_KICK_RETURN_TIME)
 	_arm_tween.tween_property(self, "arm_kick_rot", 0.0, ARM_KICK_RETURN_TIME)
 	_arm_tween.tween_property(arm_sprite, "modulate", Color.WHITE, ARM_KICK_RETURN_TIME)
+
 
 
 func _facing_suffix() -> String:
@@ -512,8 +533,19 @@ func _shoot(aim_dir: Vector2, is_moving: bool) -> void:
 
 
 func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
-	var dirs: Array[Vector2] = [base_dir]
+	# Extra-shot items ADD up (Double +1, Quad +3 -> 5 shots), fanned evenly using the
+	# widest spread among them. Custom pattern modifiers run on the result afterwards.
+	var extra := 0
+	var spread := 0.0
+	var custom: Array[ShotPatternModifier] = []
 	for modifier in shot_pattern_modifiers:
+		if modifier.extra_shots > 0:
+			extra += modifier.extra_shots
+			spread = maxf(spread, modifier.spread_degrees)
+		else:
+			custom.append(modifier)
+	var dirs := ShotPatternModifier.fan(base_dir, 1 + extra, spread)
+	for modifier in custom:
 		dirs = modifier.modify_directions(dirs)
 	for d in dirs:
 		if shot_style:

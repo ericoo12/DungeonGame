@@ -33,6 +33,5 @@ position = Vector2(539, 247)
 
 [node name="Player" parent="Entities" unique_id=1881097379 instance=ExtResource("2_pfrhd")]
 position = Vector2(-4, -3)
-knockback_recovery_speed = 100.0
 
 [node name="Hud" parent="." unique_id=1634359545 instance=ExtResource("3_pfrhd")]

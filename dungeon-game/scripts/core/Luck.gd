@@ -6,7 +6,9 @@ const ROOM_LUCK_CAP := 10.0
 ## Current player luck
 static func raw() -> float:
 	var tree := Engine.get_main_loop() as SceneTree
-	var p := tree.get_first_node_in_group("player") as Player if tree else null
+	if tree == null:
+		return 0.0
+	var p := tree.get_first_node_in_group("player") as Player
 	return p.luck if p else 0.0
 
 # Luck as used by a roll: negatives act like 0

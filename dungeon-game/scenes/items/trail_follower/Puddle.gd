@@ -30,6 +30,7 @@ func setup(dmg: float, life: float, radius: float) -> void:
 
 
 func _ready() -> void:
+	add_to_group("room_effects")  # Dungeon clears these on room change (GroundEffects outlives rooms)
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
