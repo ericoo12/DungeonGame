@@ -1,6 +1,11 @@
 class_name MuggBlackboard
 extends RefCounted
 
+## Last decision details for the test arena/debugger. Not gameplay conditions.
+var situation: String = "NO TARGET"
+var chosen_response: String = "Idle"
+var choice_weights: Dictionary = {}
+
 var player_visible: bool = false
 var shot_clear: bool = false
 var has_last_seen: bool = false

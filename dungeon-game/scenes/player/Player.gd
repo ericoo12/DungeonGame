@@ -10,7 +10,7 @@ var knockback_velocity: Vector2 = Vector2.ZERO
 
 # --- Health ---
 @export var max_hearts: int = 3
-var current_hearts: int
+var current_hearts: float
 var invulnerable: bool = false
 const INVULN_DURATION := 1.0
 var is_dying: bool = false
@@ -297,7 +297,7 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 	if invulnerable or is_dying:
 		return
 
-	current_hearts -= int(round(amount))
+	current_hearts = maxf(0.0, current_hearts - maxf(0.0, amount))
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
 
 	if current_hearts <= 0:
