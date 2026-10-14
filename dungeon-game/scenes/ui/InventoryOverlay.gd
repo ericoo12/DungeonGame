@@ -33,6 +33,7 @@ var _passive_grid: GridContainer
 var _passive_empty: Label
 var _count_label: Label
 var _seed_label: Label
+var _stage_label: Label
 var _detail_name: Label
 var _detail_tag: Label
 var _detail_desc: Label
@@ -56,6 +57,7 @@ func _ready() -> void:
 func open() -> void:
 	visible = true
 	_seed_label.text = "Seed: %d" % GameState.run_seed
+	_stage_label.text = "STAGE %d" % GameState.current_stage
 	if _active_item:
 		_active_slot.grab_focus()
 	elif _passive_grid.get_child_count() > 0:
@@ -189,6 +191,12 @@ func _build_ui() -> void:
 	var header := HBoxContainer.new()
 	root.add_child(header)
 	header.add_child(_label("INVENTORY", 28, COL_TITLE))
+	var title_gap := Control.new()
+	title_gap.custom_minimum_size.x = 18
+	header.add_child(title_gap)
+	_stage_label = _label("STAGE %d" % GameState.current_stage, 20, COL_ACTIVE)
+	_stage_label.size_flags_vertical = Control.SIZE_SHRINK_END
+	header.add_child(_stage_label)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(spacer)

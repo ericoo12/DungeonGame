@@ -62,6 +62,18 @@ var _burst_tween: Tween = null
 # --- Knockback (received when THIS enemy takes damage) ---
 @export var knockback_recovery_speed: float = 800.0
 @export var knockback_immune: bool = false
+## Knockback is deflected by a random angle between these two values (either side),
+## so enemies get knocked off at a diagonal instead of always straight back.
+@export var knockback_min_spread_degrees: float = 15.0
+@export var knockback_spread_degrees: float = 40.0
+## Repeated hits while still in a knockback chain get weaker: each extra hit is
+## multiplied by this again (0.5 -> 100%, 50%, 25%...). Stops a stream of shots
+## from carrying an enemy across the whole room.
+@export_range(0.0, 1.0) var knockback_chain_falloff: float = 0.5
+## Time without being hit before the chain resets to full strength.
+@export var knockback_chain_reset_time: float = 0.5
+## Floor for the chain falloff, so constant fire still nudges enemies a little.
+@export_range(0.0, 1.0) var knockback_chain_min: float = 0.25
 
 @export var is_boss: bool = false
 ## Bosses only (is_boss): incoming knockback is scaled by this, then capped at
@@ -112,6 +124,8 @@ var health: float
 var player: Node2D = null
 var is_dying: bool = false
 var knockback_velocity: Vector2 = Vector2.ZERO
+var _knockback_chain: int = 0
+var _last_knockback_ms: int = -100000
 
 var facing_direction: String = "down"  # down / left / right / up
 var facing_right: bool = false 
@@ -294,9 +308,22 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 
 	if knockback_strength > 0.0 and not knockback_immune:
 		var strength := knockback_strength
+		var dir := knockback_dir.normalized()
 		if is_boss:
 			strength = minf(strength * boss_knockback_multiplier, boss_max_knockback)
-		knockback_velocity = knockback_dir.normalized() * strength
+		else:
+			var now := Time.get_ticks_msec()
+			if now - _last_knockback_ms > int(knockback_chain_reset_time * 1000.0):
+				_knockback_chain = 0
+			_last_knockback_ms = now
+			strength *= maxf(pow(knockback_chain_falloff, _knockback_chain), knockback_chain_min)
+			_knockback_chain += 1
+			if knockback_spread_degrees > 0.0:
+				var spread := deg_to_rad(randf_range(knockback_min_spread_degrees, knockback_spread_degrees))
+				dir = dir.rotated(spread if randf() < 0.5 else -spread)
+		# A weaker follow-up hit never cancels a stronger knockback already in progress.
+		if strength >= knockback_velocity.length():
+			knockback_velocity = dir * strength
 
 
 func _play_damage_animation() -> void:
