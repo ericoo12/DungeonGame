@@ -24,9 +24,10 @@ func apply_player_stats(player: Player) -> void:
 	beam_width = base_beam_width * player.projectile_size
 
 
-## Physics layers the laser cares about: layer 1 = walls + obstacles (stop the beam),
-## layer 3 = enemy bodies (pierced: every enemy on the line gets hit once).
-const STOP_MASK := 1
+## Physics layers the laser cares about: layer 1 = walls + obstacles and layer 9 = the
+## final arena's projectile blockers (stop the beam), layer 3 = enemy bodies (pierced:
+## every enemy on the line gets hit once).
+const STOP_MASK := 1 | (1 << 8)
 const ENEMY_MASK := 4
 const MAX_PIERCE := 32
 

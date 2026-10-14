@@ -140,5 +140,5 @@ func _try_deal_damage(target: Node) -> void:
 		for proc in procs:
 			proc.on_hit(target, shooter)
 		_land()
-	elif target.is_in_group("walls"):
+	elif target.is_in_group("walls") or target.is_in_group("projectile_blockers"):  # final-arena blue blocks
 		_land()

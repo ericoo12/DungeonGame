@@ -19,6 +19,14 @@ var boss_scenes: Array[PackedScene] = []
 @export var boss_room_scene: PackedScene
 @export var item_room_scene: PackedScene
 @export var shop_room_scene: PackedScene
+
+@export_group("Final boss")
+## On this stage the boss room is the final boss's own arena with the final boss in it
+## (instead of boss_room_scene + a random boss from boss_folder). 0 = never.
+@export var final_boss_stage: int = 3
+@export var final_boss_room_scene: PackedScene = preload("res://scenes/final_boss/FinalBossRoom.tscn")
+@export var final_boss_scene: PackedScene = preload("res://scenes/final_boss/DoktorMugg.tscn")
+@export_group("")
 @export var item_pool_folder: String = "res://scenes/items/item_data/"
 
 var item_pool: Array[ItemBase] = []
@@ -140,7 +148,7 @@ func _generate_and_load_floor() -> void:
 	_load_room(Vector2i.ZERO, DungeonGenerator.SOUTH)
 
 	player.global_position = current_room.global_position  # true initial spawn only — centers the player
-	player.set_camera_bounds(current_room.global_position, room_world_size)
+	_apply_room_camera_bounds()
 	player.reset_position_history()
 	player.reset_followers_position()
 
@@ -197,7 +205,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	var scene: PackedScene
 	match data.type:
 		RoomData.Type.START: scene = start_room_scene
-		RoomData.Type.BOSS: scene = boss_room_scene
+		RoomData.Type.BOSS: scene = final_boss_room_scene if is_final_boss_stage() else boss_room_scene
 		RoomData.Type.ITEM: scene = item_room_scene
 		RoomData.Type.SHOP: scene = shop_room_scene
 		_: 
@@ -215,14 +223,33 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 
 
 	
-	var entrance_direction := entered_from * -1
 	if entered_from == Vector2i.ZERO and current_room.toilet:
 		player.global_position = current_room.toilet.get_arrival_point()
 	else:
-		player.global_position = current_room.global_position + get_entry_offset(entrance_direction)
-	player.set_camera_bounds(current_room.global_position, room_world_size)
+		player.global_position = _room_entry_position(entered_from)
+	_apply_room_camera_bounds()
 	player.reset_position_history()
 	player.reset_followers_position()
+
+func is_final_boss_stage() -> bool:
+	return final_boss_stage > 0 and GameState.current_stage == final_boss_stage and final_boss_room_scene != null
+
+
+## Normal rooms: room center + get_entry_offset(). The final boss arena is bigger and
+## knows its own size.
+func _room_entry_position(entered_from: Vector2i) -> Vector2:
+	if current_room is FinalBossArena:
+		return (current_room as FinalBossArena).get_entry_position(entered_from, ENTRY_DISTANCE_FROM_WALL)
+	return current_room.global_position + get_entry_offset(entered_from * -1)
+
+
+func _apply_room_camera_bounds() -> void:
+	if current_room is FinalBossArena:
+		var bounds := (current_room as FinalBossArena).get_arena_bounds()
+		player.set_camera_bounds(bounds.get_center(), bounds.size)
+	else:
+		player.set_camera_bounds(current_room.global_position, room_world_size)
+
 
 func get_enemy_count_for_stage(stage: int) -> int:
 	var base := randi_range(enemy_count_min, maxi(enemy_count_min, enemy_count_max))

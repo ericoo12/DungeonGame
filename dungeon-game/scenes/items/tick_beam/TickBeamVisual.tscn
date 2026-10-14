@@ -30,3 +30,4 @@ collision_mask = 5
 shape = SubResource("RectangleShape2D_ng0gt")
 
 [node name="WallRay" type="RayCast2D" parent="." unique_id=2043141]
+collision_mask = 257
