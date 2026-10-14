@@ -2,7 +2,7 @@ class_name DecisionNode
 extends RefCounted
 
 ## Small reactive behavior-tree primitives. Actions request a tactic; the FSM
-## owns its execution. A committed-action branch prevents repeated restarts.
+## tracks execution; its decision gate prevents repeated action restarts.
 enum Status { FAILURE, SUCCESS, RUNNING }
 enum Kind { SELECTOR, SEQUENCE, CONDITION, ACTION }
 var kind: Kind

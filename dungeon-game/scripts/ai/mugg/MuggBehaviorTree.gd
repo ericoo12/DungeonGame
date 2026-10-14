@@ -1,46 +1,45 @@
 class_name MuggBehaviorTree
 extends Node
 
-## Active first iteration: lifecycle guards, commitment, anti-cover positioning,
-## limited retreat, Basic Shot, reposition, pressure. New tactic leaves can be
-## inserted here without moving physics or attack execution into the tree.
+## READ FIRST: situations are prioritized; responses inside them are weighted.
+## Death, stun and action commitment are guarded by the FSM before evaluation.
+var actor: Node
 var root_node: DecisionNode
 
-func configure(actor: Node) -> void:
+func configure(boss: Node) -> void:
+	actor = boss
 	root_node = DecisionNode.selector([
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.is_dying),
-			DecisionNode.action(func(): return actor.ai_dead())]),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.action_state == "damage"),
-			DecisionNode.action(func(): return actor.ai_stunned())]),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.state_machine.is_committed()),
-			DecisionNode.action(func(): return DecisionNode.Status.RUNNING)]),
-		DecisionNode.action(func(): return actor.ai_dodge()),
-		DecisionNode.action(func(): return actor.ai_take_cover()),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return not actor.blackboard.has_last_seen),
-			DecisionNode.action(func(): return actor.ai_idle())]),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.movement_is_committed()),
-			DecisionNode.action(func(): return DecisionNode.Status.RUNNING)]),
-		DecisionNode.action(func(): return actor.ai_area_attack()),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return not actor.blackboard.player_visible or not actor.blackboard.shot_clear),
-			DecisionNode.action(func(): return actor.ai_reposition("Find firing angle"))]),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.blackboard.distance < actor.close_distance),
-			DecisionNode.action(func(): return actor.ai_reposition("Create distance"))]),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.can_basic_shot()),
-			DecisionNode.action(func(): return actor.ai_choose_offense())]),
-		DecisionNode.sequence([
-			DecisionNode.condition(func(): return actor.bad_position()),
-			DecisionNode.action(func(): return actor.ai_reposition("Reposition"))]),
-		DecisionNode.action(func(): return actor.ai_pressure()),
-		DecisionNode.action(func(): return actor.ai_idle())
+		_when(actor.tactics.immediate_danger, MuggTactics.Situation.DANGER),
+		_when(actor.tactics.player_blocked, MuggTactics.Situation.BLOCKED),
+		_when(actor.tactics.player_too_close, MuggTactics.Situation.TOO_CLOSE),
+		_when(actor.tactics.player_in_range, MuggTactics.Situation.COMBAT),
+		_when(func(): return actor.blackboard.has_last_seen, MuggTactics.Situation.SEARCH),
+		DecisionNode.action(_idle)
+	])
+
+func _when(condition: Callable, situation: MuggTactics.Situation) -> DecisionNode:
+	return DecisionNode.sequence([
+		DecisionNode.condition(condition),
+		DecisionNode.action(func(): return _respond(situation))
 	])
 
 func tick() -> DecisionNode.Status:
-	return root_node.tick() if root_node else DecisionNode.Status.FAILURE
+	if not root_node:
+		return DecisionNode.Status.FAILURE
+	if not actor.state_machine.can_choose_tactic(actor):
+		return DecisionNode.Status.RUNNING
+	return root_node.tick()
+
+func _idle() -> DecisionNode.Status:
+	actor.blackboard.situation = "NO TARGET"
+	actor.blackboard.chosen_response = "Idle"
+	actor.blackboard.choice_weights.clear()
+	return actor.ai_idle()
+
+func _respond(situation: MuggTactics.Situation) -> DecisionNode.Status:
+	var result: DecisionNode.Status = actor.tactics.choose(situation)
+	if result == DecisionNode.Status.FAILURE and situation == MuggTactics.Situation.COMBAT:
+		# Kiting is the movement between attacks, not another attack lottery.
+		actor.blackboard.chosen_response = "Kite between attacks" if actor.kiting_enabled else "Move between attacks"
+		return actor.ai_pressure()
+	return result

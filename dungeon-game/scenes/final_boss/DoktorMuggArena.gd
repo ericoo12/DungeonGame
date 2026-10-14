@@ -22,7 +22,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	var status := "Boss defeated!"
 	if is_instance_valid(boss):
-		status = "%s | %s | HP %.0f | Sight: %s | Clear shot: %s" % [boss.state_machine.state_name(), boss.blackboard.last_decision, boss.health, boss.blackboard.player_visible, boss.blackboard.shot_clear]
+		status = "%s -> %s\nState: %s | HP %.0f | Sight: %s | Clear shot: %s" % [boss.blackboard.situation, boss.blackboard.chosen_response, boss.state_machine.state_name(), boss.health, boss.blackboard.player_visible, boss.blackboard.shot_clear]
 	info.text = "DOKTOR MUGG TEST | WASD: move | Arrows: shoot | R: restart\nGreen: walk blocker | Blue: walk/shot/sight blocker | Leave warning circles\n" + status
 
 func _unhandled_key_input(event: InputEvent) -> void:

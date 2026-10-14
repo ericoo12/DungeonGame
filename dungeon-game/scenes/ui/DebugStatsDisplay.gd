@@ -16,7 +16,7 @@ func _process(_delta: float) -> void:
 		_find_player()
 		return
 	
-	text = "hearts: %d/%d\ndamage_ups: %d\neffective_dmg: %.2f\nmove_speed: %.1f\nfire_rate: %.2f\nknockback: %.1f\nrange: %.2f\nproj_size: %.2f\nplayer_size: %.2f\nluck: %.1f\nitems: %d" % [
+	text = "hearts: %.1f/%d\ndamage_ups: %d\neffective_dmg: %.2f\nmove_speed: %.1f\nfire_rate: %.2f\nknockback: %.1f\nrange: %.2f\nproj_size: %.2f\nplayer_size: %.2f\nluck: %.1f\nitems: %d" % [
 		player.current_hearts,
 		player.max_hearts,
 		player.damage_ups,

@@ -1,6 +1,6 @@
 extends Node
 
-signal player_health_changed(current: int, max: int)
+signal player_health_changed(current: float, max: int)
 signal item_added(item: Item)
 signal active_item_changed(item: ActiveItem)
 signal active_item_charges_changed(charges: int, max_charges: int)
