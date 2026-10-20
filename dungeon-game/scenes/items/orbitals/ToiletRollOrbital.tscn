@@ -6,7 +6,8 @@
 [node name="ToiletRollOrbital" instance=ExtResource("1_base")]
 collision_mask = 68
 radius = 22.0
-damage = 2.0
+damage = 0.0
+speed_scale = 1.8
 blocks_projectiles = true
 
 [node name="Sprite2D" parent="." index="1"]

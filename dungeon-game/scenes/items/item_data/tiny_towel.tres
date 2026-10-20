@@ -5,8 +5,8 @@
 
 [resource]
 script = ExtResource("1_script")
-speed_bonus = 10.0
+luck_bonus = 1.0
 player_size_bonus = -0.12
 item_name = "Tiny Towel"
-description = "Barely covers anything. Smaller and a bit faster."
+description = "Barely covers anything. Smaller, and luck up."
 icon = ExtResource("2_icon")

@@ -7,7 +7,7 @@
 script = ExtResource("1_pe60g")
 speed_bonus = 15.0
 fire_rate_bonus = 0.05
-range_bonus = 1.5
+range_bonus = 0.4
 item_name = "Yellow Syringe"
 description = "A little extra urgency. Movement speed, fire rate and range up."
 icon = ExtResource("1_33pr8")

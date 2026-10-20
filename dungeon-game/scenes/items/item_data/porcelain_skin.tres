@@ -5,9 +5,8 @@
 
 [resource]
 script = ExtResource("1_script")
-max_hearts_bonus = 2
-speed_bonus = -15.0
-player_size_bonus = 0.1
+max_hearts_bonus = 3
+player_size_bonus = 0.25
 item_name = "Porcelain Skin"
-description = "Hard, cold and surprisingly fragile. Health up, speed down, bigger."
+description = "Hard, cold and surprisingly fragile. Lots of health, but a much bigger target."
 icon = ExtResource("2_icon")

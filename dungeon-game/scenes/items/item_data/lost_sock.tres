@@ -10,5 +10,5 @@ rarity = 1
 follower_trail_delay = 0.55
 follower_scene = ExtResource("3_ext")
 item_name = "Lost Sock"
-description = "It found you. Follows you and sometimes fires a weaker copy of your shot."
+description = "It found you. Follows you and sometimes fires a weaker copy of your shot backwards."
 icon = ExtResource("2_icon")

@@ -894,6 +894,7 @@ func set_player_scale(value: float) -> void:
 	body_collision.position = body_collision_base_position * player_scale
 	hurtbox_collision.position = hurtbox_collision_base_position * player_scale
 	hurtbox.position = hurtbox_base_position * player_scale
+	_sync_shadow_to_size()
 
 
 func equip_shot_style(style: ShotStyleModifier) -> void:
@@ -938,12 +939,35 @@ func add_follower(scene: PackedScene, trail_delay: float) -> void:
 	followers.append(follower)
 
 
+## The player's shadow and the size it was made for. Everything on the player scales
+## around the node origin (chest height), so when the player shrinks or grows the feet
+## move up/down; _sync_shadow_to_size() keeps the shadow under the feet (and sized to
+## the body) so the player still stands on the floor.
+var _shadow: Shadow
+var _shadow_base_offset: Vector2
+var _shadow_base_scale: float = 1.0
+var _shadow_base_player_scale: float = 1.0
+
 func _spawn_shadow() -> void:
 	var shadow: Shadow = SHADOW_SCENE.instantiate()
 	var ground_layer := get_tree().get_first_node_in_group("ground_effects")
 	var target_parent: Node = ground_layer if ground_layer else get_parent()
 	target_parent.add_child(shadow)
 	shadow.setup(self, false)
+	_shadow = shadow
+	_shadow_base_offset = shadow.offset
+	_shadow_base_scale = shadow.shadow_scale
+	_shadow_base_player_scale = player_scale
+	_sync_shadow_to_size()
+
+
+func _sync_shadow_to_size() -> void:
+	if not is_instance_valid(_shadow) or _shadow_base_player_scale <= 0.0:
+		return
+	var ratio := player_scale / _shadow_base_player_scale
+	_shadow.offset = _shadow_base_offset * ratio
+	_shadow.shadow_scale = _shadow_base_scale * ratio
+	_shadow.scale = Vector2.ONE * _shadow.shadow_scale
 
 
 func set_camera_bounds(room_center: Vector2, room_size: Vector2) -> void:

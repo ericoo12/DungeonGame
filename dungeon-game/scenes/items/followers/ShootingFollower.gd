@@ -12,6 +12,8 @@ extends TrailFollower
 @export var knockback: float = 20.0
 ## Also roll the player's shot effects (poison, slow, ...) for this shot.
 @export var copy_procs: bool = false
+## Fire the opposite way of the player's shot (Lost Sock covers your back).
+@export var fire_backwards: bool = false
 @export var shot_tint: Color = Color.WHITE
 ## Sprite sheet animation (Sprite2D.hframes > 1).
 @export var anim_fps: float = 14.0
@@ -55,4 +57,4 @@ func _on_player_shot(direction: Vector2) -> void:
 			proc.decorate_projectile(shot)
 	get_parent().add_child(shot)
 	shot.global_position = global_position + sprite.position
-	shot.launch(direction, Vector2.ZERO)
+	shot.launch(-direction if fire_backwards else direction, Vector2.ZERO)

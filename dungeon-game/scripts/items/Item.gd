@@ -17,6 +17,8 @@ extends ItemBase
 @export var player_size_bonus: float = 0.0	# common -0.1, rare -0.2, bad 0.2
 @export var shot_speed_bonus: float = 0.0
 @export var luck_bonus: float = 0.0
+## Lead Underwear: the player can't be knocked back by hits anymore.
+@export var player_knockback_immune: bool = false
 # --- Multiplicative stat bonuses
 @export var fire_rate_multiplier: float = 1.0       # >1 = fires faster, e.g. 5.5 = 5.5x faster
 @export var damage_multiplier: float = 1.0          # <1 = weaker shots, e.g. 0.2 = keep 20% (-80%)
@@ -134,6 +136,9 @@ func apply(player: Player) -> void:
 	if luck_bonus != 0.0:
 		player.luck += luck_bonus
 
+	if player_knockback_immune:
+		player.knockback_immune = true
+
 	if shot_proc:
 		player.shot_procs.append(shot_proc)
 
@@ -178,6 +183,8 @@ func get_stat_lines() -> Array[Dictionary]:
 	else:
 		_add_line(lines, knockback_multiplier - 1.0, "x%.2f Knockback" % knockback_multiplier)
 	_add_line(lines, luck_bonus, "%s Luck" % _signed(luck_bonus))
+	if player_knockback_immune:
+		lines.append({"text": "Can't be knocked back", "good": true, "neutral": false})
 	if shot_style:
 		lines.append({"text": "Changes your shot", "good": true, "neutral": true})
 	if shot_pattern_modifier:

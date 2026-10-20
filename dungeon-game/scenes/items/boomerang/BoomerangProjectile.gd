@@ -1,7 +1,8 @@
 ## U-Bend's shot: flies out, slows to a stop, then flies back to the player.
 ## Goes through enemies (hits each one once on the way out and once on the way back),
 ## turns around early when it hits a wall or obstacle, and flies over walls on the way
-## back so it can't get stuck. Disappears when it reaches the player.
+## back so it can't get stuck. On the way back it flies THROUGH the player and keeps
+## going for `overshoot_distance` px before it drops (it isn't caught).
 ## Range stat = how far it goes out; shot speed = how fast.
 class_name BoomerangProjectile
 extends Projectile
@@ -15,7 +16,10 @@ extends Projectile
 @export var spin_speed: float = 14.0
 ## Safety net: lands after this many seconds no matter what.
 @export var max_flight_time: float = 4.0
-@export var catch_distance: float = 10.0
+## How close it has to come to the player before it stops homing and flies straight on.
+@export var pass_distance: float = 12.0
+## How far it keeps flying past the player before it drops.
+@export var overshoot_distance: float = 90.0
 
 var _dir: Vector2 = Vector2.RIGHT
 var _speed0: float = 0.0
@@ -23,6 +27,8 @@ var _out_time: float = 0.5
 var _returning: bool = false
 var _return_speed: float = 0.0
 var _hit_this_leg: Array[Node] = []
+var _passed_player: bool = false
+var _overshoot_left: float = 0.0
 
 
 func launch(aim_dir: Vector2, shooter_velocity: Vector2) -> void:
@@ -42,18 +48,26 @@ func _physics_process(delta: float) -> void:
 		velocity = _dir * _speed0 * maxf(1.0 - t, 0.0)
 		if t >= 1.0:
 			_start_return()
-	else:
+	elif not _passed_player:
 		if not is_instance_valid(shooter):
 			_land()
 			return
 		var target: Vector2 = shooter.get_hurtbox_center()
 		var to_target := target - global_position
-		if to_target.length() <= catch_distance:
-			has_landed = true
-			queue_free()  # caught: no splash
-			return
 		_return_speed = minf(_return_speed + _speed0 * 3.0 * delta, _speed0 * return_speed_ratio)
-		velocity = to_target.normalized() * _return_speed
+		# Reached the player, or already flying away from them: stop homing, fly on straight.
+		if to_target.length() <= pass_distance or (velocity != Vector2.ZERO and to_target.dot(velocity) < 0.0):
+			_passed_player = true
+			_overshoot_left = overshoot_distance
+			if velocity == Vector2.ZERO:
+				velocity = -_dir * _return_speed
+		else:
+			velocity = to_target.normalized() * _return_speed
+	else:
+		_overshoot_left -= velocity.length() * delta
+		if _overshoot_left <= 0.0:
+			_land()
+			return
 	global_position += velocity * delta
 	sprite_rotator.rotation += spin_speed * delta
 	if elapsed >= max_flight_time:

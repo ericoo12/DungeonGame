@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_rxsmm")
 speed_bonus = 30.0
-range_bonus = 1.5
+range_bonus = 0.4
 shot_speed_bonus = 0.2
 item_name = "Green Syringe"
 description = "Everything moves faster. Movement speed, shot speed and range up."

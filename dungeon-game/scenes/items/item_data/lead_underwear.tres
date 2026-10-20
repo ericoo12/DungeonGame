@@ -5,10 +5,10 @@
 
 [resource]
 script = ExtResource("1_script")
+player_knockback_immune = true
 rarity = 1
 shot_speed_bonus = -0.3
-damage_multiplier = 1.25
 knockback_multiplier = 1.5
 item_name = "Lead Underwear"
-description = "Built for impact. Damage and knockback up, shot speed down."
+description = "Built for impact. You can't be knocked back, your shots knock harder, shot speed down."
 icon = ExtResource("2_icon")
