@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_wub7b")
+rarity = 1
 follower_scene = ExtResource("1_1x50u")
 item_name = "Nosebleed"
 description = "A bloody little follower. Leaves a trail that damages enemies."

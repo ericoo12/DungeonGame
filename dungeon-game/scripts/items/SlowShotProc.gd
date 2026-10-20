@@ -1,5 +1,5 @@
 ## Chance per shot to fire a slowing shot. Chance scales with luck via ShotProcEffect
-## (base_chance at 0 luck -> 100% at luck_for_max).
+## (base_chance + per_luck * luck, capped at max_chance).
 class_name SlowShotProc
 extends ShotProcEffect
 
@@ -19,4 +19,4 @@ func on_hit(target: Node, _player: Player) -> void:
 
 
 func get_stat_text() -> String:
-	return "%d%% chance to slow enemies (100%% at %d luck)" % [roundi(get_chance() * 100.0), roundi(luck_for_max)]
+	return "%d%% chance to slow enemies" % roundi(get_chance() * 100.0) + luck_text()

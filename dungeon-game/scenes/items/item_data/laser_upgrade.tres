@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_2bwcx")
+rarity = 2
 shot_style = ExtResource("3_ptddd")
 item_name = "Laser Hole"
 description = "Concentrated embarrassment. Replace your shots with an instant laser."

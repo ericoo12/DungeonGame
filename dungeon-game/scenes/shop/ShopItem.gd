@@ -125,7 +125,10 @@ func _on_body_entered(body: Node) -> void:
 	if decloggers > 0:
 		player.add_decloggers(decloggers)
 	elif item is ActiveItem:
-		player.add_active_item(item as ActiveItem)
+		var previous: ActiveItem = player.add_active_item(item as ActiveItem)
+		if previous:  # the old one is put down just above the counter, not lost
+			ItemPickup.drop_active(get_parent(), previous, player.last_dropped_active_charges,
+				global_position + Vector2(0, -24))
 	elif item is Item:
 		player.add_item(item as Item)
 	purchased.emit()

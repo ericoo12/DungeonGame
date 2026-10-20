@@ -18,6 +18,11 @@ func modify_directions(dirs: Array[Vector2]) -> Array[Vector2]:
 	return dirs
 
 
+## Inventory line for custom patterns ("" = the generic "Changes your shot pattern").
+func get_stat_text() -> String:
+	return ""
+
+
 ## `count` directions fanned evenly around `aim`, `spread_deg` apart.
 static func fan(aim: Vector2, count: int, spread_deg: float) -> Array[Vector2]:
 	var result: Array[Vector2] = []

@@ -7,6 +7,7 @@
 
 [resource]
 script = ExtResource("1_item")
+rarity = 1
 hurt_drop_scene = ExtResource("2_duck")
 cosmetic_scene = ExtResource("3_hat")
 cosmetic_slot = "Head"

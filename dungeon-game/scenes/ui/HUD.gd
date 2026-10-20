@@ -6,6 +6,9 @@ class_name HUD
 @onready var active_item_icon: TextureRect = $ActiveItemSlot/Icon
 @onready var dungeon_map: Control = $DungeonMap
 
+## P: freezes the whole game with nothing drawn on top (for screenshots).
+var _frozen: bool = false
+
 func _ready() -> void:
 	visible = true
 	item_overlay.visible = false
@@ -14,6 +17,14 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_pause") and not item_overlay.visible:
+		_frozen = not _frozen
+		get_tree().paused = _frozen
+		get_viewport().set_input_as_handled()
+		return
+	if _frozen:
+		return  # frozen: nothing else (inventory, debug view) until P again
+
 	if event.is_action_pressed("toggle_items"):
 		_toggle_item_overlay()
 	elif event.is_action_pressed("ui_cancel") and item_overlay.visible:

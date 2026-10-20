@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("1_item")
+rarity = 1
 shot_pattern_modifier = ExtResource("2_mirror")
 arm_down = ExtResource("3_arm_down")
 arm_left = ExtResource("4_arm_left")

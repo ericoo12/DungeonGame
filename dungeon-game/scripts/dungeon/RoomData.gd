@@ -22,6 +22,10 @@ var obstacles_rolled: bool = false
 ## Respawned on revisit; an entry is removed when its pickup emits `collected`.
 var pending_drops: Array = []
 
+## Active items the player put down here (swapped for another one), so they're still
+## on their pedestal on revisits: [{ "item": ItemBase, "charges": int, "position": Vector2 (room-local) }].
+var floor_items: Array = []
+
 ## Shop rooms: what's for sale, rolled on first visit and kept for revisits.
 ## [{ "item": ItemBase, "price": int, "sold": bool }], one entry per item spot (in order).
 var shop_stock: Array = []

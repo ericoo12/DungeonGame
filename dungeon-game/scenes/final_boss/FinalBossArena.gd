@@ -8,6 +8,29 @@ class_name FinalBossArena
 ## Local room rectangle in gameplay units. Keep it aligned with the arena walls.
 @export var arena_bounds := Rect2(-216.0, -112.0, 432.0, 224.0)
 const SIGHT_BLOCKER_MASK: int = 1 << 9
+## Switch to the boss theme while this arena is loaded (back to normal music when it's
+## left or the boss dies). Off for test scenes that only borrow the arena's walls.
+@export var play_boss_music: bool = true
+
+
+func _enter_tree() -> void:
+	if play_boss_music:
+		Audio.play_boss_music()
+		if not EventBus.boss_defeated.is_connected(_on_boss_defeated_music):
+			EventBus.boss_defeated.connect(_on_boss_defeated_music)
+
+
+func _exit_tree() -> void:
+	if play_boss_music:
+		if EventBus.boss_defeated.is_connected(_on_boss_defeated_music):
+			EventBus.boss_defeated.disconnect(_on_boss_defeated_music)
+		var audio := get_node_or_null("/root/Audio")
+		if audio:
+			audio.play_normal_music()
+
+
+func _on_boss_defeated_music() -> void:
+	Audio.play_normal_music()
 
 
 ## RoomBase's normal-room colliders (WallBlockers for movement, ProjectileWalls for

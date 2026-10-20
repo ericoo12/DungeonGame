@@ -16,9 +16,10 @@ scale = Vector2(0.5, 0.5)
 sprite_sheet_path = "res://assets/sprites/enemies/sewer_turret/turret_idle.png"
 attack_sheet_path = "res://assets/sprites/enemies/sewer_turret/turret_attack.png"
 shadow_offset = Vector2(0, 8)
+max_health = 20.0
+knockback_immune = true
 movement_behavior = ExtResource("2_mxipq")
 attack_behavior = ExtResource("3_ut8t4")
-knockback_immune = true
 visual_scale = 0.9
 
 [node name="testsprite" parent="." index="0" unique_id=963101555]

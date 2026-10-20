@@ -69,6 +69,7 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	if room_data.type == RoomData.Type.NORMAL:
 		_spawn_obstacles(room_data, dungeon)
 	_respawn_pending_drops()
+	_respawn_floor_items()
 	# After obstacles (needs their cells), before enemies (they must not spawn on it).
 	_spawn_toilet(room_data, dungeon)
 
@@ -326,15 +327,11 @@ func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
 	if room_data.assigned_item:
 		chosen_item = room_data.assigned_item
 	else:
-		var available: Array[ItemBase] = []
-		for candidate in dungeon.item_pool:
-			if not GameState.picked_up_items.has(candidate):
-				available.append(candidate)
-
-		if available.is_empty():
+		var picks := dungeon.pick_items(1)  # rarity-weighted, skips items already taken
+		if picks.is_empty():
 			return
 
-		chosen_item = available[randi() % available.size()]
+		chosen_item = picks[0]
 		room_data.assigned_item = chosen_item
 		GameState.picked_up_items.append(chosen_item)
 
@@ -368,12 +365,8 @@ func _spawn_shop(room_data: RoomData, dungeon: Dungeon) -> void:
 
 	if not room_data.shop_rolled:
 		room_data.shop_rolled = true
-		var available: Array[ItemBase] = []
-		for candidate in dungeon.item_pool:
-			if not GameState.picked_up_items.has(candidate):
-				available.append(candidate)
-		available.shuffle()
 		var item_spots := spots.size() - 1 if spots.size() >= 2 else spots.size()
+		var available := dungeon.pick_items(item_spots)  # rarity-weighted
 		for i in mini(item_spots, available.size()):
 			var item: ItemBase = available[i]
 			GameState.picked_up_items.append(item)  # reserved: won't show up elsewhere
@@ -477,7 +470,7 @@ func _special_room_toilet_cell() -> Vector2i:
 func _shop_price(item: ItemBase, dungeon: Dungeon) -> int:
 	if item.shop_price > 0:
 		return item.shop_price
-	return dungeon.shop_active_item_price if item is ActiveItem else dungeon.shop_item_price
+	return dungeon.get_default_price(item)
 
 
 ## Marker2D nodes in this room that aren't enemy/obstacle spawn points, left to right
@@ -649,6 +642,29 @@ func _spawn_drop(scene: PackedScene, global_pos: Vector2, existing_entry: Dictio
 		_current_room_data.pending_drops.append(entry)
 	var room_data := _current_room_data
 	drop.connect("collected", func(): room_data.pending_drops.erase(entry))
+
+
+## Remembers a pedestal (a swapped-out active item) so it's back on revisits.
+func register_floor_item(pickup: ItemPickup) -> void:
+	if _current_room_data == null:
+		return
+	var entry := {"item": pickup.item, "charges": pickup.stored_charges, "position": to_local(pickup.global_position)}
+	_current_room_data.floor_items.append(entry)
+	pickup.room_data = _current_room_data
+	pickup.room_entry = entry
+
+
+func _respawn_floor_items() -> void:
+	if _entities_container == null:
+		return
+	for entry in _current_room_data.floor_items:
+		var pickup: ItemPickup = ITEM_PICKUP_SCENE.instantiate()
+		pickup.item = entry.item
+		pickup.stored_charges = entry.charges
+		pickup.room_data = _current_room_data
+		pickup.room_entry = entry
+		pickup.position = _entities_container.to_local(to_global(entry.position))
+		_entities_container.add_child(pickup)
 
 
 func _respawn_pending_drops() -> void:

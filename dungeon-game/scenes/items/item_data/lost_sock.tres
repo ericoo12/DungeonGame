@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Item" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/items_icons/lost_sock.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/items/followers/LostSock.tscn" id="3_ext"]
+
+[resource]
+script = ExtResource("1_script")
+rarity = 1
+follower_trail_delay = 0.55
+follower_scene = ExtResource("3_ext")
+item_name = "Lost Sock"
+description = "It found you. Follows you and sometimes fires a weaker copy of your shot."
+icon = ExtResource("2_icon")

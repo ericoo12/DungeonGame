@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ActiveItem" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/ActiveItem.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/items_icons/overflow_alarm.png" id="2_icon"]
+[ext_resource type="Script" path="res://scripts/items/effects/OverflowAlarmEffect.gd" id="3_sub"]
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("3_sub")
+
+[resource]
+script = ExtResource("1_script")
+max_charges = 3
+cooldown = 0.5
+effect = SubResource("Resource_effect")
+item_name = "Overflow Alarm"
+description = "Everybody out! Floods the room: enemies slowed and you run faster for 5 seconds."
+icon = ExtResource("2_icon")

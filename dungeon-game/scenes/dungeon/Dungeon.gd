@@ -59,8 +59,22 @@ var item_pool: Array[ItemBase] = []
 ## Economy: a cleared room drops ~0.85 ducks on average, plus pots/trash bags.
 @export var shop_item_price: int = 7
 @export var shop_active_item_price: int = 8
+## Extra ducks on top of the default price for Uncommon / Rare items.
+@export var uncommon_price_bonus: int = 2
+@export var rare_price_bonus: int = 5
 ## The rightmost shop spot sells a declogger (when the shop has 2+ spots).
 @export var shop_declogger_price: int = 3
+@export_group("")
+
+@export_group("Item rarity")
+## Relative chance per item of each rarity (ItemBase.rarity) in item rooms and shops,
+## plus how much each point of luck adds. With 25 common / 31 uncommon / 11 rare items
+## at 0 luck: ~57% common, ~35% uncommon, ~8% rare per pick (rare ~11% at 4 luck).
+@export var common_weight: float = 10.0
+@export var uncommon_weight: float = 5.0
+@export var rare_weight: float = 3.0
+@export var uncommon_weight_per_luck: float = 0.5
+@export var rare_weight_per_luck: float = 0.5
 @export_group("")
 
 @export_group("Drops")
@@ -230,6 +244,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	_apply_room_camera_bounds()
 	player.reset_position_history()
 	player.reset_followers_position()
+	EventBus.room_entered.emit()
 
 func is_final_boss_stage() -> bool:
 	return final_boss_stage > 0 and GameState.current_stage == final_boss_stage and final_boss_room_scene != null
@@ -352,3 +367,45 @@ func _load_obstacle_pools() -> void:
 func get_neighbor_type(direction: Vector2i) -> int:
 	var data: RoomData = layout.get(current_grid_pos + direction)
 	return data.type if data else -1
+
+
+# --- Item picks ------------------------------------------------------------------
+
+func get_rarity_weight(item: ItemBase) -> float:
+	var luck := Luck.effective()
+	match item.rarity:
+		ItemBase.Rarity.UNCOMMON: return uncommon_weight + uncommon_weight_per_luck * luck
+		ItemBase.Rarity.RARE: return rare_weight + rare_weight_per_luck * luck
+	return common_weight
+
+
+## Up to `count` different items not picked up / reserved yet this run, drawn by rarity
+## weight (no repeats). Doesn't reserve them; the caller does.
+func pick_items(count: int) -> Array[ItemBase]:
+	var pool: Array[ItemBase] = []
+	for candidate in item_pool:
+		if not GameState.picked_up_items.has(candidate):
+			pool.append(candidate)
+	var result: Array[ItemBase] = []
+	while result.size() < count and not pool.is_empty():
+		var total := 0.0
+		for item in pool:
+			total += get_rarity_weight(item)
+		var roll := randf() * total
+		var chosen: ItemBase = pool[-1]
+		for item in pool:
+			roll -= get_rarity_weight(item)
+			if roll <= 0.0:
+				chosen = item
+				break
+		result.append(chosen)
+		pool.erase(chosen)
+	return result
+
+
+func get_default_price(item: ItemBase) -> int:
+	var price := shop_active_item_price if item is ActiveItem else shop_item_price
+	match item.rarity:
+		ItemBase.Rarity.UNCOMMON: price += uncommon_price_bonus
+		ItemBase.Rarity.RARE: price += rare_price_bonus
+	return price

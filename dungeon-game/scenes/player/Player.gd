@@ -1,6 +1,9 @@
 extends CharacterBody2D
 class_name Player
 
+## Every trigger pull (once per shot, not per bullet). Drain Fly listens to this.
+signal shot_fired(direction: Vector2)
+
 # --- Movement ---
 @export var move_speed: float = 100.0
 var knockback_velocity: Vector2 = Vector2.ZERO
@@ -581,15 +584,26 @@ func _facing_suffix() -> String:
 	return "down"
 
 
+## Damage ups give diminishing returns (sqrt). Negative damage ups (High-Fibre Diet,
+## ...) cost 15% each, multiplicatively, instead of going through the sqrt (which used
+## to drop damage straight to the 0.5 floor at -1).
+const NEGATIVE_DAMAGE_UP_FACTOR := 0.85
+
 func get_effective_damage() -> float:
-	var scaling_input: float = max(0.0, damage_ups * 1.2 + 1.0)
-	return max(0.5, base_damage * sqrt(scaling_input)) * damage_multiplier * charge_damage_mult
+	var base: float
+	if damage_ups >= 0:
+		base = base_damage * sqrt(damage_ups * 1.2 + 1.0)
+	else:
+		base = base_damage * pow(NEGATIVE_DAMAGE_UP_FACTOR, -damage_ups)
+	return max(0.5, base) * damage_multiplier * charge_damage_mult
 
 
 func _shoot(aim_dir: Vector2, is_moving: bool) -> void:
 	shoot_cooldown = fire_rate
 	shoot_timer = SHOOT_POSE_DURATION
 	fire_single_shot(aim_dir)
+	shot_fired.emit(aim_dir)
+	Audio.play_shoot()  # once per trigger pull, not per bullet (multi-shot items)
 	if arm_sprite:
 		_play_arm_kick(aim_dir)
 
@@ -616,8 +630,15 @@ func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
 			_fire_projectile(d, apply_momentum)
 
 
-func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true) -> void:
-	var scene: PackedScene = charge_projectile_scene if charge_projectile_scene else PROJECTILE_SCENE
+## For shot styles that use their own projectile scene (BoomerangShotStyle). Gets the
+## same stats, procs, muzzle and momentum as a normal shot.
+func fire_projectile_scene(scene: PackedScene, aim_dir: Vector2, apply_momentum: bool = true) -> void:
+	_fire_projectile(aim_dir, apply_momentum, scene)
+
+
+func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true, scene_override: PackedScene = null) -> void:
+	var scene: PackedScene = scene_override if scene_override \
+		else (charge_projectile_scene if charge_projectile_scene else PROJECTILE_SCENE)
 	var projectile := scene.instantiate()
 	projectile.damage = get_effective_damage()
 	projectile.knockback_strength = projectile_knockback * charge_knockback_mult
@@ -753,11 +774,20 @@ func add_item(item: Item) -> void:
 	EventBus.item_added.emit(item)
 
 
-func add_active_item(item: ActiveItem) -> void:
+## Equips `item`. `charges` < 0 = fully charged (new items); a swapped-back item keeps
+## the charges it had. Returns the active item you were holding before (null if none),
+## so pickups can put it down instead of it disappearing; its charges are in
+## `last_dropped_active_charges`.
+var last_dropped_active_charges: int = 0
+
+func add_active_item(item: ActiveItem, charges: int = -1) -> ActiveItem:
+	var previous := active_item
+	last_dropped_active_charges = active_item_charges
 	active_item = item
 	active_item_cooldown_timer = 0.0
 	EventBus.active_item_changed.emit(item)
-	_set_active_item_charges(item.max_charges)  # picked up fully charged
+	_set_active_item_charges(item.max_charges if charges < 0 else charges)
+	return previous
 
 
 func add_ducks(amount: int) -> void:

@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_6fytt")
+rarity = 2
 fire_rate_multiplier = 5.5
 damage_multiplier = 0.2
 projectile_size_multiplier = 0.5

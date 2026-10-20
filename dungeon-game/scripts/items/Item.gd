@@ -13,6 +13,7 @@ extends ItemBase
 @export var knockback_bonus: float = 0.0	# common +25, uncommon +50, rare +100, bad 50
 @export var range_bonus: float = 0.0	# common +0.2, uncommon +0.4, rare +0.8, bad -0.3
 @export var size_bonus: float = 0.0	# common +0.15, uncommon +0.3, rare +0.5, bad -0.2
+## Relative: -0.1 = 10% smaller, +0.2 = 20% bigger (stacks multiplicatively).
 @export var player_size_bonus: float = 0.0	# common -0.1, rare -0.2, bad 0.2
 @export var shot_speed_bonus: float = 0.0
 @export var luck_bonus: float = 0.0
@@ -72,6 +73,9 @@ func apply(player: Player) -> void:
 		player.max_hearts += max_hearts_bonus
 		player.current_hearts += max_hearts_bonus
 		EventBus.player_health_changed.emit(player.current_hearts, player.max_hearts)
+		# On purpose: a -1 heart item on your last heart kills you (read before you grab).
+		if player.current_hearts <= 0:
+			player._die()
 
 	player.move_speed = clamp(player.move_speed + speed_bonus, 20.0, 300.0)
 
@@ -95,7 +99,7 @@ func apply(player: Player) -> void:
 		player.projectile_size = clamp(player.projectile_size + size_bonus, Player.PROJECTILE_SIZE_MIN, Player.PROJECTILE_SIZE_MAX)
 
 	if player_size_bonus != 0.0:
-		player.set_player_scale(player.player_scale + player_size_bonus)
+		player.set_player_scale(player.player_scale * maxf(1.0 + player_size_bonus, 0.1))
 
 	if shot_style:
 		player.equip_shot_style(shot_style)
@@ -164,8 +168,8 @@ func get_stat_lines() -> Array[Dictionary]:
 	_add_line(lines, knockback_bonus, "%+.0f Knockback" % knockback_bonus)
 	_add_line(lines, range_bonus, "%+.1f Range" % range_bonus)
 	_add_line(lines, size_bonus, "%+.2f Shot Size" % size_bonus)
-	_add_line(lines, shot_speed_bonus, "%+.0f Shot Speed" % shot_speed_bonus)
-	_add_line(lines, -player_size_bonus, "%+.2f Player Size" % player_size_bonus)  # smaller = good
+	_add_line(lines, shot_speed_bonus, "%s Shot Speed" % _signed(shot_speed_bonus))
+	_add_line(lines, -player_size_bonus, "%+d%% Player Size" % roundi(player_size_bonus * 100.0))  # smaller = good
 	_add_line(lines, fire_rate_multiplier - 1.0, "x%.2f Fire Rate" % fire_rate_multiplier)
 	_add_line(lines, damage_multiplier - 1.0, "x%.2f Damage" % damage_multiplier)
 	_add_line(lines, projectile_size_multiplier - 1.0, "x%.2f Shot Size" % projectile_size_multiplier)
@@ -173,7 +177,7 @@ func get_stat_lines() -> Array[Dictionary]:
 		lines.append({"text": "No Knockback", "good": false, "neutral": false})
 	else:
 		_add_line(lines, knockback_multiplier - 1.0, "x%.2f Knockback" % knockback_multiplier)
-	_add_line(lines, luck_bonus, "%+d Luck" % int(luck_bonus))
+	_add_line(lines, luck_bonus, "%s Luck" % _signed(luck_bonus))
 	if shot_style:
 		lines.append({"text": "Changes your shot", "good": true, "neutral": true})
 	if shot_pattern_modifier:
@@ -183,6 +187,10 @@ func get_stat_lines() -> Array[Dictionary]:
 			text = "+%d Shot%s" % [extra, "" if extra == 1 else "s"]
 		elif shot_pattern_modifier is MirrorShotModifier:
 			text = "Also shoots backwards"
+		elif shot_pattern_modifier is CrossShotModifier:
+			text = "Also shoots to both sides"
+		elif shot_pattern_modifier.get_stat_text() != "":
+			text = shot_pattern_modifier.get_stat_text()
 		lines.append({"text": text, "good": true, "neutral": extra == 0})
 	if charge_shot:
 		lines.append({"text": "Charge shot", "good": true, "neutral": true})
@@ -197,6 +205,14 @@ func get_stat_lines() -> Array[Dictionary]:
 			else "%d-%d" % [hurt_drop_count.x, hurt_drop_count.y]
 		lines.append({"text": "Drops %s pickups when hurt" % n, "good": true, "neutral": true})
 	return lines
+
+
+## "+2" for whole numbers, "+0.2" / "+0.25" otherwise (so small bonuses don't show as +0).
+static func _signed(value: float) -> String:
+	if is_equal_approx(value, roundf(value)):
+		return "%+d" % roundi(value)
+	var text := "%+.2f" % value
+	return text.rstrip("0")
 
 
 ## `goodness` > 0 means the change helps the player, < 0 hurts, 0 = not listed.

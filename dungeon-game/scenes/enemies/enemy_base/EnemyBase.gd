@@ -119,6 +119,20 @@ var forced_velocity: Vector2 = Vector2.ZERO
 const SLOW_TINT := Color(0.55, 0.75, 1.0)
 var _slow_factor: float = 1.0
 var _slow_timer: float = 0.0
+
+# --- Confuse (ConfuseShotProc) ---
+## While > 0 the enemy stumbles around in random directions and doesn't attack.
+var _confuse_timer: float = 0.0
+var _confuse_dir: Vector2 = Vector2.RIGHT
+var _confuse_turn_timer: float = 0.0
+const CONFUSE_TURN_INTERVAL := 0.45
+
+# --- Stun (Emergency Wrench) and rust (Rusty Water): end times in msec ---
+var _stun_until_ms: int = 0
+var _rust_until_ms: int = 0
+var _rust_knockback_mult: float = 1.0
+## Pink Eye: marked enemies take this much more damage (PinkEyeStatus sets it).
+var damage_taken_mult: float = 1.0
 # --- State ---
 var health: float
 var player: Node2D = null
@@ -204,6 +218,10 @@ func _physics_process(delta: float) -> void:
 		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
 	elif forced_velocity_active:
 		velocity = forced_velocity
+	elif is_stunned():
+		velocity = Vector2.ZERO
+	elif _confuse_timer > 0.0:
+		_update_confused(delta)
 	elif movement_behavior:
 		_update_speed_burst(delta)
 		velocity = movement_behavior.get_velocity(self, delta)
@@ -219,7 +237,7 @@ func _physics_process(delta: float) -> void:
 	if velocity.length_squared() > 1.0 and knockback_velocity.length() <= 1.0:
 		heading = velocity.normalized()
 
-	if attack_behavior and action_state == "":
+	if attack_behavior and action_state == "" and _confuse_timer <= 0.0 and not is_stunned():
 		attack_behavior.try_attack(self, delta)
 
 	_apply_slow_to_velocity(delta)
@@ -291,7 +309,7 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 	if is_dying:
 		return
 
-	health -= amount
+	health -= amount * damage_taken_mult
 	_update_label()
 
 	if is_boss:
@@ -301,6 +319,9 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 		is_dying = true
 		die()
 		return
+
+	if Time.get_ticks_msec() < _rust_until_ms:
+		knockback_strength *= _rust_knockback_mult
 
 	if not is_boss:
 		_play_damage_animation()  # bosses only flash: the hit anim would stun-lock them
@@ -451,6 +472,64 @@ func get_player_aim_point() -> Vector2:
 	if player.has_method("get_hurtbox_center"):
 		return player.call("get_hurtbox_center")  # player is typed Node2D here
 	return player.global_position
+
+
+## Damage-over-time tick (PoisonStatus): no hit animation, no knockback, so poison
+## can't stun-lock. Still kills, and still updates the boss bar.
+func take_dot_damage(amount: float, flash_color: Color = Color(0.5, 1.0, 0.4)) -> void:
+	if is_dying:
+		return
+	health -= amount
+	_update_label()
+	if is_boss:
+		EventBus.boss_health_changed.emit(health)
+	if health <= 0:
+		is_dying = true
+		die()
+		return
+	sprite.modulate = flash_color
+	await get_tree().create_timer(0.1).timeout
+	if is_instance_valid(sprite):
+		sprite.modulate = Color.WHITE
+
+
+## Stuns (no movement, no attacks) for `duration` seconds. Bosses: half as long.
+func apply_stun(duration: float) -> void:
+	if is_dying:
+		return
+	var ms := int(duration * (0.5 if is_boss else 1.0) * 1000.0)
+	_stun_until_ms = maxi(_stun_until_ms, Time.get_ticks_msec() + ms)
+
+
+func is_stunned() -> bool:
+	return Time.get_ticks_msec() < _stun_until_ms
+
+
+## Rusty Water: slowed AND takes `knockback_mult` x knockback for `duration` seconds.
+func apply_rust(slow_factor: float, knockback_mult: float, duration: float) -> void:
+	if is_dying:
+		return
+	apply_slow(slow_factor, duration)
+	_rust_knockback_mult = knockback_mult
+	_rust_until_ms = maxi(_rust_until_ms, Time.get_ticks_msec() + int(duration * 1000.0))
+
+
+## Confuses for `duration` seconds: wanders randomly and can't attack. Bosses are immune.
+func apply_confuse(duration: float) -> void:
+	if is_dying or is_boss:
+		return
+	_confuse_timer = maxf(_confuse_timer, duration)
+	_confuse_turn_timer = 0.0
+
+
+func _update_confused(delta: float) -> void:
+	_confuse_timer -= delta
+	_confuse_turn_timer -= delta
+	if _confuse_turn_timer <= 0.0:
+		_confuse_turn_timer = CONFUSE_TURN_INTERVAL
+		_confuse_dir = Vector2.RIGHT.rotated(randf() * TAU)
+	velocity = _confuse_dir * move_speed
+	_update_facing_direction(_confuse_dir)
 
 
 ## Slows movement to `factor` (0.5 = half speed) for `duration` seconds. A stronger

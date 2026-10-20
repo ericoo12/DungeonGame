@@ -79,5 +79,6 @@ func _alive_count() -> int:
 static func _current_room(enemy: EnemyBase) -> RoomController:
 	var dungeon := enemy.get_tree().get_first_node_in_group("dungeon") as Dungeon
 	if dungeon == null:
-		return null
+		# Test scenes without a Dungeon (EnemyTestRoom) tag their room instead.
+		return enemy.get_tree().get_first_node_in_group("test_room") as RoomController
 	return dungeon.current_room as RoomController

@@ -110,7 +110,10 @@ static func current() -> RoomGrid:
 	if tree == null:
 		return null
 	var dungeon := tree.get_first_node_in_group("dungeon") as Dungeon
-	if dungeon == null:
-		return null
-	var room := dungeon.current_room as RoomController
+	var room: RoomController = null
+	if dungeon:
+		room = dungeon.current_room as RoomController
+	else:
+		# Test scenes without a Dungeon (EnemyTestRoom) tag their room instead.
+		room = tree.get_first_node_in_group("test_room") as RoomController
 	return room.grid if room else null

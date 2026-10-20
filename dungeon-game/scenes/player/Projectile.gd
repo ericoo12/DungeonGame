@@ -41,6 +41,8 @@ var has_landed: bool = false
 ## triggered for this shot (applied to whatever it hits).
 var shooter: Player = null
 var procs: Array[ShotProcEffect] = []
+## Never hits this node (split shots ignore the enemy they split from).
+var ignored_target: Node = null
 
 const SHADOW_SCENE := preload("res://scenes/effects/Shadow.tscn")
 const SPLASH_SCENE := preload("res://scenes/effects/ProjectileSplash.tscn")
@@ -133,12 +135,13 @@ func _on_area_entered(area: Node) -> void:
 
 
 func _try_deal_damage(target: Node) -> void:
-	if has_landed:
+	if has_landed or target == ignored_target:
 		return
 	if target.has_method("take_damage"):
 		target.take_damage(damage, velocity.normalized(), knockback_strength)
 		for proc in procs:
 			proc.on_hit(target, shooter)
+			proc.on_projectile_hit(self, target)
 		_land()
 	elif target.is_in_group("walls") or target.is_in_group("projectile_blockers"):  # final-arena blue blocks
 		_land()

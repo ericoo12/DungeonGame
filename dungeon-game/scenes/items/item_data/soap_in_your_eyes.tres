@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/items_icons/soap_in_your_eyes_icon.png" id="2_icon"]
+[ext_resource type="Script" path="res://scripts/items/ConfuseShotProc.gd" id="3_sub"]
+
+[sub_resource type="Resource" id="Resource_shot_proc"]
+script = ExtResource("3_sub")
+base_chance = 0.08
+duration = 2.0
+
+[resource]
+script = ExtResource("1_script")
+luck_bonus = 0.5
+shot_proc = SubResource("Resource_shot_proc")
+item_name = "Soap in Your Eyes"
+description = "No peeking! Luck up, shots can confuse enemies."
+icon = ExtResource("2_icon")

@@ -6,6 +6,8 @@
 
 [resource]
 script = ExtResource("1_28e0a")
+fire_rate_multiplier = 0.8
+rarity = 1
 shot_pattern_modifier = ExtResource("3_u4j8r")
 item_name = "Double Shot"
 description = "Double the laundry. Fire two underwear projectiles at once."

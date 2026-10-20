@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_dvp5h")
+rarity = 1
 effect = ExtResource("1_57u5c")
 item_name = "Panty Panic"
 description = "Laundry in every direction. Release a ring of underwear projectiles."
