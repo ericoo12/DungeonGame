@@ -16,7 +16,7 @@ class_name FinalBossBase
 @export var move_speed: float = 10.0
 
 # --- Contact damage ---
-@export var contact_damage: int = 1
+@export var contact_damage: float = 0.5  # hearts
 @export var contact_damage_interval: float = 0.6
 @export var contact_knockback_strength: float = 100.0
 
@@ -65,7 +65,7 @@ var contact_tick_timer: float = 0.0
 
 func _ready() -> void:
 	max_health *= GameState.get_health_multiplier()
-	contact_damage = int(round(contact_damage * GameState.get_damage_multiplier()))
+	contact_damage = snappedf(contact_damage * GameState.get_damage_multiplier(), 0.5)
 	health = max_health
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 	hitbox.area_exited.connect(_on_hitbox_area_exited)

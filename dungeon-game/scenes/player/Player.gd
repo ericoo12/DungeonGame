@@ -642,7 +642,9 @@ func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true, scene_overr
 	var projectile := scene.instantiate()
 	projectile.damage = get_effective_damage()
 	projectile.knockback_strength = projectile_knockback * charge_knockback_mult
-	projectile.lifetime = projectile_range
+	# Range = how far shots go. Faster shots fly for a shorter time, so shot speed only
+	# changes how quickly they arrive, not the distance (120 px x range).
+	projectile.lifetime = projectile_range / maxf(shot_speed, 0.05)
 	projectile.speed_multiplier = shot_speed * charge_speed_mult
 	projectile.scale = Vector2.ONE * projectile_size * charge_size_mult
 	projectile.shooter = self
@@ -671,7 +673,7 @@ func roll_shot_procs() -> Array[ShotProcEffect]:
 	return triggered
 
 
-func heal(amount: int) -> void:
+func heal(amount: float) -> void:
 	current_hearts = minf(current_hearts + amount, float(max_hearts))
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
 

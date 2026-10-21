@@ -52,7 +52,7 @@ class_name MuggSettings
 
 @export_category("Basic Shot")
 @export var projectile_scene: PackedScene
-@export var projectile_damage: float = 1.0
+@export var projectile_damage: float = 0.5
 @export var projectile_speed: float = 160.0
 @export_range(0.1, 3.0) var windup_duration: float = 0.55
 @export_range(0.01, 1.0) var fire_duration: float = 0.08
@@ -90,7 +90,7 @@ class_name MuggSettings
 @export var homing_tracking_duration: float = 1.6
 @export var homing_tracking_delay: float = 0.2
 @export var homing_lifetime: float = 3.2
-@export var homing_damage: float = 1.0
+@export var homing_damage: float = 0.5
 @export var homing_windup: float = 0.85
 @export var homing_cooldown: float = 6.0
 @export var paper_trail_damage: float = 0.5
@@ -144,7 +144,7 @@ class_name MuggSettings
 @export_range(20.0, 120.0, 5.0) var area_radius: float = 60.0
 @export_range(0.4, 2.5, 0.05) var area_warning: float = 0.9
 @export_range(0.2, 4.0, 0.1) var area_lifetime: float = 1.4
-@export var area_damage: float = 1.0
+@export var area_damage: float = 0.5
 @export_range(0.1, 2.0, 0.05) var area_recovery: float = 0.5
 @export_range(1.0, 15.0, 0.1) var area_cooldown: float = 5.0
 @export var area_range: float = 300.0

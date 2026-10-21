@@ -19,15 +19,12 @@ height = 220.0
 
 [node name="Enemy" unique_id=1579853284 instance=ExtResource("1_51iyx")]
 script = ExtResource("2_auikw")
-lunge_range = 90.0
-shoot_range = 100.0
-attack_cooldown = 1.5
-lunge_speed = 200.0
-lunge_duration = 0.2
 projectile_scene = ExtResource("3_2ebgb")
-projectile_damage = 1.0
+projectile_damage = 0.5
 projectile_launch_delay = 0.15
 is_boss = true
+max_health = 110.0
+move_speed = 45.0
 visual_scale = 0.2
 
 [node name="testsprite" parent="." index="0" unique_id=963101555]

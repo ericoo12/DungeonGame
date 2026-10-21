@@ -19,7 +19,7 @@ func activate(player: Player) -> void:
 	var shot: Projectile = SHOT_SCENE.instantiate()
 	shot.damage = player.get_effective_damage() * damage_ratio
 	shot.knockback_strength = knockback
-	shot.lifetime = flight_time
+	shot.lifetime = flight_time / maxf(player.shot_speed, 0.05)  # fixed distance, shot speed = faster
 	shot.speed_multiplier = player.shot_speed * 1.2
 	shot.scale = Vector2.ONE * size
 	shot.shooter = player

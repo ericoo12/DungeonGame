@@ -1,13 +1,12 @@
-[gd_resource type="Resource" script_class="Item" format=3]
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://du1mi31o7bxvo"]
 
-[ext_resource type="Script" path="res://scripts/items/Item.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/items/items_icons/soap_in_your_eyes_icon.png" id="2_icon"]
-[ext_resource type="Script" path="res://scripts/items/ConfuseShotProc.gd" id="3_sub"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://diw63cc1yh5dw" path="res://assets/sprites/items/items_icons/soap_in_your_eyes_icon.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://bqc8el2errrnj" path="res://scripts/items/ConfuseShotProc.gd" id="3_sub"]
 
 [sub_resource type="Resource" id="Resource_shot_proc"]
 script = ExtResource("3_sub")
 base_chance = 0.08
-duration = 2.0
 
 [resource]
 script = ExtResource("1_script")

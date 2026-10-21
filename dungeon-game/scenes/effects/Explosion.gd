@@ -15,7 +15,7 @@ class_name Explosion
 @export var damages_enemies: bool = true
 @export var enemy_damage: float = 10.0       # HP (enemies use HP, the player uses hearts)
 @export var radius: float = 22.0           # px from the blast centre to the player's hurtbox centre
-@export var damage: float = 1.0            # hearts
+@export var damage: float = 0.5            # hearts
 @export var knockback_strength: float = 160.0
 ## Delay before the blast hurts: 2 frames at 14 fps = the big-burst frame. Also the
 ## tiny window the player gets to react.

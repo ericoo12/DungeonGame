@@ -5,7 +5,7 @@ extends AttackBehavior
 @export var range: float = 250.0
 @export var cooldown: float = 1.8
 @export var projectile_scene: PackedScene
-@export var projectile_damage: float = 1.0
+@export var projectile_damage: float = 0.5
 ## Random delay (min, max) before the FIRST shot once the player is in range: gives the
 ## player a moment after entering, and de-syncs multiple shooters in one room.
 @export var first_shot_delay: Vector2 = Vector2(0.4, 1.2)

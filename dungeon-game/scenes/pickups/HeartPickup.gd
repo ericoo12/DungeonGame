@@ -6,7 +6,7 @@ class_name HeartPickup
 
 signal collected
 
-@export var heal_amount: int = 1
+@export var heal_amount: float = 1.0  # 0.5 = half heart (HalfHeartPickup.tscn)
 
 
 func _ready() -> void:

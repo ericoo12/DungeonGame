@@ -6,7 +6,7 @@ class_name FinalBossProjectile
 ## be tuned independently. Also lands on arena projectile blockers (blue blocks).
 
 @export var speed: float = 250.0
-@export var damage: float = 1.0
+@export var damage: float = 0.5
 @export var lifetime: float = 3.0
 @export var knockback_strength: float = 150.0
 

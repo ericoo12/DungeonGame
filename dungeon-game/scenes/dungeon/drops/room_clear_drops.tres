@@ -7,11 +7,12 @@
 [ext_resource type="PackedScene" path="res://scenes/pickups/DuckPickup5.tscn" id="d5_scene"]
 [ext_resource type="PackedScene" path="res://scenes/pickups/DuckPickup10.tscn" id="d10_scene"]
 [ext_resource type="PackedScene" path="res://scenes/pickups/DeclogPickup.tscn" id="dc_scene"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/HalfHeartPickup.tscn" id="hh_scene"]
 
 [sub_resource type="Resource" id="Resource_ajv5g"]
 script = ExtResource("1_80vyo")
 scene = ExtResource("2_qyo1y")
-weight = 4.0
+weight = 1.5
 metadata/_custom_type_script = "uid://voder0mw7gaa"
 
 [sub_resource type="Resource" id="Resource_duck1"]
@@ -36,9 +37,14 @@ script = ExtResource("1_80vyo")
 scene = ExtResource("dc_scene")
 weight = 3.0
 
+[sub_resource type="Resource" id="Resource_halfheart"]
+script = ExtResource("1_80vyo")
+scene = ExtResource("hh_scene")
+weight = 4.0
+
 [resource]
 script = ExtResource("2_oj08x")
 drop_chance = 0.5
 drop_chance_per_luck = 0.03
-entries = Array[ExtResource("1_80vyo")]([SubResource("Resource_ajv5g"), SubResource("Resource_duck1"), SubResource("Resource_duck5"), SubResource("Resource_duck10"), SubResource("Resource_declog")])
+entries = Array[ExtResource("1_80vyo")]([SubResource("Resource_halfheart"), SubResource("Resource_ajv5g"), SubResource("Resource_duck1"), SubResource("Resource_duck5"), SubResource("Resource_duck10"), SubResource("Resource_declog")])
 metadata/_custom_type_script = "uid://e2o4jr4848mt"

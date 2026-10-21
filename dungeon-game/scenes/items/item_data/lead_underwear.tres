@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="Item" format=3]
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://c4jm78n7pqwvm"]
 
-[ext_resource type="Script" path="res://scripts/items/Item.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/items/items_icons/lead_underwear.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://scripts/items/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b57q2tbm12xkm" path="res://assets/sprites/items/items_icons/lead_underwear.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_script")
-player_knockback_immune = true
-rarity = 1
 shot_speed_bonus = -0.3
+player_knockback_immune = true
 knockback_multiplier = 1.5
 item_name = "Lead Underwear"
 description = "Built for impact. You can't be knocked back, your shots knock harder, shot speed down."
 icon = ExtResource("2_icon")
+rarity = 1

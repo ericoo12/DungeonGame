@@ -46,7 +46,7 @@ func _on_player_shot(direction: Vector2) -> void:
 	var shot: Projectile = SHOT_SCENE.instantiate()
 	shot.damage = maxf(player_ref.get_effective_damage() * damage_ratio, 0.5)
 	shot.knockback_strength = knockback
-	shot.lifetime = player_ref.projectile_range
+	shot.lifetime = player_ref.projectile_range / maxf(player_ref.shot_speed, 0.05)  # same distance rule as the player
 	shot.speed_multiplier = player_ref.shot_speed
 	shot.scale = Vector2.ONE * player_ref.projectile_size * size_ratio
 	shot.shooter = player_ref

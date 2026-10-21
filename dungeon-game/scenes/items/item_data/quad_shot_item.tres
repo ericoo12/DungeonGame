@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("1_orw3o")
 fire_rate_multiplier = 0.5
-rarity = 2
 shot_pattern_modifier = ExtResource("3_pw8eb")
 item_name = "Quad shot"
 description = "Quadruple the underwear, quadruple the fun"
 icon = ExtResource("1_h78gj")
+rarity = 2
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

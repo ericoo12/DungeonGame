@@ -6,7 +6,7 @@ var health: float
 
 ## Contact damage, same as enemies (EnemyBase): hurts the player's HurtBox on touch and
 ## again every contact_damage_interval while they stay on it. 0 = harmless.
-@export var contact_damage: int = 1
+@export var contact_damage: float = 0.5  # hearts
 @export var contact_damage_interval: float = 0.6
 @export var contact_knockback_strength: float = 100.0
 

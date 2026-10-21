@@ -83,6 +83,9 @@ var item_pool: Array[ItemBase] = []
 @export var chest_toilet_drops: Vector2i = Vector2i(2, 3)
 ## Share of normal rooms that get a chest-toilet (DungeonGenerator).
 @export_range(0.0, 1.0) var chest_toilet_chance: float = 0.15
+## Stages up to and including this one start with the ITEM/SHOP portal toilets already
+## unclogged, so early decloggers go to chest toilets. 0 = always clogged.
+@export var free_special_rooms_until_stage: int = 1
 ## Rolled once when a normal room is cleared (luck-scaled, see DropTable).
 @export var room_clear_drops: DropTable
 @export_group("")
@@ -158,6 +161,8 @@ func _generate_and_load_floor() -> void:
 		0.1, 1, chest_toilet_chance)
 	layout = result.layout
 	room_distances = result.distances
+	if GameState.current_stage <= free_special_rooms_until_stage:
+		_unclog_special_room_toilets()
 	current_room = null
 	_load_room(Vector2i.ZERO, DungeonGenerator.SOUTH)
 
@@ -165,6 +170,16 @@ func _generate_and_load_floor() -> void:
 	_apply_room_camera_bounds()
 	player.reset_position_history()
 	player.reset_followers_position()
+
+
+## Unclogs every PORTAL toilet that leads into an ITEM or SHOP room.
+func _unclog_special_room_toilets() -> void:
+	for data: RoomData in layout.values():
+		if data.toilet_kind != RoomData.ToiletKind.PORTAL or not layout.has(data.toilet_target):
+			continue
+		var target: RoomData = layout[data.toilet_target]
+		if target.type == RoomData.Type.ITEM or target.type == RoomData.Type.SHOP:
+			data.toilet_unclogged = true
 
 
 func _on_boss_defeated() -> void:
