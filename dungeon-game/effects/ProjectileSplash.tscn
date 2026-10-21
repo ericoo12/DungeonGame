@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cgyqc6i06hlsa"]
+
+[ext_resource type="Script" uid="uid://ya4s2i3cpgcf" path="res://effects/ProjectileSplash.gd" id="1_w00op"]
+
+[node name="ProjectileSplash" type="Node2D" unique_id=1976094952]
+scale = Vector2(0.2, 0.2)
+script = ExtResource("1_w00op")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2146018676]
+scale = Vector2(0.5, 0.5)

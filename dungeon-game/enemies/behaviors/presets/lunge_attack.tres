@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="LungeAttack" format=3]
+
+[ext_resource type="Script" path="res://enemies/behaviors/LungeAttack.gd" id="1_lunge"]
+
+[resource]
+script = ExtResource("1_lunge")

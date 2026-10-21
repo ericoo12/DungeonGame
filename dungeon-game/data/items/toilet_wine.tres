@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3]
+
+[ext_resource type="Script" path="res://items/core/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/icons/toilet_wine.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+rarity = 1
+damage_bonus = 1
+shot_speed_bonus = -0.2
+luck_bonus = -0.5
+fire_rate_multiplier = 1.15
+item_name = "Toilet Wine"
+description = "A questionable vintage. Damage and fire rate up, shot speed and luck down."
+icon = ExtResource("2_icon")

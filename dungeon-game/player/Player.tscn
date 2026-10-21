@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://drrxiowem0goy"]
+
+[ext_resource type="Script" uid="uid://dxs6s44nql754" path="res://player/Player.gd" id="1_wr5hl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spdwv"]
+size = Vector2(53, 63)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ovr6g"]
+size = Vector2(80, 63)
+
+[node name="Player" type="CharacterBody2D" unique_id=1881097379]
+y_sort_enabled = true
+collision_layer = 2
+collision_mask = 133
+motion_mode = 1
+script = ExtResource("1_wr5hl")
+player_scale = 0.15
+
+[node name="testingsprite" type="Sprite2D" parent="." unique_id=1031009948]
+visible = false
+position = Vector2(0, 58)
+
+[node name="testingsprite2" type="Sprite2D" parent="." unique_id=1656273743]
+visible = false
+position = Vector2(8, -72)
+
+[node name="WeaponMarker" type="Marker2D" parent="." unique_id=1093616269]
+
+[node name="LowerBodySprite" type="AnimatedSprite2D" parent="." unique_id=430370660]
+position = Vector2(0, 78)
+frame_progress = 0.33096507
+
+[node name="UpperBodySprite" type="AnimatedSprite2D" parent="." unique_id=1707168056]
+z_index = 1
+position = Vector2(8, -45)
+
+[node name="wallCollision" type="CollisionShape2D" parent="." unique_id=61987316]
+position = Vector2(0, 84)
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_spdwv")
+
+[node name="HurtBox" type="Area2D" parent="." unique_id=803020027]
+position = Vector2(0, 70.225)
+collision_layer = 16
+collision_mask = 32
+
+[node name="EnemyCollision" type="CollisionShape2D" parent="HurtBox" unique_id=1992060411]
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_ovr6g")
+
+[node name="LaserRay" type="RayCast2D" parent="." unique_id=655673405]
+collision_mask = 5
+
+[node name="PiercingRay" type="RayCast2D" parent="." unique_id=1047255717]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1444617432]
+zoom = Vector2(3, 3)
+position_smoothing_enabled = true

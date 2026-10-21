@@ -1,6 +1,6 @@
 # Final boss update and action ownership
 
-> Applies to the final boss only (`scenes/final_boss/FinalBossBase.gd`, used by Doktor Mugg). Regular enemies and the normal bosses use `EnemyBase` and work differently.
+> Applies to the final boss only (`enemies/doktor_mugg/FinalBossBase.gd`, used by Doktor Mugg). Regular enemies and the normal bosses use `EnemyBase` and work differently.
 
 FinalBossBase owns initialization, the physics update and the single move_and_slide call. Do not add an independent physics loop to an enemy FSM/behavior tree or move its body from a state or resource.
 

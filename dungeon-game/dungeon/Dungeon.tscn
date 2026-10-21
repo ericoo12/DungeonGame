@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://b5kode1hexcb3"]
+
+[ext_resource type="Script" uid="uid://spv05i2npm3h" path="res://dungeon/Dungeon.gd" id="1_em5vm"]
+[ext_resource type="PackedScene" uid="uid://drrxiowem0goy" path="res://player/Player.tscn" id="2_pfrhd"]
+[ext_resource type="PackedScene" uid="uid://drhtuxvhek602" path="res://rooms/StartRoom.tscn" id="2_wbjle"]
+[ext_resource type="PackedScene" uid="uid://b1ktu3n06cjut" path="res://rooms/NormalRoom01.tscn" id="3_mdrox"]
+[ext_resource type="PackedScene" uid="uid://bng62ay6px8iq" path="res://ui/HUD.tscn" id="3_pfrhd"]
+[ext_resource type="PackedScene" uid="uid://b4glh88c57oo2" path="res://rooms/BossRoom.tscn" id="3_s0nkc"]
+[ext_resource type="Script" uid="uid://bpeg8hj5rhrvx" path="res://dungeon/generation/RoomFloorVariant.gd" id="5_4ombv"]
+[ext_resource type="PackedScene" uid="uid://bwl5grm0ecqfm" path="res://rooms/ItemRoom.tscn" id="5_60ybf"]
+[ext_resource type="PackedScene" uid="uid://bo47jaixo361m" path="res://rooms/ShopRoom.tscn" id="5_shop"]
+[ext_resource type="Resource" uid="uid://ih71i7kgqn8h" path="res://data/drops/room_clear_drops.tres" id="6_4wd1e"]
+[ext_resource type="Resource" uid="uid://cs8k8x1emlnc1" path="res://data/floors/sewer_rust.tres" id="6_60ybf"]
+[ext_resource type="Resource" uid="uid://dscgdgxj7gcv2" path="res://data/floors/sewer_basic.tres" id="7_4wd1e"]
+[ext_resource type="Resource" uid="uid://cy4iwfd287wg4" path="res://data/floors/sewer_green_crack.tres" id="8_1co7r"]
+
+[node name="Dungeon" type="Node2D" unique_id=851390655 groups=["dungeon"]]
+script = ExtResource("1_em5vm")
+room_count = 7
+start_room_scene = ExtResource("2_wbjle")
+normal_room_scenes = Array[PackedScene]([ExtResource("3_mdrox")])
+boss_room_scene = ExtResource("3_s0nkc")
+item_room_scene = ExtResource("5_60ybf")
+shop_room_scene = ExtResource("5_shop")
+room_clear_drops = ExtResource("6_4wd1e")
+floor_variants = Array[ExtResource("5_4ombv")]([ExtResource("6_60ybf"), ExtResource("7_4wd1e"), ExtResource("8_1co7r"), null, null, null])
+
+[node name="RoomContainer" type="Node2D" parent="." unique_id=415070356]
+
+[node name="GroundEffects" type="Node2D" parent="." unique_id=1147516760 groups=["ground_effects"]]
+
+[node name="Entities" type="Node2D" parent="." unique_id=1532688443]
+y_sort_enabled = true
+position = Vector2(539, 247)
+
+[node name="Player" parent="Entities" unique_id=1881097379 instance=ExtResource("2_pfrhd")]
+position = Vector2(-4, -3)
+
+[node name="Hud" parent="." unique_id=1634359545 instance=ExtResource("3_pfrhd")]

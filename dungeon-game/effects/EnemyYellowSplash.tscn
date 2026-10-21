@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://cgyqc6i06hlsa" path="res://effects/ProjectileSplash.tscn" id="1_splash"]
+
+[node name="EnemyYellowSplash" instance=ExtResource("1_splash")]
+sheet_path = "res://assets/sprites/enemies/projectiles/enemy_yellow_splash.png"
+frame_count = 4

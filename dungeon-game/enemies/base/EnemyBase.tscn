@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://dwa7putw81xer"]
+
+[ext_resource type="Script" uid="uid://lxbsdwgl6plj" path="res://enemies/base/EnemyBase.gd" id="1_6m61i"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6m61i"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ovr6g"]
+
+[node name="Enemy" type="CharacterBody2D" unique_id=1579853284]
+collision_layer = 4
+collision_mask = 11
+motion_mode = 1
+script = ExtResource("1_6m61i")
+
+[node name="testsprite" type="Sprite2D" parent="." unique_id=963101555]
+visible = false
+hframes = 6
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1367813687]
+shape = SubResource("CircleShape2D_6m61i")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1065903410]
+collision_layer = 32
+collision_mask = 24
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=703121797]
+shape = SubResource("CircleShape2D_ovr6g")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=622601666]
+
+[node name="Label" type="Label" parent="." unique_id=1371920992]
+offset_left = -9.0
+offset_top = -3.0
+offset_right = 27.625
+offset_bottom = 21.51
+scale = Vector2(0.5200067, 0.16000003)

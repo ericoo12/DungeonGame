@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://88evmtptgcws"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_6vskp"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/slither_movement.tres" id="2_slither"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/lunge_attack.tres" id="3_lunge"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_snakebody"]
+radius = 14.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_snakehit"]
+radius = 14.0
+height = 56.0
+
+[node name="Enemy" unique_id=1579853284 instance=ExtResource("1_6vskp")]
+sprite_sheet_path = "res://assets/sprites/enemies/snake/sewer_snake_slither_6frames.png"
+side_view_frames = 6
+side_view_faces_right = true
+sheet_up_path = "res://assets/sprites/enemies/snake/sewer_snake_slither_up_6frames.png"
+sheet_down_path = "res://assets/sprites/enemies/snake/sewer_snake_slither_down_6frames.png"
+attack_sheet_up_path = "res://assets/sprites/enemies/snake/sewer_snake_lunge_up_4frames.png"
+attack_sheet_down_path = "res://assets/sprites/enemies/snake/sewer_snake_lunge_down_4frames.png"
+rotate_hitbox_with_facing = true
+attack_sheet_path = "res://assets/sprites/enemies/snake/sewer_snake_lunge_4frames.png"
+shadow_offset = Vector2(0, 5)
+max_health = 15.0
+move_speed = 60.0
+movement_behavior = ExtResource("2_slither")
+family = &"snake"
+attack_behavior = ExtResource("3_lunge")
+visual_scale = 0.4
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 3)
+shape = SubResource("CircleShape2D_snakebody")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+position = Vector2(0, 1)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_snakehit")

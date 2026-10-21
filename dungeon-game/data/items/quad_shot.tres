@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://krmbdp2tth62"]
+
+[ext_resource type="Texture2D" uid="uid://dcs3l0tcqwwhc" path="res://assets/sprites/items/icons/quad_shot.png" id="1_h78gj"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_orw3o"]
+[ext_resource type="Resource" uid="uid://qm2y7blk8lw0" path="res://data/item_effects/quad_shot.tres" id="3_pw8eb"]
+
+[resource]
+script = ExtResource("1_orw3o")
+fire_rate_multiplier = 0.5
+shot_pattern_modifier = ExtResource("3_pw8eb")
+item_name = "Quad shot"
+description = "Quadruple the underwear, quadruple the fun"
+icon = ExtResource("1_h78gj")
+rarity = 2
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

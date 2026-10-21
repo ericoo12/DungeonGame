@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://d2jwn7datdj6e"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_6fytt"]
+[ext_resource type="Texture2D" uid="uid://p58fcr7tksdy" path="res://assets/sprites/items/icons/plum_juice.png" id="1_ehbpv"]
+
+[resource]
+script = ExtResource("1_6fytt")
+rarity = 2
+fire_rate_multiplier = 5.5
+damage_multiplier = 0.2
+projectile_size_multiplier = 0.5
+knockback_multiplier = 0.0
+item_name = "Plum Juice"
+description = "Open the floodgates. Fire rate way up, damage and shot size down."
+icon = ExtResource("1_ehbpv")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

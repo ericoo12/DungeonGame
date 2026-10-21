@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://enemies/projectiles/EnemyProjectile.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/projectiles/enemy_yellow_projectile.png" id="2_tex"]
+[ext_resource type="PackedScene" path="res://effects/EnemyYellowSplash.tscn" id="3_splash"]
+
+[node name="EnemyProjectileYellow" unique_id=1404136849 instance=ExtResource("1_base")]
+splash_scene = ExtResource("3_splash")
+
+[node name="Sprite2D" parent="." index="1" unique_id=632972302]
+texture = ExtResource("2_tex")

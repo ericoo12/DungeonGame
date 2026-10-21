@@ -162,7 +162,7 @@ MuggSettings inherits FinalBossBase, and DoktorMugg inherits MuggSettings. This 
 
 ## 9. See the choices in-game
 
-Open scenes/final_boss/DoktorMuggArena.tscn and press F6. The overlay now shows:
+Open enemies/doktor_mugg/DoktorMuggArena.tscn and press F6. The overlay now shows:
 
 ```text
 DANGER -> Take cover

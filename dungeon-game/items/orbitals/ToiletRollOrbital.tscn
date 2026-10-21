@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dy17jyc3728up" path="res://items/orbitals/Orbital.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/icons/toilet_roll.png" id="2_tex"]
+
+[node name="ToiletRollOrbital" instance=ExtResource("1_base")]
+collision_mask = 68
+radius = 22.0
+damage = 0.0
+speed_scale = 1.8
+blocks_projectiles = true
+
+[node name="Sprite2D" parent="." index="1"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_tex")

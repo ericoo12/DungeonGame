@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="SpawnMinionsAttack" format=3]
-
-[ext_resource type="Script" path="res://scripts/enemies/SpawnMinionsAttack.gd" id="1_spawn"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/regular_enemies/easy/FlyGreen.tscn" id="2_fly"]
-
-[resource]
-script = ExtResource("1_spawn")
-minion_scene = ExtResource("2_fly")

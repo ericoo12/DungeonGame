@@ -14,16 +14,16 @@ func _ready() -> void:
 func run() -> void:
 	# A normal-size room with the final-boss arena logic (arena helpers live on
 	# FinalBossArena now, not on every room).
-	var room = load("res://scenes/rooms/RoomBase.tscn").instantiate()
-	room.set_script(load("res://scenes/final_boss/FinalBossArena.gd"))
+	var room = load("res://rooms/RoomBase.tscn").instantiate()
+	room.set_script(load("res://enemies/doktor_mugg/FinalBossArena.gd"))
 	room.scale = Vector2(2, 2)
 	# Test-only obstacles; the playable boss arena intentionally remains open.
 	for entry in [["GreenBlock", Vector2(-85,25)], ["BlueBlock", Vector2(85,25)]]:
-		var obstacle = load("res://scenes/final_boss/obstacles/" + entry[0] + ".tscn").instantiate()
+		var obstacle = load("res://enemies/doktor_mugg/arena_obstacles/" + entry[0] + ".tscn").instantiate()
 		obstacle.position = entry[1]
 		room.add_child(obstacle)
 	add_child(room)
-	var boss: DoktorMugg = load("res://scenes/final_boss/DoktorMugg.tscn").instantiate()
+	var boss: DoktorMugg = load("res://enemies/doktor_mugg/DoktorMugg.tscn").instantiate()
 	boss.process_mode = Node.PROCESS_MODE_PAUSABLE
 	boss.random_seed = 123
 	boss.running_shot_weight = 0

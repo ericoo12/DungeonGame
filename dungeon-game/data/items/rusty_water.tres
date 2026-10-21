@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://o65c4wu4kcjh"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cfoarf07k60o3" path="res://assets/sprites/items/icons/rusty_water.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://c58dwfq3bboxn" path="res://items/procs/RustShotProc.gd" id="3_sub"]
+
+[sub_resource type="Resource" id="Resource_shot_proc"]
+script = ExtResource("3_sub")
+base_chance = 0.15
+
+[resource]
+script = ExtResource("1_script")
+shot_proc = SubResource("Resource_shot_proc")
+item_name = "Rusty Water"
+description = "Probably safe. Shots can rust enemies: slower and easier to knock back."
+icon = ExtResource("2_icon")

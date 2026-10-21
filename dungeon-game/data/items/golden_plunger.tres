@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Item" format=3]
+
+[ext_resource type="Script" path="res://items/core/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/icons/golden_plunger.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+rarity = 1
+damage_bonus = 1
+luck_bonus = 1.0
+shop_price = 20
+item_name = "Golden Plunger"
+description = "The finest unclogging money can buy. Damage and luck up."
+icon = ExtResource("2_icon")

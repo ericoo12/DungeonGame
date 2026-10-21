@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="SlitherMovement" format=3]
+
+[ext_resource type="Script" path="res://enemies/behaviors/SlitherMovement.gd" id="1_slither"]
+
+[resource]
+script = ExtResource("1_slither")

@@ -11,7 +11,7 @@ func frames(count: int = 2) -> void:
 	for i in count:
 		await get_tree().physics_frame
 func shot_at(position: Vector2, direction: Vector2 = Vector2.RIGHT) -> Projectile:
-	var shot: Projectile = load("res://scenes/player/Projectile.tscn").instantiate()
+	var shot: Projectile = load("res://player/Projectile.tscn").instantiate()
 	shot.position = position
 	shot.lifetime = 4
 	add_child(shot)
@@ -34,9 +34,9 @@ func reset_boss() -> void:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var room: FinalBossArena = load("res://scenes/final_boss/FinalBossArena.tscn").instantiate()
+	var room: FinalBossArena = load("res://enemies/doktor_mugg/FinalBossArena.tscn").instantiate()
 	add_child(room)
-	boss = load("res://scenes/final_boss/DoktorMugg.tscn").instantiate()
+	boss = load("res://enemies/doktor_mugg/DoktorMugg.tscn").instantiate()
 	boss.process_mode = Node.PROCESS_MODE_PAUSABLE
 	boss.random_seed = 123
 	boss.running_shot_weight = 0

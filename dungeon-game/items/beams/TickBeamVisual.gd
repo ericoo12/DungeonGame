@@ -1,0 +1,140 @@
+## Persistent, player-tracking damage beam (TickBeamEffect). Unlike
+## LaserBeamVisual, this manages its own live raycast + damage-tick loop every
+## frame — length updates continuously so the beam correctly shortens if the
+## player moves toward a wall mid-cast, and DamageArea ticks everything
+## currently overlapping rather than stopping at the first enemy hit.
+extends Node2D
+class_name TickBeamVisual
+
+@onready var line: Line2D = $Line2D
+@onready var splash_pivot: Node2D = $SplashPivot
+@onready var splash_sprite: AnimatedSprite2D = $SplashPivot/SplashSprite
+@onready var damage_area: Area2D = $DamageArea
+@onready var damage_shape: CollisionShape2D = $DamageArea/CollisionShape2D
+@onready var wall_ray: RayCast2D = $WallRay
+
+# The splash art (32x64 frames) sprays UPWARD from a base near the bottom of the frame.
+# Rotated -90° it sprays back along -x, i.e. from the wall toward the player.
+# SPLASH_BASE_OFFSET = frame centre -> bottom of the art (px, unscaled); it pins the
+# base on SplashPivot's origin (the wall hit point) while the splash shrinks.
+# Resize the splash by changing SplashSprite's scale in the scene; this follows it.
+const SPLASH_ROTATION := -PI / 2.0
+const SPLASH_BASE_OFFSET := 23.0
+
+var duration: float = 1.5
+var shrink_duration: float = 0.3
+var timer: float = 0.0
+
+var damage: float = 0.0
+var damage_interval: float = 0.3
+var tick_timer: float = 0.0
+var knockback_strength: float = 0.0  # push along the beam per damage tick
+var overlapping_bodies: Array[Node] = []
+
+var base_width: float = 6.0
+var max_range: float = 3000.0
+
+
+func _ready() -> void:
+	damage_area.body_entered.connect(_on_body_entered)
+	damage_area.body_exited.connect(_on_body_exited)
+	splash_sprite.sprite_frames = AnimSheetLoader.build_single_animation(
+		"res://assets/sprites/items/beams/tick_beam_splash.png", 3, 12.0
+	)
+	# Base of the spray on SplashPivot's origin, which _update_beam_geometry() puts at
+	# the true wall-collision point; the spray points back along the beam.
+	splash_sprite.rotation = SPLASH_ROTATION
+	splash_sprite.position = Vector2(-SPLASH_BASE_OFFSET * splash_sprite.scale.y, 0)
+
+
+func setup(start: Vector2, direction: Vector2, range_limit: float, width: float, vis_duration: float, dmg: float, tick_interval: float, shrink_time: float = 0.3, knockback: float = 0.0) -> void:
+	global_position = start
+	rotation = direction.angle()
+	max_range = range_limit
+
+	base_width = width
+	line.texture_mode = Line2D.LINE_TEXTURE_TILE
+	wall_ray.target_position = Vector2(max_range, 0)
+
+	duration = vis_duration
+	shrink_duration = min(shrink_time, vis_duration)
+	damage = dmg
+	damage_interval = tick_interval
+	knockback_strength = knockback
+
+	_update_beam_geometry()
+
+
+func _physics_process(delta: float) -> void:
+	timer += delta
+	var time_remaining: float = duration - timer
+
+	_update_beam_geometry()
+
+	# Beam holds at full size until the final shrink_duration seconds, then
+	# tapers to nothing — reads as "the jet runs dry" rather than fading.
+	if time_remaining <= shrink_duration:
+		var shrink_progress: float = 1.0 - (time_remaining / shrink_duration)
+		line.width = base_width * (1.0 - shrink_progress)
+		splash_pivot.scale = Vector2.ONE * (1.0 - shrink_progress)
+	else:
+		line.width = base_width
+		splash_pivot.scale = Vector2.ONE
+
+	if overlapping_bodies.size() > 0 and damage > 0.0:
+		tick_timer -= delta
+		if tick_timer <= 0.0:
+			tick_timer = damage_interval
+			for body in overlapping_bodies:
+				if is_instance_valid(body) and body.has_method("take_damage"):
+					_hit(body)
+
+	if timer >= duration:
+		queue_free()
+
+
+func _update_beam_geometry() -> void:
+	wall_ray.force_raycast_update()
+	# Obstacles share the world layer with walls, but the beam should pass through
+	# them (DamageArea hurts them instead) — exclude each one and re-cast.
+	var guard := 0
+	while wall_ray.is_colliding() and guard < 16:
+		var collider := wall_ray.get_collider() as Node
+		if collider == null or not collider.is_in_group("obstacles"):
+			break
+		wall_ray.add_exception(collider)
+		wall_ray.force_raycast_update()
+		guard += 1
+
+	var length: float = max_range
+	var did_hit := false
+	if wall_ray.is_colliding():
+		length = wall_ray.global_position.distance_to(wall_ray.get_collision_point())
+		did_hit = true
+
+	line.points = PackedVector2Array([Vector2.ZERO, Vector2(length, 0)])
+
+	var shape := damage_shape.shape as RectangleShape2D
+	shape.size = Vector2(length, base_width)
+	damage_area.position = Vector2(length / 2.0, 0)
+
+	splash_pivot.position = Vector2(length, 0)
+	splash_pivot.visible = did_hit
+	if did_hit and not splash_sprite.is_playing():
+		splash_sprite.play("splash")
+
+
+func _on_body_entered(body: Node) -> void:
+	overlapping_bodies.append(body)
+	if damage > 0.0 and body.has_method("take_damage"):
+		tick_timer = damage_interval
+		_hit(body)
+
+
+## Damage + push along the beam (the jet's direction follows the beam's rotation).
+func _hit(body: Node) -> void:
+	body.take_damage(damage, Vector2.RIGHT.rotated(global_rotation), knockback_strength)
+
+
+func _on_body_exited(body: Node) -> void:
+	overlapping_bodies.erase(body)

@@ -1,0 +1,242 @@
+[gd_scene format=3 uid="uid://bo47jaixo361m"]
+
+[ext_resource type="PackedScene" uid="uid://bu2hprdcy6fqt" path="res://rooms/RoomBase.tscn" id="1_x7ioy"]
+[ext_resource type="Texture2D" uid="uid://458bw602f8a7" path="res://assets/sprites/tiles/special_rooms/bathroom_shop.png" id="2_sv1on"]
+[ext_resource type="Texture2D" uid="uid://bswvl0n6jui7s" path="res://assets/sprites/objects/kiddie_pool_water.png" id="3_ujb1q"]
+[ext_resource type="Texture2D" uid="uid://cu4rb3m0gclub" path="res://assets/sprites/pickups/ducks/duck_1.png" id="4_nn65e"]
+[ext_resource type="Script" uid="uid://d0dpow7f1sdxn" path="res://shop/DuckBob.gd" id="5_ar0sc"]
+[ext_resource type="Texture2D" uid="uid://pdsxkgesndtt" path="res://assets/sprites/pickups/ducks/duck_5.png" id="6_oy86a"]
+[ext_resource type="Texture2D" uid="uid://byb5ehvq1jkxm" path="res://assets/sprites/pickups/ducks/duck_10.png" id="7_gdi2q"]
+[ext_resource type="Texture2D" uid="uid://bktmbd1doqlvd" path="res://assets/sprites/objects/sewer_shopkeeper_duck_float.png" id="9_gdi2q"]
+[ext_resource type="Texture2D" uid="uid://cqcbd7xsli87v" path="res://assets/sprites/objects/shop_pipe_counter.png" id="9_oy86a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7vlb8"]
+atlas = ExtResource("3_ujb1q")
+region = Rect2(0, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jf13c"]
+atlas = ExtResource("3_ujb1q")
+region = Rect2(96, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m135p"]
+atlas = ExtResource("3_ujb1q")
+region = Rect2(192, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nn65e"]
+atlas = ExtResource("3_ujb1q")
+region = Rect2(288, 0, 96, 96)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ng0gt"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7vlb8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jf13c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m135p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nn65e")
+}],
+"loop": 1,
+"name": &"pool",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6rt4j"]
+radius = 31.78
+height = 93.47
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+size = Vector2(178.6181, 16.972664)
+
+[node name="RoomBase" unique_id=1502560529 instance=ExtResource("1_x7ioy")]
+use_own_background = true
+
+[node name="TopLeft" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="0" unique_id=790014058]
+texture = ExtResource("2_sv1on")
+
+[node name="TopRigth" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="1" unique_id=287535255]
+texture = ExtResource("2_sv1on")
+
+[node name="BotLeft" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="2" unique_id=516633177]
+texture = ExtResource("2_sv1on")
+
+[node name="BotRigth" parent="Background" parent_id_path=PackedInt32Array(1420536896) index="3" unique_id=703316082]
+texture = ExtResource("2_sv1on")
+
+[node name="Decor" type="Node2D" parent="Doors" parent_id_path=PackedInt32Array(1675798878) index="0" unique_id=568074525]
+
+[node name="Layout" type="Node2D" parent="Doors/Decor" index="0" unique_id=580773740]
+
+[node name="Pool" type="AnimatedSprite2D" parent="Doors/Decor/Layout" index="0" unique_id=222448466]
+position = Vector2(140, -50)
+scale = Vector2(0.7, 0.7)
+sprite_frames = SubResource("SpriteFrames_ng0gt")
+animation = &"pool"
+autoplay = "pool"
+frame_progress = 0.256195
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Doors/Decor/Layout/Pool" index="0" unique_id=1680314583]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Doors/Decor/Layout/Pool/StaticBody2D" index="0" unique_id=12089870]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_6rt4j")
+
+[node name="Sprite2D" type="Sprite2D" parent="Doors/Decor/Layout/Pool" index="1" unique_id=418542678]
+texture_filter = 4
+position = Vector2(-21.428572, -4.285714)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("4_nn65e")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Doors/Decor/Layout/Pool" index="2" unique_id=1880944072]
+texture_filter = 4
+position = Vector2(-2.857143, -20)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_oy86a")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D3" type="Sprite2D" parent="Doors/Decor/Layout/Pool" index="3" unique_id=947369166]
+texture_filter = 4
+position = Vector2(0, 4.285714)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("7_gdi2q")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D4" type="Sprite2D" parent="Doors/Decor/Layout/Pool" index="4" unique_id=219890404]
+texture_filter = 4
+position = Vector2(24.285717, -4.285715)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_oy86a")
+flip_h = true
+script = ExtResource("5_ar0sc")
+
+[node name="Pool2" type="AnimatedSprite2D" parent="Doors/Decor/Layout" index="1" unique_id=834286293]
+position = Vector2(-140, -50)
+scale = Vector2(0.7, 0.7)
+sprite_frames = SubResource("SpriteFrames_ng0gt")
+animation = &"pool"
+autoplay = "pool"
+frame_progress = 0.256195
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Doors/Decor/Layout/Pool2" index="0" unique_id=1972636175]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Doors/Decor/Layout/Pool2/StaticBody2D" index="0" unique_id=2058901904]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_6rt4j")
+
+[node name="Sprite2D" type="Sprite2D" parent="Doors/Decor/Layout/Pool2" index="1" unique_id=851428954]
+texture_filter = 4
+position = Vector2(-21.428572, -4.285714)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("4_nn65e")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Doors/Decor/Layout/Pool2" index="2" unique_id=1051910423]
+texture_filter = 4
+position = Vector2(-2.857143, -20)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_oy86a")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D3" type="Sprite2D" parent="Doors/Decor/Layout/Pool2" index="3" unique_id=15027698]
+texture_filter = 4
+position = Vector2(0, 4.285714)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("7_gdi2q")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D4" type="Sprite2D" parent="Doors/Decor/Layout/Pool2" index="4" unique_id=1148182311]
+texture_filter = 4
+position = Vector2(24.285717, -4.285715)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_oy86a")
+flip_h = true
+script = ExtResource("5_ar0sc")
+
+[node name="Pool3" type="AnimatedSprite2D" parent="Doors/Decor/Layout" index="2" unique_id=1378964419]
+position = Vector2(-3.0000153, -27.000002)
+scale = Vector2(0.7, 0.7)
+sprite_frames = SubResource("SpriteFrames_ng0gt")
+animation = &"pool"
+autoplay = "pool"
+frame_progress = 0.256195
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Doors/Decor/Layout/Pool3" index="0" unique_id=374050543]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Doors/Decor/Layout/Pool3/StaticBody2D" index="0" unique_id=718386212]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_6rt4j")
+
+[node name="Bob" type="Sprite2D" parent="Doors/Decor/Layout/Pool3" index="1" unique_id=1795095308]
+texture_filter = 4
+position = Vector2(2.1457672e-05, -20)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("9_gdi2q")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D" type="Sprite2D" parent="Doors/Decor/Layout/Pool3" index="2" unique_id=251308723]
+texture_filter = 4
+position = Vector2(-21.428549, -4.2857103)
+scale = Vector2(0.029999996, 0.029999996)
+texture = ExtResource("4_nn65e")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D3" type="Sprite2D" parent="Doors/Decor/Layout/Pool3" index="3" unique_id=339745529]
+texture_filter = 4
+position = Vector2(0, 4.285714)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("7_gdi2q")
+script = ExtResource("5_ar0sc")
+
+[node name="Sprite2D4" type="Sprite2D" parent="Doors/Decor/Layout/Pool3" index="4" unique_id=1130313541]
+texture_filter = 4
+position = Vector2(24.285717, -4.285715)
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_oy86a")
+flip_h = true
+script = ExtResource("5_ar0sc")
+
+[node name="ItemTable" type="Sprite2D" parent="Doors/Decor/Layout" index="3" unique_id=1261658985]
+position = Vector2(-3, 33)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("9_oy86a")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Doors/Decor/Layout/ItemTable" index="0" unique_id=1130394051]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Doors/Decor/Layout/ItemTable/StaticBody2D" index="0" unique_id=280887621]
+position = Vector2(4.2915344e-06, 2)
+scale = Vector2(1.0301307, 3.2994235)
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Item1" type="Marker2D" parent="Doors/Decor/Layout/ItemTable" index="1" unique_id=850166024]
+position = Vector2(-70, -18)
+
+[node name="Item2" type="Marker2D" parent="Doors/Decor/Layout/ItemTable" index="2" unique_id=1707878438]
+position = Vector2(-34, -18)
+
+[node name="Item3" type="Marker2D" parent="Doors/Decor/Layout/ItemTable" index="3" unique_id=345870941]
+position = Vector2(0, -18)
+
+[node name="Item4" type="Marker2D" parent="Doors/Decor/Layout/ItemTable" index="4" unique_id=866809174]
+position = Vector2(36, -18)
+
+[node name="Item5" type="Marker2D" parent="Doors/Decor/Layout/ItemTable" index="5" unique_id=1711558977]
+position = Vector2(72, -18)
+
+[node name="ToiletSpot" type="Marker2D" parent="." index="5" unique_id=2001376042]
+position = Vector2(-137, 43)
+
+[editable path="Doors/North"]
+[editable path="Doors/South"]
+[editable path="Doors/East"]
+[editable path="Doors/West"]

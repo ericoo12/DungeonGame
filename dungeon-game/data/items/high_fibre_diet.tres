@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3]
+
+[ext_resource type="Script" path="res://items/core/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/icons/high_fibre_diet.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+damage_bonus = -1
+fire_rate_bonus = 0.08
+range_bonus = 0.3
+item_name = "High-Fibre Diet"
+description = "Keeps things moving. Fire rate and range up, damage down."
+icon = ExtResource("2_icon")

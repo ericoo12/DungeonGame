@@ -1,0 +1,183 @@
+[gd_scene format=3 uid="uid://bu2hprdcy6fqt"]
+
+[ext_resource type="Script" uid="uid://dchcemaxt6x4b" path="res://rooms/RoomBase.gd" id="1_oo7mm"]
+[ext_resource type="Texture2D" uid="uid://da18duoyx5g88" path="res://assets/sprites/tiles/sewer.png" id="4_j71mv"]
+[ext_resource type="PackedScene" uid="uid://b5e7hergm1vcs" path="res://dungeon/Door.tscn" id="4_oo7mm"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_northwall"]
+size = Vector2(184, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_southwall"]
+size = Vector2(184, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sidewall"]
+size = Vector2(45, 112)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_projwall_h"]
+size = Vector2(480, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_projwall_v"]
+size = Vector2(40, 300)
+
+[node name="RoomBase" type="Node2D" unique_id=1502560529]
+script = ExtResource("1_oo7mm")
+metadata/_edit_horizontal_guides_ = [-112.0, 112.0]
+metadata/_edit_vertical_guides_ = [-216.0, 216.0]
+
+[node name="WallBlockers" type="StaticBody2D" parent="." unique_id=1843290117 groups=["walls"]]
+collision_mask = 0
+
+[node name="NorthLeft" type="CollisionShape2D" parent="WallBlockers" unique_id=1276604833]
+position = Vector2(-108, -107)
+shape = SubResource("RectangleShape2D_northwall")
+
+[node name="NorthRight" type="CollisionShape2D" parent="WallBlockers" unique_id=1938820571]
+position = Vector2(108, -107)
+shape = SubResource("RectangleShape2D_northwall")
+
+[node name="SouthLeft" type="CollisionShape2D" parent="WallBlockers" unique_id=1407733961]
+position = Vector2(-108, 103)
+shape = SubResource("RectangleShape2D_southwall")
+
+[node name="SouthRight" type="CollisionShape2D" parent="WallBlockers" unique_id=1625409187]
+position = Vector2(108, 103)
+shape = SubResource("RectangleShape2D_southwall")
+
+[node name="WestTop" type="CollisionShape2D" parent="WallBlockers" unique_id=1119482306]
+position = Vector2(-201.5, -72)
+shape = SubResource("RectangleShape2D_sidewall")
+
+[node name="WestBottom" type="CollisionShape2D" parent="WallBlockers" unique_id=1750361094]
+position = Vector2(-201.5, 72)
+shape = SubResource("RectangleShape2D_sidewall")
+
+[node name="EastTop" type="CollisionShape2D" parent="WallBlockers" unique_id=1302976648]
+position = Vector2(201.5, -72)
+shape = SubResource("RectangleShape2D_sidewall")
+
+[node name="EastBottom" type="CollisionShape2D" parent="WallBlockers" unique_id=1888140725]
+position = Vector2(201.5, 72)
+shape = SubResource("RectangleShape2D_sidewall")
+
+[node name="ProjectileWalls" type="StaticBody2D" parent="." unique_id=1561822247 groups=["walls"]]
+collision_layer = 8
+collision_mask = 0
+
+[node name="North" type="CollisionShape2D" parent="ProjectileWalls" unique_id=1234076690]
+position = Vector2(0, -130)
+shape = SubResource("RectangleShape2D_projwall_h")
+
+[node name="South" type="CollisionShape2D" parent="ProjectileWalls" unique_id=1485520374]
+position = Vector2(0, 116)
+shape = SubResource("RectangleShape2D_projwall_h")
+
+[node name="West" type="CollisionShape2D" parent="ProjectileWalls" unique_id=1692718233]
+position = Vector2(-216, 0)
+shape = SubResource("RectangleShape2D_projwall_v")
+
+[node name="East" type="CollisionShape2D" parent="ProjectileWalls" unique_id=1976203551]
+position = Vector2(216, 0)
+shape = SubResource("RectangleShape2D_projwall_v")
+
+[node name="Background" type="Node2D" parent="." unique_id=1420536896]
+
+[node name="TopLeft" type="Sprite2D" parent="Background" unique_id=790014058]
+position = Vector2(-108, -56)
+scale = Vector2(1.0691534, 1)
+texture = ExtResource("4_j71mv")
+region_enabled = true
+region_rect = Rect2(0.971, 0, 202, 112)
+
+[node name="TopRigth" type="Sprite2D" parent="Background" unique_id=287535255]
+position = Vector2(108, -56)
+scale = Vector2(1.069, 1)
+texture = ExtResource("4_j71mv")
+flip_h = true
+region_enabled = true
+region_rect = Rect2(1.039, 0, 202, 112)
+
+[node name="BotLeft" type="Sprite2D" parent="Background" unique_id=516633177]
+position = Vector2(-107.99999, 56.000004)
+scale = Vector2(1.0689286, 0.99999994)
+texture = ExtResource("4_j71mv")
+flip_v = true
+region_enabled = true
+region_rect = Rect2(1.044, 0, 202, 112)
+
+[node name="BotRigth" type="Sprite2D" parent="Background" unique_id=703316082]
+position = Vector2(107.9, 56)
+scale = Vector2(1.07, 1)
+texture = ExtResource("4_j71mv")
+flip_h = true
+flip_v = true
+region_enabled = true
+region_rect = Rect2(1.023, 0, 202, 112)
+
+[node name="Doors" type="Node2D" parent="." unique_id=1675798878]
+
+[node name="North" parent="Doors" unique_id=158042467 instance=ExtResource("4_oo7mm")]
+position = Vector2(0, -92)
+scale = Vector2(1, 0.73)
+
+[node name="CollisionShape2D" parent="Doors/North" index="1" unique_id=2113766507]
+position = Vector2(0, -1.5385)
+scale = Vector2(1.5789, 1.0475)
+
+[node name="PhysicalBlocker" parent="Doors/North" index="2" unique_id=1472804281]
+position = Vector2(0, -20.548)
+collision_mask = 10
+
+[node name="CollisionShape2D" parent="Doors/North/PhysicalBlocker" index="0" unique_id=2093098370]
+scale = Vector2(1.8947, 2.529)
+
+[node name="South" parent="Doors" unique_id=1481538488 instance=ExtResource("4_oo7mm")]
+position = Vector2(0, 92)
+rotation = 3.1415927
+scale = Vector2(1, 0.7)
+
+[node name="CollisionShape2D" parent="Doors/South" index="1" unique_id=2113766507]
+position = Vector2(0, 2.9412)
+scale = Vector2(1.5789, 1.0013)
+
+[node name="PhysicalBlocker" parent="Doors/South" index="2" unique_id=1472804281]
+position = Vector2(0, -15.714)
+
+[node name="CollisionShape2D" parent="Doors/South/PhysicalBlocker" index="0" unique_id=2093098370]
+scale = Vector2(1.8947, 2.6374)
+
+[node name="East" parent="Doors" unique_id=953514927 instance=ExtResource("4_oo7mm")]
+position = Vector2(193, 0)
+rotation = 1.5707964
+scale = Vector2(1, 0.7)
+
+[node name="CollisionShape2D" parent="Doors/East" index="1" unique_id=2113766507]
+position = Vector2(0, 4.2857)
+scale = Vector2(1.5789, 0.9726)
+
+[node name="PhysicalBlocker" parent="Doors/East" index="2" unique_id=1472804281]
+position = Vector2(0, -12.143)
+
+[node name="CollisionShape2D" parent="Doors/East/PhysicalBlocker" index="0" unique_id=2093098370]
+scale = Vector2(1.8947, 2.4725)
+
+[node name="West" parent="Doors" unique_id=1414241096 instance=ExtResource("4_oo7mm")]
+position = Vector2(-195, 0)
+rotation = -1.5707964
+scale = Vector2(1, 0.775)
+
+[node name="CollisionShape2D" parent="Doors/West" index="1" unique_id=2113766507]
+position = Vector2(0, 6.4516)
+scale = Vector2(1.5789, 0.8785)
+
+[node name="PhysicalBlocker" parent="Doors/West" index="2" unique_id=1472804281]
+position = Vector2(0, -8.387)
+
+[node name="CollisionShape2D" parent="Doors/West/PhysicalBlocker" index="0" unique_id=2093098370]
+scale = Vector2(1.8947, 2.2333)
+
+[node name="EnemySpawnPoints" type="Node2D" parent="." unique_id=2016783228]
+
+[editable path="Doors/North"]
+[editable path="Doors/South"]
+[editable path="Doors/East"]
+[editable path="Doors/West"]

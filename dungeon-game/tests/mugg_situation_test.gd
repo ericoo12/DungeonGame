@@ -33,9 +33,9 @@ func reset() -> void:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var room: FinalBossArena = load("res://scenes/final_boss/FinalBossArena.tscn").instantiate()
+	var room: FinalBossArena = load("res://enemies/doktor_mugg/FinalBossArena.tscn").instantiate()
 	add_child(room)
-	boss = load("res://scenes/final_boss/DoktorMugg.tscn").instantiate()
+	boss = load("res://enemies/doktor_mugg/DoktorMugg.tscn").instantiate()
 	boss.random_seed = 17
 	boss.spawn_grace_period = 0
 	add_child(boss)
@@ -104,7 +104,7 @@ func run() -> void:
 	boss.behavior_tree.tick()
 	check(boss.blackboard.situation == "SEARCH", "Out of range uses approach/search context")
 	reset()
-	var projectile: Projectile = load("res://scenes/player/Projectile.tscn").instantiate()
+	var projectile: Projectile = load("res://player/Projectile.tscn").instantiate()
 	projectile.position = Vector2(-60,0)
 	projectile.lifetime = 4
 	add_child(projectile)

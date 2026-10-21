@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/swarm_fly_movement.tres" id="2_chase"]
+[ext_resource type="PackedScene" path="res://enemies/regular/easy/FlyGreen.tscn" id="4_greenfly"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/yellow_fly_spit.tres" id="5_spit"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_flybody"]
+radius = 18.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_flyhit"]
+radius = 18.0
+
+[node name="FlyYellow" unique_id=1579853284 instance=ExtResource("1_base")]
+scale = Vector2(0.5, 0.5)
+sprite_sheet_path = "res://assets/sprites/enemies/flies/fly_yellow.png"
+max_health = 15.0
+move_speed = 6.0
+attack_sheet_path = "res://assets/sprites/enemies/flies/fly_yellow.png"
+idle_fps = 14.0
+movement_behavior = ExtResource("2_chase")
+attack_behavior = ExtResource("5_spit")
+spawn_weight = 0.5
+pack_member_scene = ExtResource("4_greenfly")
+family = &"fly"
+pack_size = Vector2i(2, 3)
+pack_mixes_family = false
+visual_scale = 0.55
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+shape = SubResource("CircleShape2D_flybody")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("CircleShape2D_flyhit")
+
+[node name="Label" parent="." index="4" unique_id=1371920992]
+offset_top = -19.0
+offset_bottom = 5.51

@@ -17,7 +17,7 @@ FinalBossBase owns the sole physics loop, health/contact handling, and cancellab
 
 ## Balancing
 
-Select the root of scenes/final_boss/DoktorMugg.tscn. Existing scene values override script defaults. All existing exported names were preserved; the refactor does not rewrite scene overrides.
+Select the root of enemies/doktor_mugg/DoktorMugg.tscn. Existing scene values override script defaults. All existing exported names were preserved; the refactor does not rewrite scene overrides.
 
 New Situation sections expose separate weights for danger, blocked-player, close-range, combat-cover and search responses. Existing Basic/Cluster/Homing/Running weights apply in combat. Close-range Running Shot uses its own close_running_shot_weight; zeroing one context's weight does not disable that response in every other context. To disable an ability globally, use its enable setting when available, or zero its weights in each context.
 
@@ -40,7 +40,7 @@ The situation priority order, state names and collision rules are structural log
 
 ## Playtesting
 
-Run scenes/final_boss/DoktorMuggArena.tscn with F6. WASD moves, arrows shoot, R restarts. The four-room-sized arena keeps normal camera zoom. Its overlay shows the current situation, chosen response and FSM state. Inspect blackboard.choice_weights in the remote debugger for the eligible weights from the last lottery.
+Run enemies/doktor_mugg/DoktorMuggArena.tscn with F6. WASD moves, arrows shoot, R restarts. The four-room-sized arena keeps normal camera zoom. Its overlay shows the current situation, chosen response and FSM state. Inspect blackboard.choice_weights in the remote debugger for the eligible weights from the last lottery.
 
 The arena uses player base damage 3.5. The normal Dungeon.tscn has an existing base_damage=50 override; this refactor does not change it. Judge difficulty with the intended player stats.
 

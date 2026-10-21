@@ -12,7 +12,7 @@ func frames(count: int) -> void:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var arena = load("res://scenes/final_boss/DoktorMuggArena.tscn").instantiate()
+	var arena = load("res://enemies/doktor_mugg/DoktorMuggArena.tscn").instantiate()
 	add_child(arena)
 	arena.boss.set_physics_process(false)
 	arena.room.get_node("Obstacles").queue_free()

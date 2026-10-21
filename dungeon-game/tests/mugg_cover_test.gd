@@ -16,9 +16,9 @@ func frames(count: int = 2) -> void:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var room: FinalBossArena = load("res://scenes/final_boss/FinalBossRoom.tscn").instantiate()
+	var room: FinalBossArena = load("res://enemies/doktor_mugg/FinalBossRoom.tscn").instantiate()
 	add_child(room)
-	var boss: DoktorMugg = load("res://scenes/final_boss/DoktorMugg.tscn").instantiate()
+	var boss: DoktorMugg = load("res://enemies/doktor_mugg/DoktorMugg.tscn").instantiate()
 	boss.random_seed = 123
 	boss.spawn_grace_period = 0
 	boss.position = Vector2(120,-70)

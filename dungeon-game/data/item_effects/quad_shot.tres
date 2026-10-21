@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="QuadShotModifier" format=3 uid="uid://qm2y7blk8lw0"]
+
+[ext_resource type="Script" uid="uid://dsueux4uigrj" path="res://items/shot_patterns/QuadShotModifier.gd" id="1_1ef13"]
+
+[resource]
+script = ExtResource("1_1ef13")
+metadata/_custom_type_script = "uid://dsueux4uigrj"

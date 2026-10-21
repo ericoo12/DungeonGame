@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://items/followers/DrainFly.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/flies/fly_green.png" id="2_tex"]
+
+[node name="DrainFly" type="Node2D"]
+script = ExtResource("1_script")
+trail_delay = 0.25
+bob_height = 4.0
+bob_speed = 7.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.75, 0.9, 1, 1)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_tex")
+hframes = 4

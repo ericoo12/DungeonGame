@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3]
+
+[ext_resource type="Script" path="res://items/core/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/icons/soap_bar.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+speed_bonus = 25.0
+knockback_bonus = -30.0
+player_size_bonus = -0.1
+item_name = "Soap Bar"
+description = "Slippery when wet. Smaller and faster, knockback down."
+icon = ExtResource("2_icon")

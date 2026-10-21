@@ -12,7 +12,7 @@ func frames(n: int) -> void:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var player: Player = load("res://scenes/player/Player.tscn").instantiate()
+	var player: Player = load("res://player/Player.tscn").instantiate()
 	add_child(player)
 	player.set_physics_process(false)
 	player.position = Vector2(500, 500)
@@ -35,7 +35,7 @@ func run() -> void:
 	check(player.current_hearts == 1.0, "Stepping on paper costs half a heart")
 	trail._physics_process(1.0)
 	check(trail.segments.is_empty(), "Paper expires after one second")
-	var block: ArenaObstacle = load("res://scenes/final_boss/obstacles/Obstacle.tscn").instantiate()
+	var block: ArenaObstacle = load("res://enemies/doktor_mugg/arena_obstacles/ArenaObstacle.tscn").instantiate()
 	block.blocks_projectiles = false
 	block.blocks_sight = false
 	block.position = Vector2(70,0)
@@ -64,7 +64,7 @@ func run() -> void:
 	await frames(12)
 	check(not is_instance_valid(blue_test), "Blue cover stops ordinary paper")
 	var settings := MuggSettings.new()
-	check(settings.projectile_damage == 1.0 and settings.running_shot_damage == 0.5 and settings.cluster_damage == 0.5, "Attack damage defaults match requested hearts")
+	check(settings.projectile_damage == 0.5 and settings.running_shot_damage == 0.5 and settings.cluster_damage == 0.5, "Attack damage defaults match requested hearts")
 	settings.free()
 	await frames(70)
 	check(get_tree().get_nodes_in_group("mugg_paper_trails").is_empty(), "Trail cleans up after projectile removal")

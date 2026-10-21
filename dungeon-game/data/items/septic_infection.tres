@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dstfk82ej52g8"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c7psdtbg0tnec" path="res://assets/sprites/items/icons/septic_infection.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://dbf5sfnvgbe1b" path="res://items/procs/PoisonShotProc.gd" id="3_sub"]
+
+[sub_resource type="Resource" id="Resource_shot_proc"]
+script = ExtResource("3_sub")
+base_chance = 0.08
+
+[resource]
+script = ExtResource("1_script")
+damage_bonus = 1
+shot_proc = SubResource("Resource_shot_proc")
+item_name = "Septic Infection"
+description = "Something is growing. Damage up, shots can poison."
+icon = ExtResource("2_icon")
+rarity = 1

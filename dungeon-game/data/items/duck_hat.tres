@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bevmiwidq1ok0"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://pickups/DuckPickup1.tscn" id="2_duck"]
+[ext_resource type="PackedScene" uid="uid://dwfp2dvun7kl1" path="res://items/cosmetics/head/DuckHat.tscn" id="3_hat"]
+[ext_resource type="Texture2D" uid="uid://ejgxpeneh16v" path="res://assets/sprites/items/icons/duck_hat.png" id="3_xxeab"]
+
+[resource]
+script = ExtResource("1_item")
+rarity = 1
+hurt_drop_scene = ExtResource("2_duck")
+cosmetic_scene = ExtResource("3_hat")
+cosmetic_slot = "Head"
+item_name = "Duck Hat"
+description = "Squeak when squeezed. Taking damage drops 1-2 ducks."
+icon = ExtResource("3_xxeab")

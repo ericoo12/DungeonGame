@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bf4norc70i6ij"]
+
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_6x4rq"]
+[ext_resource type="Texture2D" uid="uid://ggn18ti0m01x" path="res://assets/sprites/items/icons/poop_projectile.png" id="1_xm2je"]
+[ext_resource type="PackedScene" uid="uid://dy17jyc3728up" path="res://items/orbitals/Orbital.tscn" id="2_ve0hk"]
+
+[resource]
+script = ExtResource("1_6x4rq")
+rarity = 1
+orbital_scene = ExtResource("2_ve0hk")
+item_name = "Another One Poop"
+description = "A friend with poor boundaries. Orbits you and damages enemies on contact."
+icon = ExtResource("1_xm2je")
+metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

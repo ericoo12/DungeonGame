@@ -18,9 +18,9 @@ func balls() -> Array[MuggBall]:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var room: FinalBossArena = load("res://scenes/final_boss/FinalBossArena.tscn").instantiate()
+	var room: FinalBossArena = load("res://enemies/doktor_mugg/FinalBossArena.tscn").instantiate()
 	add_child(room)
-	var boss: DoktorMugg = load("res://scenes/final_boss/DoktorMugg.tscn").instantiate()
+	var boss: DoktorMugg = load("res://enemies/doktor_mugg/DoktorMugg.tscn").instantiate()
 	boss.random_seed = 123
 	boss.spawn_grace_period = 0
 	add_child(boss)
@@ -98,13 +98,13 @@ func run() -> void:
 	homing.position = Vector2.ZERO
 	homing.velocity = Vector2.RIGHT * homing.speed
 	target.position = Vector2(150,0)
-	var blue = load("res://scenes/final_boss/obstacles/BlueBlock.tscn").instantiate()
+	var blue = load("res://enemies/doktor_mugg/arena_obstacles/BlueBlock.tscn").instantiate()
 	blue.position = Vector2(75,0)
 	room.add_child(blue)
 	await frames()
 	homing._physics_process(0.01)
 	check(homing.tracking_lost, "Blue cover breaks homing lock")
-	var green = load("res://scenes/final_boss/obstacles/GreenBlock.tscn").instantiate()
+	var green = load("res://enemies/doktor_mugg/arena_obstacles/GreenBlock.tscn").instantiate()
 	green.position = Vector2(-100,80)
 	room.add_child(green)
 	var passing := MuggBall.new()

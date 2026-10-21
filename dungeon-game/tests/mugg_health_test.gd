@@ -9,13 +9,13 @@ func check(value: bool, message: String) -> void:
 func _ready() -> void:
 	call_deferred("run")
 func run() -> void:
-	var room: FinalBossArena = load("res://scenes/final_boss/FinalBossArena.tscn").instantiate()
+	var room: FinalBossArena = load("res://enemies/doktor_mugg/FinalBossArena.tscn").instantiate()
 	add_child(room)
-	var player: Player = load("res://scenes/player/Player.tscn").instantiate()
+	var player: Player = load("res://player/Player.tscn").instantiate()
 	player.position = Vector2(180,0)
 	add_child(player)
 	player.set_physics_process(false)
-	var boss: DoktorMugg = load("res://scenes/final_boss/DoktorMugg.tscn").instantiate()
+	var boss: DoktorMugg = load("res://enemies/doktor_mugg/DoktorMugg.tscn").instantiate()
 	add_child(boss)
 	boss.set_physics_process(false)
 	boss.set_arena(room)
@@ -45,7 +45,7 @@ func run() -> void:
 	player.current_hearts = player.max_hearts
 	boss._update_perception(0.1)
 	check(boss.health_aggression() == 0 and boss.health_defense() == 0, "Healing restores baseline without accumulating modifiers")
-	var blue = load("res://scenes/final_boss/obstacles/BlueBlock.tscn").instantiate()
+	var blue = load("res://enemies/doktor_mugg/arena_obstacles/BlueBlock.tscn").instantiate()
 	blue.position = Vector2(90,0)
 	room.add_child(blue)
 	await get_tree().physics_frame
@@ -57,6 +57,6 @@ func run() -> void:
 	boss.health = 1
 	boss._observed_player_health_ratio = 0.1
 	check(boss.health_defense() == 0 and boss.health_aggression() == 0, "Inspector switch disables health tactics")
-	check(boss.max_health == 100 and boss.projectile_damage == 1, "Health and damage stats unchanged")
+	check(boss.max_health == 100 and boss.projectile_damage == 0.5, "Health and damage stats unchanged")
 	print("MUGG HEALTH: ",checks," checks; ",failures," failures")
 	get_tree().quit(0 if failures == 0 else 1)

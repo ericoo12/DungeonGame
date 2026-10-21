@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://2vwj0f2j11al"]
+
+[ext_resource type="Script" uid="uid://ddtntg3v3ax68" path="res://items/ItemPickup.gd" id="1_71355"]
+[ext_resource type="Texture2D" uid="uid://d4llnvxu4upod" path="res://assets/sprites/objects/bathroom_pedestal.png" id="2_jk4cd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
+size = Vector2(14, 27)
+
+[node name="ItemPickup" type="Area2D" unique_id=461120326]
+collision_mask = 7
+script = ExtResource("1_71355")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1998462875]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_ng0gt")
+
+[node name="Pedestal" type="Sprite2D" parent="." unique_id=1730452218]
+position = Vector2(0, 4)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_jk4cd")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=714185411]
+z_index = 1
+position = Vector2(0, -7)
