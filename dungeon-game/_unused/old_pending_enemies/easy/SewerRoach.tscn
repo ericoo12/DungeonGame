@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/ScurryMovement.gd" id="s_ScurryMovement"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_ScurryMovement")
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 59.7
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 89.6
+
+[node name="SewerRoach" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/sewer_roach/sewer_roach_move_4frames.png"
+side_view_frames = 4
+shadow_scale_ratio = 4.48
+shadow_offset = Vector2(0, 4)
+max_health = 4.0
+move_speed = 22.0
+movement_behavior = SubResource("Resource_move")
+pack_size = Vector2i(2, 3)
+family = &"roach"
+visual_scale = 0.067
+display_name = "Sewer Roach"
+log_description = "Wanders around until you get close, then panics and scurries straight ahead. Fast, but one good hit squashes it."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")

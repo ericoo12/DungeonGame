@@ -9,5 +9,6 @@ rarity = 1
 max_hearts_bonus = -1
 damage_bonus = 2
 item_name = "Drain Opener"
-description = "Corrosive results. Damage up, health down."
+description = "Damage up, health down."
+flavor_text = "Corrosive results."
 icon = ExtResource("2_icon")

@@ -7,6 +7,9 @@
 ##     (the widest spread_degrees among them is used). Double (+1) + Quad (+3) = 5 shots.
 ##   - Custom patterns (extra_shots == 0): override modify_directions(); applied after
 ##     the fan, in pickup order (e.g. a future "also shoot backwards").
+##   - Single extras: override extra_directions(aim) (and adds_single_extras() -> true).
+##     They add shots off the aim direction ONCE, not per multishot shot, and other
+##     custom patterns don't copy them (Quad + Cross Flush = 4 forward + 2 sides).
 class_name ShotPatternModifier
 extends Resource
 
@@ -16,6 +19,16 @@ extends Resource
 
 func modify_directions(dirs: Array[Vector2]) -> Array[Vector2]:
 	return dirs
+
+
+## True for modifiers that add their shots once, off the aim (see extra_directions).
+func adds_single_extras() -> bool:
+	return false
+
+
+## Extra directions added once per trigger pull, based on the aim only.
+func extra_directions(_aim: Vector2) -> Array[Vector2]:
+	return []
 
 
 ## Inventory line for custom patterns ("" = the generic "Changes your shot pattern").

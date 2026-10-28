@@ -12,5 +12,6 @@ base_chance = 0.15
 script = ExtResource("1_script")
 shot_proc = SubResource("Resource_shot_proc")
 item_name = "Rusty Water"
-description = "Probably safe. Shots can rust enemies: slower and easier to knock back."
+description = "Shots can rust enemies: slower and easier to knock back."
+flavor_text = "Probably safe."
 icon = ExtResource("2_icon")

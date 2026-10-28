@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://enemies/doktor_mugg/arena_obstacles/ArenaObstacle.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objects/treasure_containment_vaults.png" id="2_art"]
+
+[node name="TreasureVault" instance=ExtResource("1_base")]
+obstacle_size = Vector2(44, 44)
+blocks_sight = true
+placeholder_color = Color(0.15, 0.4, 1, 1)
+art_sheet = ExtResource("2_art")
+art_frames = 4
+art_content = Rect2(10, 13, 236, 225)
+art_width = 52.0

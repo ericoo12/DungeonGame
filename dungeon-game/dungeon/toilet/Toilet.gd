@@ -3,11 +3,13 @@
 ##            declogger, then walk into it to travel to RoomData.toilet_target. The item/
 ##            shop room has one too (already unclogged) that takes you back.
 ##   CHEST  - unclog it for a few drops (Dungeon.toilet_chest_drops).
-## Can only be unclogged once the room is cleared. State lives on RoomData, so it stays
-## unclogged/looted on revisits. Spawned by RoomController._spawn_toilet().
+## Locked (lid down, can't be used) until the room is cleared - also toilets that start
+## unclogged (stage 1 portals, Dungeon.free_special_rooms_until_stage). State lives on
+## RoomData, so it stays unclogged/looted on revisits. Spawned by RoomController._spawn_toilet().
 ##
-## Looks: lid down while enemies are alive -> clogged bowl once the room is cleared ->
-## walk in: plunger plunges (plunge_duration) -> unclog frames -> clean water.
+## Looks: lid down while enemies are alive -> clogged bowl (or clean water if already
+## unclogged) once the room is cleared -> walk in: plunger plunges (plunge_duration) ->
+## unclog frames -> clean water.
 extends Node2D
 class_name Toilet
 
@@ -75,14 +77,31 @@ func _exit_tree() -> void:
 ## you straight back. (Grid, not a physics query: this runs in the same frame the rooms
 ## swap, when the old room's colliders still exist and the new ones aren't active yet.)
 ## Hand-made rooms: put the "ToiletSpot" marker where the space in front is free.
+## Also has to be well inside the floor: the grid counts a doorway gap as walkable, so a
+## toilet next to a closed door could drop you into the door blocker (stuck in the wall).
 func get_arrival_point() -> Vector2:
 	var d := trigger_radius + 12.0
 	var grid: RoomGrid = room.grid if room else null
+	var floor_rect: Rect2 = room.get_floor_rect().grow(-10.0) if room and room.has_method("get_floor_rect") else Rect2()
 	for offset in [Vector2(0, d), Vector2(-d - 4, -4), Vector2(d + 4, -4), Vector2(0, -d - 14)]:
 		var p: Vector2 = global_position + offset
-		if grid == null or grid.is_walkable(grid.global_to_cell(p)):
+		if floor_rect.has_area() and not floor_rect.has_point(p):
+			continue
+		if grid == null or _footprint_clear(grid, p):
 			return p
-	return global_position + Vector2(0, d)
+	var fallback := global_position + Vector2(0, d)
+	if floor_rect.has_area():
+		fallback = fallback.clamp(floor_rect.position, floor_rect.end)
+	return fallback
+
+
+## The player's body is wider than a point: the cells under its edges must be free too,
+## or an obstacle in the next cell overlaps it.
+func _footprint_clear(grid: RoomGrid, p: Vector2) -> bool:
+	for o in [Vector2.ZERO, Vector2(-7, 0), Vector2(7, 0), Vector2(0, -5), Vector2(0, 5)]:
+		if not grid.is_walkable(grid.global_to_cell(p + o)):
+			return false
+	return true
 
 
 # --- Building ------------------------------------------------------------------
@@ -165,19 +184,19 @@ func _build_trigger() -> void:
 
 ## Runs before Dungeon flips room_data.cleared (it connects later), so don't rely on it.
 func _on_room_cleared() -> void:
-	if not _busy and not room_data.toilet_unclogged:
-		_sprite.play("clogged")
+	if not _busy:
+		_sprite.play("clean" if room_data.toilet_unclogged else "clogged")
 
 
 func _update_visual() -> void:
 	if _busy:
 		return
-	if room_data.toilet_unclogged:
-		_sprite.play("clean")
-	elif room_data.cleared:
-		_sprite.play("clogged")
-	else:
+	if not room_data.cleared:
 		_sprite.play("lid_down")
+	elif room_data.toilet_unclogged:
+		_sprite.play("clean")
+	else:
+		_sprite.play("clogged")
 
 
 # --- Using it --------------------------------------------------------------------
@@ -189,9 +208,12 @@ func _on_body_entered(body: Node) -> void:
 
 	if _busy:
 		return
+	if not room_data.cleared:
+		_deny()  # lid down until the enemies are dead
+		return
 	if not room_data.toilet_unclogged:
-		if not room_data.cleared or not player.use_declogger():
-			_deny()  # enemies still alive, or no declogger
+		if not player.use_declogger():
+			_deny()  # no declogger
 			return
 		_unclog()
 		return

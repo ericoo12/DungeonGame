@@ -28,6 +28,8 @@ movement_behavior = ExtResource("2_slither")
 family = &"snake"
 attack_behavior = ExtResource("3_lunge")
 visual_scale = 0.4
+display_name = "Sewer Snake"
+log_description = "Slithers around the room. Coils up when you are close and in front of it, then lunges. Get behind it."
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
 position = Vector2(0, 3)

@@ -17,63 +17,63 @@
 [ext_resource type="Resource" uid="uid://r13i4hdrodhn" path="res://data/items/tick_beam.tres" id="14_153g2"]
 [ext_resource type="Resource" uid="uid://bpvnd7jr40nwy" path="res://data/items/nose_blood.tres" id="14_n6vps"]
 [ext_resource type="Resource" uid="uid://d0qvi76opy402" path="res://data/items/used_toilet_paper.tres" id="18_1g4r2"]
-[ext_resource type="Resource" uid="uid://dw6yfvk81vfdv" path="res://data/items/plunger_boots.tres" id="18_xg2r1"]
 [ext_resource type="Resource" uid="uid://c5ttmqjoq74x8" path="res://data/items/paper_armour.tres" id="19_xg2r1"]
 [ext_resource type="Resource" uid="uid://dus84rqolvfrl" path="res://data/items/charge_shot.tres" id="20_7xisw"]
 [ext_resource type="Resource" uid="uid://ba2bibxm1qyey" path="res://data/items/mirror_shot.tres" id="20_kefgr"]
 [ext_resource type="Resource" uid="uid://bevmiwidq1ok0" path="res://data/items/duck_hat.tres" id="21_20tjt"]
 [ext_resource type="Texture2D" uid="uid://ggn18ti0m01x" path="res://assets/sprites/items/icons/poop_projectile.png" id="22_kefgr"]
-[ext_resource type="Resource" path="res://data/items/loose_change.tres" id="new_loose_change"]
-[ext_resource type="Resource" path="res://data/items/pipe_cleaner.tres" id="new_pipe_cleaner"]
-[ext_resource type="Resource" path="res://data/items/family_sized_briefs.tres" id="new_family_sized_briefs"]
-[ext_resource type="Resource" path="res://data/items/rubber_duck_soles.tres" id="new_rubber_duck_soles"]
-[ext_resource type="Resource" path="res://data/items/reading_material.tres" id="new_reading_material"]
-[ext_resource type="Resource" path="res://data/items/pressure_valve.tres" id="new_pressure_valve"]
-[ext_resource type="Resource" path="res://data/items/clogged_barrel.tres" id="new_clogged_barrel"]
-[ext_resource type="Resource" path="res://data/items/emergency_diet.tres" id="new_emergency_diet"]
-[ext_resource type="Resource" path="res://data/items/waterlogged.tres" id="new_waterlogged"]
-[ext_resource type="Resource" path="res://data/items/soap_bar.tres" id="new_soap_bar"]
-[ext_resource type="Resource" path="res://data/items/septic_infection.tres" id="new_septic_infection"]
-[ext_resource type="Resource" path="res://data/items/soap_in_your_eyes.tres" id="new_soap_in_your_eyes"]
-[ext_resource type="Resource" path="res://data/items/wet_floor_sign.tres" id="new_wet_floor_sign"]
-[ext_resource type="Resource" path="res://data/items/slow_shot.tres" id="new_slow_shot_item"]
-[ext_resource type="Resource" path="res://data/items/soap_bubble.tres" id="new_soap_bubble"]
-[ext_resource type="Resource" path="res://data/items/toilet_roll.tres" id="new_toilet_roll"]
-[ext_resource type="Resource" path="res://data/items/drain_fly.tres" id="new_drain_fly"]
-[ext_resource type="Resource" path="res://data/items/cross_flush.tres" id="new_cross_flush"]
-[ext_resource type="Resource" path="res://data/items/split_seam.tres" id="new_split_seam"]
-[ext_resource type="Resource" path="res://data/items/u_bend.tres" id="new_u_bend"]
-[ext_resource type="Resource" path="res://data/items/emergency_flush.tres" id="new_emergency_flush"]
-[ext_resource type="Resource" path="res://data/items/plumbers_toolbox.tres" id="new_plumbers_toolbox"]
-[ext_resource type="Resource" path="res://data/items/golden_plunger.tres" id="new_golden_plunger"]
-[ext_resource type="Resource" path="res://data/items/drain_opener.tres" id="new_drain_opener"]
-[ext_resource type="Resource" path="res://data/items/porcelain_skin.tres" id="new_porcelain_skin"]
-[ext_resource type="Resource" path="res://data/items/tiny_towel.tres" id="new_tiny_towel"]
-[ext_resource type="Resource" path="res://data/items/lead_underwear.tres" id="new_lead_underwear"]
-[ext_resource type="Resource" path="res://data/items/high_fibre_diet.tres" id="new_high_fibre_diet"]
-[ext_resource type="Resource" path="res://data/items/toilet_wine.tres" id="new_toilet_wine"]
-[ext_resource type="Resource" path="res://data/items/public_bathroom_shoes.tres" id="new_public_bathroom_shoes"]
-[ext_resource type="Resource" path="res://data/items/bleach_briefs.tres" id="new_bleach_briefs"]
-[ext_resource type="Resource" path="res://data/items/static_cling.tres" id="new_static_cling"]
-[ext_resource type="Resource" path="res://data/items/sewer_gas.tres" id="new_sewer_gas"]
-[ext_resource type="Resource" path="res://data/items/pink_eye.tres" id="new_pink_eye"]
-[ext_resource type="Resource" path="res://data/items/rusty_water.tres" id="new_rusty_water"]
-[ext_resource type="Resource" path="res://data/items/side_leakage.tres" id="new_side_leakage"]
-[ext_resource type="Resource" path="res://data/items/crooked_barrel.tres" id="new_crooked_barrel"]
-[ext_resource type="Resource" path="res://data/items/toilet_tornado.tres" id="new_toilet_tornado"]
-[ext_resource type="Resource" path="res://data/items/overflow.tres" id="new_overflow"]
-[ext_resource type="Resource" path="res://data/items/urinal_cake.tres" id="new_urinal_cake"]
-[ext_resource type="Resource" path="res://data/items/drain_cover.tres" id="new_drain_cover"]
-[ext_resource type="Resource" path="res://data/items/lost_sock.tres" id="new_lost_sock"]
 [ext_resource type="Resource" path="res://data/items/baby_plumber.tres" id="new_baby_plumber"]
+[ext_resource type="Resource" uid="uid://cljk5p64nxjgm" path="res://data/items/bleach_briefs.tres" id="new_bleach_briefs"]
+[ext_resource type="Resource" uid="uid://bmp0xkob8ye2m" path="res://data/items/chemical_cocktail.tres" id="new_chemical_cocktail"]
+[ext_resource type="Resource" path="res://data/items/clogged_barrel.tres" id="new_clogged_barrel"]
+[ext_resource type="Resource" uid="uid://bsdccjykmmmvh" path="res://data/items/crooked_barrel.tres" id="new_crooked_barrel"]
+[ext_resource type="Resource" uid="uid://ckucnxts5kg2w" path="res://data/items/cross_flush.tres" id="new_cross_flush"]
+[ext_resource type="Resource" path="res://data/items/drain_cover.tres" id="new_drain_cover"]
+[ext_resource type="Resource" path="res://data/items/drain_fly.tres" id="new_drain_fly"]
+[ext_resource type="Resource" path="res://data/items/drain_opener.tres" id="new_drain_opener"]
+[ext_resource type="Resource" path="res://data/items/emergency_diet.tres" id="new_emergency_diet"]
+[ext_resource type="Resource" uid="uid://kith4ixptc5x" path="res://data/items/emergency_flush.tres" id="new_emergency_flush"]
+[ext_resource type="Resource" uid="uid://uscv4gvxb4g1" path="res://data/items/emergency_wrench.tres" id="new_emergency_wrench"]
+[ext_resource type="Resource" path="res://data/items/family_sized_briefs.tres" id="new_family_sized_briefs"]
+[ext_resource type="Resource" uid="uid://nfs4fqsoe0n2" path="res://data/items/golden_flush.tres" id="new_golden_flush"]
+[ext_resource type="Resource" path="res://data/items/golden_plunger.tres" id="new_golden_plunger"]
+[ext_resource type="Resource" path="res://data/items/high_fibre_diet.tres" id="new_high_fibre_diet"]
+[ext_resource type="Resource" uid="uid://c4jm78n7pqwvm" path="res://data/items/lead_underwear.tres" id="new_lead_underwear"]
+[ext_resource type="Resource" path="res://data/items/loose_change.tres" id="new_loose_change"]
+[ext_resource type="Resource" uid="uid://53xj6y51xlf6" path="res://data/items/lost_sock.tres" id="new_lost_sock"]
+[ext_resource type="Resource" uid="uid://dfg1xki1psg17" path="res://data/items/overflow.tres" id="new_overflow"]
+[ext_resource type="Resource" uid="uid://cop0b6gbqrne7" path="res://data/items/overflow_alarm.tres" id="new_overflow_alarm"]
+[ext_resource type="Resource" uid="uid://ceaabi7wp0gm2" path="res://data/items/pink_eye.tres" id="new_pink_eye"]
+[ext_resource type="Resource" path="res://data/items/pipe_cleaner.tres" id="new_pipe_cleaner"]
+[ext_resource type="Resource" uid="uid://co8fxt6j0ysfu" path="res://data/items/plumbers_toolbox.tres" id="new_plumbers_toolbox"]
+[ext_resource type="Resource" uid="uid://dosgi07ind6or" path="res://data/items/porcelain_skin.tres" id="new_porcelain_skin"]
+[ext_resource type="Resource" uid="uid://dhhunxep4c3wh" path="res://data/items/portable_toilet.tres" id="new_portable_toilet"]
+[ext_resource type="Resource" path="res://data/items/pressure_valve.tres" id="new_pressure_valve"]
+[ext_resource type="Resource" path="res://data/items/public_bathroom_shoes.tres" id="new_public_bathroom_shoes"]
+[ext_resource type="Resource" path="res://data/items/reading_material.tres" id="new_reading_material"]
+[ext_resource type="Resource" path="res://data/items/rubber_duck_soles.tres" id="new_rubber_duck_soles"]
+[ext_resource type="Resource" uid="uid://o65c4wu4kcjh" path="res://data/items/rusty_water.tres" id="new_rusty_water"]
+[ext_resource type="Resource" uid="uid://dstfk82ej52g8" path="res://data/items/septic_infection.tres" id="new_septic_infection"]
+[ext_resource type="Resource" uid="uid://cxyffnhfhkadr" path="res://data/items/sewer_gas.tres" id="new_sewer_gas"]
 [ext_resource type="Resource" path="res://data/items/sewer_rat_friend.tres" id="new_sewer_rat_friend"]
-[ext_resource type="Resource" path="res://data/items/overflow_alarm.tres" id="new_overflow_alarm"]
-[ext_resource type="Resource" path="res://data/items/emergency_wrench.tres" id="new_emergency_wrench"]
-[ext_resource type="Resource" path="res://data/items/golden_flush.tres" id="new_golden_flush"]
-[ext_resource type="Resource" path="res://data/items/portable_toilet.tres" id="new_portable_toilet"]
-[ext_resource type="Resource" path="res://data/items/chemical_cocktail.tres" id="new_chemical_cocktail"]
-[ext_resource type="Script" path="res://debug/TestRoom.gd" id="testroom_script"]
+[ext_resource type="Resource" path="res://data/items/sewer_skewer.tres" id="new_sewer_skewer"]
+[ext_resource type="Resource" uid="uid://dfbj2mvx24g6o" path="res://data/items/side_leakage.tres" id="new_side_leakage"]
+[ext_resource type="Resource" uid="uid://4i021t52hvpn" path="res://data/items/slow_shot.tres" id="new_slow_shot_item"]
+[ext_resource type="Resource" path="res://data/items/soap_bar.tres" id="new_soap_bar"]
+[ext_resource type="Resource" path="res://data/items/soap_bubble.tres" id="new_soap_bubble"]
+[ext_resource type="Resource" uid="uid://du1mi31o7bxvo" path="res://data/items/soap_in_your_eyes.tres" id="new_soap_in_your_eyes"]
+[ext_resource type="Resource" uid="uid://bgnw27vbmu8gp" path="res://data/items/split_seam.tres" id="new_split_seam"]
+[ext_resource type="Resource" uid="uid://15bhcnh87kkv" path="res://data/items/static_cling.tres" id="new_static_cling"]
+[ext_resource type="Resource" uid="uid://dhw4hj40oh3tg" path="res://data/items/tiny_towel.tres" id="new_tiny_towel"]
+[ext_resource type="Resource" uid="uid://cpemhacs2727t" path="res://data/items/toilet_roll.tres" id="new_toilet_roll"]
+[ext_resource type="Resource" uid="uid://ch4uokv0yhfba" path="res://data/items/toilet_tornado.tres" id="new_toilet_tornado"]
+[ext_resource type="Resource" path="res://data/items/toilet_wine.tres" id="new_toilet_wine"]
+[ext_resource type="Resource" path="res://data/items/urinal_cake.tres" id="new_urinal_cake"]
+[ext_resource type="Resource" uid="uid://el0v1fi1esj7" path="res://data/items/u_bend.tres" id="new_u_bend"]
+[ext_resource type="Resource" path="res://data/items/waterlogged.tres" id="new_waterlogged"]
+[ext_resource type="Resource" uid="uid://b57gd1cyi2rdi" path="res://data/items/wet_floor_sign.tres" id="new_wet_floor_sign"]
 [ext_resource type="PackedScene" uid="uid://cn870j8d47g67" path="res://enemies/regular/easy/Pipe.tscn" id="pipe_scene"]
+[ext_resource type="Script" uid="uid://31v78qkgylwc" path="res://debug/TestRoom.gd" id="testroom_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ng0gt"]
 
@@ -152,10 +152,6 @@ item = ExtResource("14_153g2")
 position = Vector2(-124, -130)
 item = ExtResource("18_1g4r2")
 
-[node name="PlungerBoots" parent="Entities" unique_id=1571805913 instance=ExtResource("6_32oie")]
-position = Vector2(-170, -130)
-item = ExtResource("18_xg2r1")
-
 [node name="PaperArmour" parent="Entities" unique_id=788933588 instance=ExtResource("6_32oie")]
 position = Vector2(-216, -130)
 item = ExtResource("19_xg2r1")
@@ -172,211 +168,215 @@ item = ExtResource("20_kefgr")
 position = Vector2(-308, 20)
 item = ExtResource("21_20tjt")
 
-[node name="LooseChange" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="LooseChange" parent="Entities" unique_id=996154199 instance=ExtResource("6_32oie")]
 position = Vector2(-78, -130)
 item = ExtResource("new_loose_change")
 
-[node name="PipeCleaner" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PipeCleaner" parent="Entities" unique_id=193766072 instance=ExtResource("6_32oie")]
 position = Vector2(-400, -80)
 item = ExtResource("new_pipe_cleaner")
 
-[node name="FamilySizedBriefs" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="FamilySizedBriefs" parent="Entities" unique_id=864689512 instance=ExtResource("6_32oie")]
 position = Vector2(-354, -80)
 item = ExtResource("new_family_sized_briefs")
 
-[node name="RubberDuckSoles" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="RubberDuckSoles" parent="Entities" unique_id=1861787583 instance=ExtResource("6_32oie")]
 position = Vector2(-308, -80)
 item = ExtResource("new_rubber_duck_soles")
 
-[node name="ReadingMaterial" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="ReadingMaterial" parent="Entities" unique_id=539235442 instance=ExtResource("6_32oie")]
 position = Vector2(-262, -80)
 item = ExtResource("new_reading_material")
 
-[node name="PressureValve" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PressureValve" parent="Entities" unique_id=54403605 instance=ExtResource("6_32oie")]
 position = Vector2(-216, -80)
 item = ExtResource("new_pressure_valve")
 
-[node name="CloggedBarrel" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="CloggedBarrel" parent="Entities" unique_id=1844502512 instance=ExtResource("6_32oie")]
 position = Vector2(-170, -80)
 item = ExtResource("new_clogged_barrel")
 
-[node name="EmergencyDiet" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="EmergencyDiet" parent="Entities" unique_id=1972543603 instance=ExtResource("6_32oie")]
 position = Vector2(-124, -80)
 item = ExtResource("new_emergency_diet")
 
-[node name="Waterlogged" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="Waterlogged" parent="Entities" unique_id=700134207 instance=ExtResource("6_32oie")]
 position = Vector2(-78, -80)
 item = ExtResource("new_waterlogged")
 
-[node name="SoapBar" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SoapBar" parent="Entities" unique_id=1026668457 instance=ExtResource("6_32oie")]
 position = Vector2(-400, -30)
 item = ExtResource("new_soap_bar")
 
-[node name="SepticInfection" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SepticInfection" parent="Entities" unique_id=582209077 instance=ExtResource("6_32oie")]
 position = Vector2(-354, 110)
 item = ExtResource("new_septic_infection")
 
-[node name="SoapInYourEyes" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SoapInYourEyes" parent="Entities" unique_id=319557868 instance=ExtResource("6_32oie")]
 position = Vector2(-308, 110)
 item = ExtResource("new_soap_in_your_eyes")
 
-[node name="WetFloorSign" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="WetFloorSign" parent="Entities" unique_id=1149847313 instance=ExtResource("6_32oie")]
 position = Vector2(-262, 110)
 item = ExtResource("new_wet_floor_sign")
 
-[node name="StickyBriefs" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="StickyBriefs" parent="Entities" unique_id=1464508463 instance=ExtResource("6_32oie")]
 position = Vector2(-400, 110)
 item = ExtResource("new_slow_shot_item")
 
-[node name="SoapBubble" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SoapBubble" parent="Entities" unique_id=2142794960 instance=ExtResource("6_32oie")]
 position = Vector2(158, -10)
 item = ExtResource("new_soap_bubble")
 
-[node name="ToiletRoll" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="ToiletRoll" parent="Entities" unique_id=1941475083 instance=ExtResource("6_32oie")]
 position = Vector2(204, -10)
 item = ExtResource("new_toilet_roll")
 
-[node name="DrainFly" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="DrainFly" parent="Entities" unique_id=1923495129 instance=ExtResource("6_32oie")]
 position = Vector2(250, -10)
 item = ExtResource("new_drain_fly")
 
-[node name="CrossFlush" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="CrossFlush" parent="Entities" unique_id=1284686290 instance=ExtResource("6_32oie")]
 position = Vector2(250, -130)
 item = ExtResource("new_cross_flush")
 
-[node name="SplitSeam" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SplitSeam" parent="Entities" unique_id=1761733476 instance=ExtResource("6_32oie")]
 position = Vector2(296, -130)
 item = ExtResource("new_split_seam")
 
-[node name="UBend" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="UBend" parent="Entities" unique_id=1532891182 instance=ExtResource("6_32oie")]
 position = Vector2(342, -130)
 item = ExtResource("new_u_bend")
 
-[node name="EmergencyFlush" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SewerSkewer" parent="Entities" unique_id=1302090363 instance=ExtResource("6_32oie")]
+position = Vector2(388, -130)
+item = ExtResource("new_sewer_skewer")
+
+[node name="EmergencyFlush" parent="Entities" unique_id=74291369 instance=ExtResource("6_32oie")]
 position = Vector2(112, 110)
 item = ExtResource("new_emergency_flush")
 
-[node name="PlumbersToolbox" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PlumbersToolbox" parent="Entities" unique_id=592387032 instance=ExtResource("6_32oie")]
 position = Vector2(158, 110)
 item = ExtResource("new_plumbers_toolbox")
 
-[node name="GoldenPlunger" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="GoldenPlunger" parent="Entities" unique_id=1811751318 instance=ExtResource("6_32oie")]
 position = Vector2(-308, -30)
 item = ExtResource("new_golden_plunger")
 
-[node name="DrainOpener" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="DrainOpener" parent="Entities" unique_id=1224352090 instance=ExtResource("6_32oie")]
 position = Vector2(-262, -30)
 item = ExtResource("new_drain_opener")
 
-[node name="PorcelainSkin" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PorcelainSkin" parent="Entities" unique_id=784052588 instance=ExtResource("6_32oie")]
 position = Vector2(-216, -30)
 item = ExtResource("new_porcelain_skin")
 
-[node name="TinyTowel" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="TinyTowel" parent="Entities" unique_id=935838417 instance=ExtResource("6_32oie")]
 position = Vector2(-170, -30)
 item = ExtResource("new_tiny_towel")
 
-[node name="LeadUnderwear" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="LeadUnderwear" parent="Entities" unique_id=1244792341 instance=ExtResource("6_32oie")]
 position = Vector2(-124, -30)
 item = ExtResource("new_lead_underwear")
 
-[node name="HighFibreDiet" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="HighFibreDiet" parent="Entities" unique_id=761200133 instance=ExtResource("6_32oie")]
 position = Vector2(-78, -30)
 item = ExtResource("new_high_fibre_diet")
 
-[node name="ToiletWine" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="ToiletWine" parent="Entities" unique_id=1630431504 instance=ExtResource("6_32oie")]
 position = Vector2(-400, 20)
 item = ExtResource("new_toilet_wine")
 
-[node name="PublicBathroomShoes" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PublicBathroomShoes" parent="Entities" unique_id=607011538 instance=ExtResource("6_32oie")]
 position = Vector2(-354, 20)
 item = ExtResource("new_public_bathroom_shoes")
 
-[node name="BleachBriefs" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="BleachBriefs" parent="Entities" unique_id=1015493362 instance=ExtResource("6_32oie")]
 position = Vector2(-216, 110)
 item = ExtResource("new_bleach_briefs")
 
-[node name="StaticCling" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="StaticCling" parent="Entities" unique_id=114211705 instance=ExtResource("6_32oie")]
 position = Vector2(-170, 110)
 item = ExtResource("new_static_cling")
 
-[node name="SewerGas" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SewerGas" parent="Entities" unique_id=729729707 instance=ExtResource("6_32oie")]
 position = Vector2(-124, 110)
 item = ExtResource("new_sewer_gas")
 
-[node name="PinkEye" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PinkEye" parent="Entities" unique_id=1117995695 instance=ExtResource("6_32oie")]
 position = Vector2(-78, 110)
 item = ExtResource("new_pink_eye")
 
-[node name="RustyWater" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="RustyWater" parent="Entities" unique_id=1998585371 instance=ExtResource("6_32oie")]
 position = Vector2(-400, 160)
 item = ExtResource("new_rusty_water")
 
-[node name="SideLeakage" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SideLeakage" parent="Entities" unique_id=2014605972 instance=ExtResource("6_32oie")]
 position = Vector2(20, -80)
 item = ExtResource("new_side_leakage")
 
-[node name="CrookedBarrel" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="CrookedBarrel" parent="Entities" unique_id=1609451060 instance=ExtResource("6_32oie")]
 position = Vector2(66, -80)
 item = ExtResource("new_crooked_barrel")
 
-[node name="ToiletTornado" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="ToiletTornado" parent="Entities" unique_id=1418027612 instance=ExtResource("6_32oie")]
 position = Vector2(112, -80)
 item = ExtResource("new_toilet_tornado")
 
-[node name="Overflow" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="Overflow" parent="Entities" unique_id=868753723 instance=ExtResource("6_32oie")]
 position = Vector2(158, -80)
 item = ExtResource("new_overflow")
 
-[node name="UrinalCake" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="UrinalCake" parent="Entities" unique_id=406290642 instance=ExtResource("6_32oie")]
 position = Vector2(296, -10)
 item = ExtResource("new_urinal_cake")
 
-[node name="DrainCover" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="DrainCover" parent="Entities" unique_id=62486457 instance=ExtResource("6_32oie")]
 position = Vector2(342, -10)
 item = ExtResource("new_drain_cover")
 
-[node name="LostSock" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="LostSock" parent="Entities" unique_id=777134985 instance=ExtResource("6_32oie")]
 position = Vector2(20, 40)
 item = ExtResource("new_lost_sock")
 
-[node name="BabyPlumber" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="BabyPlumber" parent="Entities" unique_id=1306185449 instance=ExtResource("6_32oie")]
 position = Vector2(66, 40)
 item = ExtResource("new_baby_plumber")
 
-[node name="SewerRatFriend" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="SewerRatFriend" parent="Entities" unique_id=462348086 instance=ExtResource("6_32oie")]
 position = Vector2(112, 40)
 item = ExtResource("new_sewer_rat_friend")
 
-[node name="OverflowAlarm" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="OverflowAlarm" parent="Entities" unique_id=830234000 instance=ExtResource("6_32oie")]
 position = Vector2(204, 110)
 item = ExtResource("new_overflow_alarm")
 
-[node name="EmergencyWrench" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="EmergencyWrench" parent="Entities" unique_id=758961660 instance=ExtResource("6_32oie")]
 position = Vector2(250, 110)
 item = ExtResource("new_emergency_wrench")
 
-[node name="GoldenFlush" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="GoldenFlush" parent="Entities" unique_id=1565907740 instance=ExtResource("6_32oie")]
 position = Vector2(296, 110)
 item = ExtResource("new_golden_flush")
 
-[node name="PortableToilet" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="PortableToilet" parent="Entities" unique_id=784989748 instance=ExtResource("6_32oie")]
 position = Vector2(342, 110)
 item = ExtResource("new_portable_toilet")
 
-[node name="ChemicalCocktail" parent="Entities" instance=ExtResource("6_32oie")]
+[node name="ChemicalCocktail" parent="Entities" unique_id=706036289 instance=ExtResource("6_32oie")]
 position = Vector2(20, 160)
 item = ExtResource("new_chemical_cocktail")
 
-[node name="PipeTarget" parent="Entities" instance=ExtResource("pipe_scene")]
+[node name="PipeTarget" parent="Entities" unique_id=2109322751 instance=ExtResource("pipe_scene")]
 position = Vector2(560, 210)
 max_health = 10000.0
 spawn_grace_period = 0.0
 
-[node name="Labels" type="Node2D" parent="."]
+[node name="Labels" type="Node2D" parent="." unique_id=1490658566]
 z_index = 5
 
-[node name="Stats" type="Label" parent="Labels"]
+[node name="Stats" type="Label" parent="Labels" unique_id=1287786111]
 offset_left = -420.0
 offset_top = -160.0
 offset_right = -60.0
@@ -387,7 +387,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 10
 text = "STATS"
 
-[node name="Chanceonhitluck" type="Label" parent="Labels"]
+[node name="Chanceonhitluck" type="Label" parent="Labels" unique_id=551993898]
 offset_left = -420.0
 offset_top = 80.0
 offset_right = -60.0
@@ -398,8 +398,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 10
 text = "CHANCE ON HIT (LUCK)"
 
-[node name="Shotchanges" type="Label" parent="Labels"]
-offset_left = 0.0
+[node name="Shotchanges" type="Label" parent="Labels" unique_id=920702885]
 offset_top = -160.0
 offset_right = 360.0
 offset_bottom = -146.0
@@ -409,8 +408,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 10
 text = "SHOT CHANGES"
 
-[node name="Companions" type="Label" parent="Labels"]
-offset_left = 0.0
+[node name="Companions" type="Label" parent="Labels" unique_id=1921581515]
 offset_top = -40.0
 offset_right = 360.0
 offset_bottom = -26.0
@@ -420,8 +418,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 10
 text = "COMPANIONS"
 
-[node name="Activeitems" type="Label" parent="Labels"]
-offset_left = 0.0
+[node name="Activeitems" type="Label" parent="Labels" unique_id=217737895]
 offset_top = 80.0
 offset_right = 360.0
 offset_bottom = 94.0
@@ -431,7 +428,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 10
 text = "ACTIVE ITEMS"
 
-[node name="TestSubjects" type="Label" parent="Labels"]
+[node name="TestSubjects" type="Label" parent="Labels" unique_id=472970782]
 offset_left = 500.0
 offset_top = -160.0
 offset_right = 700.0
@@ -442,7 +439,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 10
 text = "TEST SUBJECTS"
 
-[node name="DummyInfo" type="Label" parent="Labels"]
+[node name="DummyInfo" type="Label" parent="Labels" unique_id=1985496027]
 offset_left = 500.0
 offset_top = -145.0
 offset_right = 700.0
@@ -453,7 +450,7 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 7
 text = "Dummy: takes hits, no shooting"
 
-[node name="PipeInfo" type="Label" parent="Labels"]
+[node name="PipeInfo" type="Label" parent="Labels" unique_id=226937096]
 offset_left = 500.0
 offset_top = 160.0
 offset_right = 700.0

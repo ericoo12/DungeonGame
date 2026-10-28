@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/SwarmChaseMovement.gd" id="s_swarm"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_swarm")
+swarm_group = &"hairclog"
+scurry_amount = 0.5
+scurry_frequency = 6.0
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 80.0
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 100.0
+
+[node name="HairClog" instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/hairball/hairball_idle_4frames.png"
+side_view_frames = 4
+attack_sheet_path = "res://assets/sprites/enemies/hairball/hairball_roll_4frames.png"
+shadow_scale_ratio = 4.7
+shadow_offset = Vector2(0, 1)
+max_health = 4.0
+move_speed = 42.0
+movement_behavior = SubResource("Resource_move")
+family = &"hairclog"
+visual_scale = 0.055
+display_name = "Hair Clog"
+log_description = "A fist-sized wad of hair the Great Clog spits out. Scurries after you in little gangs. One or two hits pull it apart."
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(0, -6)
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" index="0"]
+position = Vector2(0, -8)
+shape = SubResource("Circle_hit")
+
+[node name="AnimatedSprite2D" parent="." index="3"]
+offset = Vector2(0, -86)

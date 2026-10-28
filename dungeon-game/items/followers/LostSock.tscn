@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://items/followers/ShootingFollower.gd" id="1_script"]
+[ext_resource type="Script" path="res://items/followers/LostSockGuard.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/items/icons/lost_sock.png" id="2_tex"]
 
 [node name="LostSock" type="Node2D"]
@@ -8,14 +8,7 @@ script = ExtResource("1_script")
 trail_delay = 0.55
 bob_height = 2.0
 bob_speed = 5.0
-fire_chance = 0.5
-damage_ratio = 0.6
-size_ratio = 0.8
-knockback = 40.0
-copy_procs = true
-fire_backwards = true
-shot_tint = Color(0.85, 0.85, 1, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.35, 0.35)
+scale = Vector2(0.22, 0.22)
 texture = ExtResource("2_tex")

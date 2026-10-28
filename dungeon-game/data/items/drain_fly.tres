@@ -10,5 +10,6 @@ rarity = 1
 follower_trail_delay = 0.25
 follower_scene = ExtResource("3_ext")
 item_name = "Drain Fly"
-description = "It followed you home. A fly that shoots a weak shot whenever you do."
+description = "Pesters a nearby enemy now and then, confusing it."
+flavor_text = "It followed you home."
 icon = ExtResource("2_icon")

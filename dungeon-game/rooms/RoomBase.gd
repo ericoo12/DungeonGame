@@ -52,17 +52,7 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	grid = RoomGrid.new(self, grid_rect)
 	_add_wall_blockers_to_grid()
 
-	for dir in doors.keys():
-		var door: Door = doors[dir]
-		door.direction = dir
-		var has_connection: bool = room_data.doors[dir]
-		door.visible = has_connection
-		if has_connection:
-			door.set_unlocked(room_data.cleared or room_data.type == RoomData.Type.ITEM \
-				or room_data.type == RoomData.Type.SHOP)
-			door.set_style(_door_style(room_data.type, dungeon.get_neighbor_type(dir)))
-		else:
-			door.set_unlocked(false)
+	_setup_doors(room_data, dungeon)
 
 	if room_data.type == RoomData.Type.BOSS and room_data.stage_door_activated and stage_door:
 		stage_door.activate()
@@ -73,19 +63,22 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 	_respawn_pending_drops()
 	_respawn_floor_items()
 	# After obstacles (needs their cells), before enemies (they must not spawn on it).
+	# Item rooms: taking the item is optional - the way back out is open from the start.
+	if room_data.type == RoomData.Type.ITEM:
+		room_data.cleared = true
 	_spawn_toilet(room_data, dungeon)
 
 	# Shops count as cleared (no fight), so stock them before the cleared-check.
 	if room_data.type == RoomData.Type.SHOP:
 		_spawn_shop(room_data, dungeon)
+	elif room_data.type == RoomData.Type.ITEM and not room_data.item_taken:
+		_spawn_pickup(room_data, dungeon)
 
 	if room_data.cleared or room_data.type == RoomData.Type.START:
 		return
 
 	if room_data.type == RoomData.Type.BOSS:
 		_spawn_boss(dungeon, entities_container)
-	elif room_data.type == RoomData.Type.ITEM:
-		_spawn_pickup(room_data, dungeon)
 	elif room_data.type == RoomData.Type.SHOP:
 		pass  # stocked above; no enemies here
 	else:
@@ -93,12 +86,38 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 		
 
 
+## Shows/locks/styles every door. `doors` is direction -> Door here; ShapedRoom (big
+## rooms) keys it per edge instead and overrides this.
+func _setup_doors(room_data: RoomData, dungeon: Dungeon) -> void:
+	for dir in doors.keys():
+		var door: Door = doors[dir]
+		door.direction = dir
+		door.cell = room_data.grid_pos
+		var has_connection: bool = room_data.doors.get(dir, false)
+		_setup_door(door, has_connection, room_data, dungeon)
+
+
+func _setup_door(door: Door, has_connection: bool, room_data: RoomData, dungeon: Dungeon) -> void:
+	door.visible = has_connection
+	if has_connection:
+		door.set_unlocked(room_data.cleared or room_data.type == RoomData.Type.ITEM \
+			or room_data.type == RoomData.Type.SHOP)
+		door.set_style(_door_style(room_data.type, dungeon.get_neighbor_type_at(door.cell, door.direction)))
+	else:
+		door.set_unlocked(false)
+
+
+## How many enemies this room gets compared to a normal one (big rooms get more).
+func _enemy_count_scale() -> float:
+	return 1.0
+
+
 func _spawn_enemies(distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
 	# Where: procedural cells from the grid (runs after _spawn_obstacles, so the grid
 	# already contains this room's obstacles), or the old hand-placed markers.
 	var positions: Array[Vector2] = []
 	if dungeon.use_procedural_enemy_spawns and grid != null:
-		var count := dungeon.get_enemy_count_for_stage(GameState.current_stage)
+		var count := roundi(dungeon.get_enemy_count_for_stage(GameState.current_stage) * _enemy_count_scale())
 		var cells := EnemySpawnPlanner.pick_cells(grid, _entry_cells(dungeon), count,
 			dungeon.enemy_min_entry_distance, dungeon.enemy_spawn_samples)
 		for cell in cells:
@@ -348,10 +367,7 @@ func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
 	_entities_container.add_child(pickup)
 	pickup.global_position = spawn_pos
 	pickup.setup(chosen_item)
-	pickup.item_taken.connect(func():
-		room_data.cleared = true
-		room_cleared.emit()
-	)
+	pickup.item_taken.connect(func(): room_data.item_taken = true)
 	
 
 # --- Shop ----------------------------------------------------------------------
@@ -496,6 +512,7 @@ func _door_style(own_type: int, neighbor_type: int) -> Door.Style:
 		if t == RoomData.Type.BOSS: return Door.Style.BOSS
 		if t == RoomData.Type.ITEM: return Door.Style.ITEM
 		if t == RoomData.Type.SHOP: return Door.Style.SHOP
+		if t == RoomData.Type.CHALLENGE: return Door.Style.CHALLENGE
 	return Door.Style.NORMAL
 
 
@@ -590,10 +607,15 @@ func _add_wall_blockers_to_grid() -> void:
 ## Grid cell where the player appears for each connected door of this room.
 func _entry_cells(dungeon: Dungeon) -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
-	for dir in DungeonGenerator.DIRECTIONS:
-		if _current_room_data.doors.get(dir, false):
-			cells.append(grid.global_to_cell(global_position + dungeon.get_entry_offset(dir)))
+	for e in _current_room_data.door_edges():
+		cells.append(grid.global_to_cell(get_door_entry_point(e[0], e[1], dungeon)))
 	return cells
+
+
+## Where the player appears (global) when coming in through the door on map square
+## `cell`, side `dir`. One-square rooms: just inside that side's door.
+func get_door_entry_point(_cell: Vector2i, dir: Vector2i, dungeon: Dungeon) -> Vector2:
+	return global_position + dungeon.get_entry_offset(dir)
 
 
 func _add_clearance(cells: Dictionary, center: Vector2i, radius: int) -> void:
@@ -626,7 +648,8 @@ func _roll_room_clear_reward() -> void:
 
 ## Spawns a drop into the Entities container. If the scene has a `collected` signal it's
 ## remembered on RoomData until picked up, so it's still there when you come back.
-## `existing_entry` is passed when respawning a remembered drop.
+## `existing_entry` is passed when respawning a remembered drop (no pop-out then).
+## Physics pickups pop out in an arc and the saved spot follows them when they're moved.
 func _spawn_drop(scene: PackedScene, global_pos: Vector2, existing_entry: Dictionary = {}) -> void:
 	if scene == null or _entities_container == null:
 		return
@@ -635,6 +658,10 @@ func _spawn_drop(scene: PackedScene, global_pos: Vector2, existing_entry: Dictio
 		(drop as Node2D).position = _entities_container.to_local(global_pos)
 	# Deferred: this runs from physics callbacks (obstacle hit) and tree_exiting (enemy died).
 	_entities_container.add_child.call_deferred(drop)
+	if drop is PhysicsPickup:
+		(drop as PhysicsPickup).floor_bounds = get_floor_rect()
+		if existing_entry.is_empty():
+			(drop as PhysicsPickup).pop.call_deferred()
 
 	if not drop.has_signal("collected"):
 		return
@@ -644,6 +671,41 @@ func _spawn_drop(scene: PackedScene, global_pos: Vector2, existing_entry: Dictio
 		_current_room_data.pending_drops.append(entry)
 	var room_data := _current_room_data
 	drop.connect("collected", func(): room_data.pending_drops.erase(entry))
+	if drop is PhysicsPickup:
+		var pickup := drop as PhysicsPickup
+		pickup.settled.connect(func():
+			if is_instance_valid(self) and is_inside_tree():
+				entry.position = to_local(pickup.global_position))
+
+
+## The open floor between the walls (global), from the WallBlockers shapes: the inner
+## edges of the wide walls above/below and the tall walls left/right. Doorways are gaps
+## in those walls, so they're outside this rect - pickups (PhysicsPickup.floor_bounds)
+## can't be pushed into a doorway. Empty if the room has no such walls.
+func get_floor_rect() -> Rect2:
+	var blockers := get_node_or_null("WallBlockers")
+	if blockers == null:
+		return Rect2()
+	var top := -INF
+	var bottom := INF
+	var left := -INF
+	var right := INF
+	for child in blockers.get_children():
+		var cs := child as CollisionShape2D
+		if cs == null or not (cs.shape is RectangleShape2D):
+			continue
+		var size: Vector2 = (cs.shape as RectangleShape2D).size * cs.global_scale.abs()
+		var r := Rect2(cs.global_position - size / 2.0, size)
+		var local := r.get_center() - global_position
+		if size.x >= size.y:
+			if local.y < 0.0: top = maxf(top, r.end.y)
+			else: bottom = minf(bottom, r.position.y)
+		else:
+			if local.x < 0.0: left = maxf(left, r.end.x)
+			else: right = minf(right, r.position.x)
+	if is_inf(top) or is_inf(bottom) or is_inf(left) or is_inf(right) or right <= left or bottom <= top:
+		return Rect2()
+	return Rect2(left, top, right - left, bottom - top)
 
 
 ## Remembers a pedestal (a swapped-out active item) so it's back on revisits.

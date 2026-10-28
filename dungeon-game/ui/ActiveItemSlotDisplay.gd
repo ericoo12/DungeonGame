@@ -33,9 +33,9 @@ func _find_player() -> void:
 
 
 func _on_active_item_changed(item: ActiveItem) -> void:
-	icon.texture = item.icon
-	icon.visible = true
-	cooldown_overlay.visible = true
+	icon.texture = item.icon if item else null
+	icon.visible = item != null
+	cooldown_overlay.visible = item != null
 
 
 func _on_charges_changed(new_charges: int, new_max: int) -> void:

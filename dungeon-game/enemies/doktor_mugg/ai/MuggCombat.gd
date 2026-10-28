@@ -29,8 +29,6 @@ func start_projectile_attack(kind: String = "basic_shot") -> DecisionNode.Status
 	# Gameplay timing is independent of the temporary animation's length.
 	if actor.begin_action(kind, "", duration) < 0:
 		return DecisionNode.Status.FAILURE
-	actor.sprite.play("attack_" + actor.facing_direction)
-	actor.sprite.pause()
 	actor.state_machine.transition(MuggStateMachine.State.WINDUP, true)
 	actor._shot_pending = true
 	var cooldown = actor._varied_cooldown(profile.cooldown * actor.effective_attack_cooldown_scale())
@@ -95,7 +93,6 @@ func advance_action(_delta: float) -> void:
 	if actor.action_elapsed >= actor._active_windup and actor._shot_pending:
 		actor._shot_pending = false
 		actor.state_machine.transition(MuggStateMachine.State.FIRE, true)
-		actor.sprite.play("attack_" + actor.facing_direction)
 		# Commit to the original direction, never re-aim at a hidden/moving player.
 		if actor.has_clear_shot(actor.global_position, actor.global_position + actor._locked_aim * actor.global_position.distance_to(actor._locked_target)):
 			actor._fire_selected_shot()
@@ -235,7 +232,6 @@ func start_dodge(allow_retreat: bool = false) -> DecisionNode.Status:
 	actor._dodge_moved_time = 0.0
 	actor._dodge_timer = maxf(actor._varied_cooldown(actor.dodge_cooldown * actor.effective_defense_cooldown_scale()), actor.dodge_duration + actor.dodge_recovery)
 	actor._update_facing_direction(chosen)
-	actor._play_run_animation()
 	actor.state_machine.transition(MuggStateMachine.State.DODGE, true)
 	actor.blackboard.last_decision = "Dodge"
 	return DecisionNode.Status.RUNNING
@@ -255,7 +251,6 @@ func _update_dodge(delta: float) -> void:
 			actor._dodge_moved_time = actor.dodge_duration
 	if actor.action_elapsed >= actor.dodge_duration or actor._dodge_moved_time >= actor.dodge_duration:
 		actor.state_machine.transition(MuggStateMachine.State.DODGE_RECOVERY, true)
-		actor.sprite.stop()
 
 func start_area_attack() -> DecisionNode.Status:
 	if not actor.area_enabled or actor.is_dying or actor.action_state != "" or actor._area_timer > 0 or actor._area_choice_timer > 0 or not actor.blackboard.has_last_seen:

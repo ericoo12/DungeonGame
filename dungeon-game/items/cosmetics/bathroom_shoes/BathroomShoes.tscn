@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dod1lfrxktwrc"]
+
+[ext_resource type="Script" uid="uid://b3bjvpfwfck26" path="res://items/cosmetics/LegOverlayCosmetic.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cc6dw63bfkido" path="res://assets/sprites/player/cosmetics/bathroom_shoes/bathroom_shoes_front.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://c848wl7w86ank" path="res://assets/sprites/player/cosmetics/bathroom_shoes/bathroom_shoes_left.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://c67gv876u2t2j" path="res://assets/sprites/player/cosmetics/bathroom_shoes/bathroom_shoes_up.png" id="4"]
+
+[node name="BathroomShoes" type="Node2D" unique_id=1600300129]
+z_index = 1
+script = ExtResource("1")
+sheet_front = ExtResource("2")
+sheet_left = ExtResource("3")
+sheet_up = ExtResource("4")
+offset_down = Vector2(0, -5)
+offset_left = Vector2(0, -20)
+scale_down = 0.8
+scale_left = 0.8
+scale_up = 0.8

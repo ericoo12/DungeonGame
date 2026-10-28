@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/SwarmChaseMovement.gd" id="s_SwarmChaseMovement"]
+[ext_resource type="Script" path="res://enemies/behaviors/LungeAttack.gd" id="s_LungeAttack"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_SwarmChaseMovement")
+swarm_group = &"maggot"
+scurry_amount = 0.15
+
+[sub_resource type="Resource" id="Resource_attack"]
+script = ExtResource("s_LungeAttack")
+lunge_range = 110.0
+vision_half_angle_deg = 180.0
+cooldown = 3.5
+windup = 0.45
+lunge_speed = 200.0
+lunge_duration = 0.5
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 52.6
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 78.9
+
+[node name="MaggotRoll" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/maggot_roll/maggot_roll_left.png"
+side_view_frames = 4
+two_row_sheet = true
+shadow_scale_ratio = 5.27
+shadow_offset = Vector2(0, 3.7)
+max_health = 10.0
+move_speed = 14.0
+movement_behavior = SubResource("Resource_move")
+attack_behavior = SubResource("Resource_attack")
+pack_size = Vector2i(1, 2)
+family = &"maggot"
+visual_scale = 0.076
+display_name = "Maggot Roll"
+log_description = "Crawls slowly... then suddenly dashes. Watch it tense up and step aside."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 0.2)
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")
+
+[node name="AnimatedSprite2D" parent="." index="3" unique_id=622601666]
+offset = Vector2(0, -30)

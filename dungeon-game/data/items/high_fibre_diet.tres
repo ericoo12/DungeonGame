@@ -9,5 +9,6 @@ damage_bonus = -1
 fire_rate_bonus = 0.08
 range_bonus = 0.3
 item_name = "High-Fibre Diet"
-description = "Keeps things moving. Fire rate and range up, damage down."
+description = "Fire rate and range up, damage down."
+flavor_text = "Keeps things moving."
 icon = ExtResource("2_icon")

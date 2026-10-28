@@ -9,5 +9,6 @@ script = ExtResource("1_script")
 rarity = 1
 orbital_scene = ExtResource("3_ext")
 item_name = "Urinal Cake"
-description = "Freshens and protects. Slowly orbits you, blocks shots and poisons enemies it touches."
+description = "Slowly orbits you, blocks shots and poisons enemies it touches."
+flavor_text = "Freshens and protects."
 icon = ExtResource("2_icon")

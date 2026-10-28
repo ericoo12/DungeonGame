@@ -1,4 +1,5 @@
-## Split Seam: when a shot hits an enemy it splits into two smaller diagonal shots.
+## Split Seam: when a shot hits an enemy it splits into two smaller diagonal shots. A shot
+## that hits nothing splits at the very end of its flight instead (just before it lands).
 ## Always on (base_chance 1.0). The split shots keep the other procs (poison etc.) but
 ## can't split again, and ignore the enemy they split from. Works with any projectile
 ## (normal, charged, boomerang); lasers have no projectile so they don't split.
@@ -22,6 +23,14 @@ func get_chance() -> float:
 
 
 func on_projectile_hit(projectile: Node, target: Node) -> void:
+	_split(projectile, target)
+
+
+func on_projectile_expire(projectile: Node) -> void:
+	_split(projectile, null)
+
+
+func _split(projectile: Node, target: Node) -> void:
 	var p := projectile as Projectile
 	if p == null or p.has_meta("split_done"):
 		return
@@ -47,11 +56,14 @@ func on_projectile_hit(projectile: Node, target: Node) -> void:
 		child.procs = child_procs
 		child.ignored_target = target
 		child.modulate = p.modulate
-		child.position = p.position  # same parent, so local == local
+		# Same parent, so local == local. Start back at gun height (the parent may have
+		# dropped towards the floor already) so the halves get a full flight.
+		child.position = p.position - Vector2(0, p.get_fallen())
+		child.fall_depth = p.fall_depth
 		# Deferred: we're inside a physics callback. Calls run in order: add, then launch.
 		parent.add_child.call_deferred(child)
 		child.launch.call_deferred(dir.rotated(deg_to_rad(split_angle_deg) * side), Vector2.ZERO)
 
 
 func get_stat_text() -> String:
-	return "Shots split in two when they hit"
+	return "Shots split in two when they hit or land"

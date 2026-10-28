@@ -1,0 +1,8 @@
+great_clog_death.png 1024x512
+great_clog_freestanding_reference.png 1536x512
+great_clog_phase1.png 1024x512
+great_clog_phase1_special.png 1024x512
+great_clog_phase2.png 1024x512
+great_clog_phase3.png 1024x512
+great_clog_remains.png 256x256
+great_clog_transition.png 1024x512

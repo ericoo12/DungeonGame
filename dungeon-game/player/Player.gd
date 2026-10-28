@@ -7,6 +7,11 @@ signal shot_fired(direction: Vector2)
 # --- Movement ---
 @export var move_speed: float = 100.0
 var knockback_velocity: Vector2 = Vector2.ZERO
+## Pushes from the environment (water currents, suction...), added on top of walking.
+## Sources call add_external_push() every physics frame; it's used up each frame.
+var external_velocity: Vector2 = Vector2.ZERO
+## Lowest walking-speed multiplier asked for this frame (hair piles...), see slow_this_frame().
+var _frame_slow: float = 1.0
 @export var knockback_recovery_speed: float = 800.0
 @export var knockback_immune: bool = false
 @onready var camera: Camera2D = $Camera2D
@@ -16,6 +21,12 @@ var knockback_velocity: Vector2 = Vector2.ZERO
 var current_hearts: float
 var invulnerable: bool = false
 const INVULN_DURATION := 1.0
+## After a hit you can walk through enemies for this long (a bit longer than the
+## invulnerability, so you have time to get out of a crowd), and enemy collision only
+## comes back once no enemy is within GHOST_CLEARANCE px - not in a gap mid-swarm.
+const GHOST_DURATION := 1.6
+const GHOST_CLEARANCE := 8.0
+var _ghost_until_ms: int = 0
 var is_dying: bool = false
 
 # --- Player size (scales sprite + collisions together) ---
@@ -87,6 +98,8 @@ var damage_multiplier: float = 1.0
 
 # --- Weapon composition ---
 var shot_style: ShotStyleModifier = null
+## Sewer Skewer: shots go through enemies (Projectile.pierce).
+var piercing_shots: bool = false
 var shot_pattern_modifiers: Array[ShotPatternModifier] = []
 
 #--- Luck ---
@@ -165,6 +178,9 @@ const ARM_MUZZLES := {
 	"res://assets/sprites/player/arm_mirror_shot/arm_down.png": {"front": Vector2(12, 516), "back": Vector2(14, 168)},
 	"res://assets/sprites/player/arm_mirror_shot/arm_left.png": {"front": Vector2(-407, -54), "back": Vector2(54, -54)},
 	"res://assets/sprites/player/arm_mirror_shot/arm_up.png":   {"front": Vector2(5, -536), "back": Vector2(6, -132)},
+	"res://assets/sprites/player/arm_crooked_barrel/arm_down.png": {"front": Vector2(63, 326)},
+	"res://assets/sprites/player/arm_crooked_barrel/arm_left.png": {"front": Vector2(-420, -61)},
+	"res://assets/sprites/player/arm_crooked_barrel/arm_up.png":   {"front": Vector2(6, -351)},
 }
 const MUZZLE_WALL_MASK := 1  # walls + obstacles: shots never spawn behind them
 
@@ -251,9 +267,16 @@ var offarm_kick: Vector2 = Vector2.ZERO  # Mirror Shot: off-hand recoil, tweened
 var _arm_tween: Tween
 
 # --- Cosmetics ---
-const COSMETIC_SLOTS := ["Head", "Face", "Neck", "Body", "Back", "LeftHand", "RightHand", "Feet", "Aura", "Trail"]
-var body_overlays: Array[Node2D] = []   # Body-slot cosmetics, drawn over the torso
-var head_overlays: Array[Node2D] = []   # Head-slot cosmetics, drawn over the head
+const COSMETIC_SLOTS := ["Head", "Face", "Neck", "Body", "Underwear", "Back", "LeftHand", "RightHand", "Feet", "Aura", "Trail"]
+## Slots that hold one visible cosmetic: picking up another hides the older one (newest
+## wins). The item's stats still apply. Back and Aura stack instead.
+const EXCLUSIVE_COSMETIC_SLOTS := ["Head", "Body", "Underwear", "Feet"]
+# Body rig draw order: [back (not facing up)] [arms behind] torso, underwear, body,
+# head, head overlays [arms in front] [back (facing up)]. See _update_body().
+var body_overlays: Array[Node2D] = []       # Body-slot cosmetics (chest), over the torso
+var underwear_overlays: Array[Node2D] = []  # Underwear-slot torso pieces, under Body cosmetics
+var head_overlays: Array[Node2D] = []       # Head-slot cosmetics, drawn over the head
+var back_overlays: Array[Node2D] = []       # Back-slot cosmetics (BackCosmetic.gd)
 ## Items that drop pickups when you get hurt: [{ "scene": PackedScene, "count": Vector2i }].
 var hurt_drops: Array[Dictionary] = []
 # Placeholder positions — tune each by eye per direction, same process as every
@@ -302,6 +325,7 @@ func _ready() -> void:
 		add_child(anchor)
 		cosmetic_anchors[slot] = anchor
 		equipped_cosmetics[slot] = []
+	move_child(cosmetic_anchors["Aura"], 0)  # auras with behind_player draw under the whole body
 
 func _physics_process(delta: float) -> void:
 	var move_vec := Vector2(
@@ -316,7 +340,10 @@ func _physics_process(delta: float) -> void:
 		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, knockback_recovery_speed * delta)
 	else:
 		knockback_velocity = Vector2.ZERO
-		velocity = move_vec * move_speed
+		velocity = move_vec * move_speed * _frame_slow
+	velocity += external_velocity
+	external_velocity = Vector2.ZERO
+	_frame_slow = 1.0
 
 	orbital_rotation += deg_to_rad(orbital_rotation_speed_deg) * delta
 	move_and_slide()
@@ -521,21 +548,31 @@ func _update_body(anim_dir: String, flip: bool) -> void:
 	offarm_sprite.visible = _pose(anim_dir, "offarm_visible")
 	# --- Draw order ---
 	var order: Array[Node] = []
+	var back_in_front := anim_dir == "up"  # facing away: the back is towards the camera
+	if not back_in_front:
+		_append_valid(order, back_overlays)
 	if _pose(anim_dir, "arm_behind"): order.append(arm_sprite)
 	if _pose(anim_dir, "offarm_behind"): order.append(offarm_sprite)
 	order.append(torso_sprite)
-	for overlay in body_overlays:
-		if is_instance_valid(overlay):
-			order.append(overlay)
+	_append_valid(order, underwear_overlays)
+	_append_valid(order, body_overlays)
 	order.append(head_sprite)
 	for overlay in head_overlays:
 		if is_instance_valid(overlay):
 			order.append(overlay)
 	if not _pose(anim_dir, "offarm_behind"): order.append(offarm_sprite)
 	if not _pose(anim_dir, "arm_behind"): order.append(arm_sprite)
+	if back_in_front:
+		_append_valid(order, back_overlays)
 	for i in order.size():
 		if order[i].get_index() != i:
 			body_root.move_child(order[i], i)
+
+
+func _append_valid(order: Array[Node], nodes: Array[Node2D]) -> void:
+	for n in nodes:
+		if is_instance_valid(n):
+			order.append(n)
 
 
 ## Swaps arm / off-hand art per direction ("down"/"left"/"up"); null entries keep the
@@ -603,7 +640,6 @@ func _shoot(aim_dir: Vector2, is_moving: bool) -> void:
 	shoot_timer = SHOOT_POSE_DURATION
 	fire_single_shot(aim_dir)
 	shot_fired.emit(aim_dir)
-	Audio.play_shoot()  # once per trigger pull, not per bullet (multi-shot items)
 	if arm_sprite:
 		_play_arm_kick(aim_dir)
 
@@ -611,6 +647,8 @@ func _shoot(aim_dir: Vector2, is_moving: bool) -> void:
 func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
 	# Extra-shot items ADD up (Double +1, Quad +3 -> 5 shots), fanned evenly using the
 	# widest spread among them. Custom pattern modifiers run on the result afterwards.
+	# "Single extra" items (Cross Flush, Side Leakage, Toilet Tornado) add their shots
+	# off the aim ONCE, however many main shots there are (Quad + Cross = 4 + 2).
 	var extra := 0
 	var spread := 0.0
 	var custom: Array[ShotPatternModifier] = []
@@ -621,8 +659,13 @@ func fire_single_shot(base_dir: Vector2, apply_momentum: bool = true) -> void:
 		else:
 			custom.append(modifier)
 	var dirs := ShotPatternModifier.fan(base_dir, 1 + extra, spread)
+	var single_extras: Array[Vector2] = []
 	for modifier in custom:
-		dirs = modifier.modify_directions(dirs)
+		if modifier.adds_single_extras():
+			single_extras.append_array(modifier.extra_directions(base_dir))
+		else:
+			dirs = modifier.modify_directions(dirs)
+	dirs.append_array(single_extras)
 	for d in dirs:
 		if shot_style:
 			shot_style.fire(self, d, apply_momentum)
@@ -648,6 +691,7 @@ func _fire_projectile(aim_dir: Vector2, apply_momentum: bool = true, scene_overr
 	projectile.speed_multiplier = shot_speed * charge_speed_mult
 	projectile.scale = Vector2.ONE * projectile_size * charge_size_mult
 	projectile.shooter = self
+	projectile.pierce = piercing_shots
 	projectile.procs = roll_shot_procs()
 	for proc in projectile.procs:
 		proc.decorate_projectile(projectile)
@@ -676,6 +720,16 @@ func roll_shot_procs() -> Array[ShotProcEffect]:
 func heal(amount: float) -> void:
 	current_hearts = minf(current_hearts + amount, float(max_hearts))
 	EventBus.player_health_changed.emit(current_hearts, max_hearts)
+
+
+## Environment push for this frame (px/s), e.g. a water current. Call every frame it applies.
+func add_external_push(push: Vector2) -> void:
+	external_velocity += push
+
+
+## Walk slower this frame (0.5 = half speed). The strongest slow this frame wins.
+func slow_this_frame(mult: float) -> void:
+	_frame_slow = minf(_frame_slow, mult)
 
 
 func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback_strength: float = 0.0) -> void:
@@ -715,6 +769,8 @@ func _spawn_hurt_drops() -> void:
 				var drop := (entry.scene as PackedScene).instantiate()
 				get_parent().add_child.call_deferred(drop)
 				drop.set_deferred("global_position", pos)
+				if drop is PhysicsPickup:
+					(drop as PhysicsPickup).pop.call_deferred()
 				continue
 			if room.grid and not room.grid.is_walkable(room.grid.global_to_cell(pos)):
 				pos = room._free_cell_near(pos)
@@ -731,6 +787,7 @@ func _start_invulnerability() -> void:
 	tween.parallel().tween_property(body_root, "modulate:a", 0.3, 0.1)
 	tween.tween_property(lower_sprite, "modulate:a", 1.0, 0.1)
 	tween.parallel().tween_property(body_root, "modulate:a", 1.0, 0.1)
+	_ghost_until_ms = Time.get_ticks_msec() + int(GHOST_DURATION * 1000.0)
 	await get_tree().create_timer(INVULN_DURATION).timeout
 	invulnerable = false
 	lower_sprite.modulate.a = 1.0
@@ -742,7 +799,7 @@ func _start_invulnerability() -> void:
 ## enemy (switching it on mid-overlap would trap or jitter the player). While still
 ## overlapping you can keep walking out; contact damage applies as normal again.
 func _restore_enemy_collision() -> void:
-	while _overlaps_enemy_body():
+	while Time.get_ticks_msec() < _ghost_until_ms or _overlaps_enemy_body():
 		await get_tree().physics_frame
 		if invulnerable or is_dying:
 			return  # hit again: that invulnerability window restores it when it ends
@@ -754,6 +811,7 @@ func _overlaps_enemy_body() -> bool:
 	query.shape = body_collision.shape
 	query.transform = body_collision.global_transform
 	query.collision_mask = 1 << (ENEMY_COLLISION_LAYER - 1)
+	query.margin = GHOST_CLEARANCE
 	query.exclude = [get_rid()]
 	return not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
 
@@ -776,6 +834,7 @@ func add_item(item: Item) -> void:
 	items.append(item)
 	item.apply(self)
 	EventBus.item_added.emit(item)
+	EventBus.item_picked_up.emit(item, Discovery.mark_item(item))
 
 
 ## Equips `item`. `charges` < 0 = fully charged (new items); a swapped-back item keeps
@@ -791,7 +850,18 @@ func add_active_item(item: ActiveItem, charges: int = -1) -> ActiveItem:
 	active_item_cooldown_timer = 0.0
 	EventBus.active_item_changed.emit(item)
 	_set_active_item_charges(item.max_charges if charges < 0 else charges)
+	if item != previous:
+		EventBus.item_picked_up.emit(item, Discovery.mark_item(item))
 	return previous
+
+
+## Takes the active item away for good (Challenge Room sacrifice).
+func remove_active_item() -> void:
+	active_item = null
+	active_item_cooldown_timer = 0.0
+	active_item_charges = 0
+	EventBus.active_item_changed.emit(null)
+	EventBus.active_item_charges_changed.emit(0, 0)
 
 
 func add_ducks(amount: int) -> void:
@@ -881,6 +951,22 @@ func get_muzzle_position(shot_dir: Vector2 = Vector2.ZERO) -> Vector2:
 	if not hit.is_empty():
 		muzzle = hit.position + (global_position - muzzle).normalized() * 2.0
 	return muzzle
+
+
+## The gun's muzzle in arm_sprite's own space (shoulder = origin) for the current pose,
+## for cosmetics riding on the arm (ArmSparksCosmetic). Same data as get_muzzle_position.
+func get_arm_muzzle_local() -> Vector2:
+	var flip := facing == Facing.RIGHT
+	var tex_dir := "left" if flip else _facing_suffix()
+	var tex: Texture2D = arm_sprite.texture if arm_sprite else null
+	var path: String = tex.resource_path if tex else ""
+	var entry: Dictionary = ARM_MUZZLES.get(path, ARM_MUZZLES[DEFAULT_ARM_TEXTURE % tex_dir])
+	var tip: Vector2 = entry.front
+	var pivot: Vector2 = ARM_PIVOT[tex_dir]
+	if flip:
+		tip.x = -tip.x
+		pivot.x = -pivot.x
+	return tip + pivot
 
 
 func get_hurtbox_center() -> Vector2:
@@ -1004,32 +1090,47 @@ func _update_cosmetic_anchors(anim_dir: String, flip: bool) -> void:
 		anchor.position = offset * player_scale
 		anchor.scale = Vector2.ONE * player_scale * (-1.0 if (flip and slot in ["Head", "Face"]) else 1.0)
 
+## Equips an item's cosmetic (Item.cosmetic_scene / cosmetic_slot).
+##   Head, Body, Back: live inside the body rig so they're drawn in the right order
+##     between torso, head and arms (see _update_body()).
+##   Underwear: the leg piece sits on its anchor; the scene can add a torso piece with
+##     add_underwear_layer().
+##   Exclusive slots (EXCLUSIVE_COSMETIC_SLOTS) show only the newest cosmetic.
 func add_cosmetic(scene: PackedScene, slot: String) -> void:
 	if not cosmetic_anchors.has(slot):
 		push_warning("Player: unknown cosmetic slot '%s'" % slot)
 		return
-	if slot == "Body" and body_root:
-		var overlay := scene.instantiate()
-		body_root.add_child(overlay)
-		body_overlays.append(overlay)
-		equipped_cosmetics[slot].append(overlay)
-		return
-	# Head: also inside the body rig (like Body), drawn right after the head sprite and
-	# copying its transform (HeadCosmetic.gd), so hats sit on the head in every direction.
-	if slot == "Head" and body_root:
-		var hat := scene.instantiate()
-		body_root.add_child(hat)
-		head_overlays.append(hat)
-		equipped_cosmetics[slot].append(hat)
-		return
+	if slot in EXCLUSIVE_COSMETIC_SLOTS:
+		for old in equipped_cosmetics[slot]:
+			if is_instance_valid(old):
+				old.visible = false
 
 	var instance := scene.instantiate()
-	cosmetic_anchors[slot].add_child(instance)
-
-	var count: int = equipped_cosmetics[slot].size()
-	instance.position += Vector2(count * 4, count * -3)  # slight stagger so stacked cosmetics stay visible
-
+	match slot:
+		"Body":
+			body_root.add_child(instance)
+			body_overlays.append(instance)
+		"Head":
+			# Copies the head's transform (HeadCosmetic.gd), so hats sit on the head in every direction.
+			body_root.add_child(instance)
+			head_overlays.append(instance)
+		"Back":
+			body_root.add_child(instance)
+			back_overlays.append(instance)
+		_:
+			cosmetic_anchors[slot].add_child(instance)
+			if slot not in EXCLUSIVE_COSMETIC_SLOTS and slot != "Aura":
+				var count: int = equipped_cosmetics[slot].size()
+				instance.position += Vector2(count * 4, count * -3)  # slight stagger so stacked cosmetics stay visible
 	equipped_cosmetics[slot].append(instance)
+
+
+## Torso piece of an Underwear cosmetic (e.g. Lead Underwear's waistband): drawn right
+## over the torso, under Body cosmetics. Copy the torso transform yourself (it's a child
+## of the body rig).
+func add_underwear_layer(node: Node2D) -> void:
+	body_root.add_child(node)
+	underwear_overlays.append(node)
 
 
 func _full_charge_time() -> float:

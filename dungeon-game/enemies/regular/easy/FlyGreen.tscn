@@ -21,6 +21,8 @@ pack_size = Vector2i(2, 3)
 family = &"fly"
 spawn_weight = 2.0
 visual_scale = 0.55
+display_name = "Green Fly"
+log_description = "The slow one of the swarm. Tougher than it looks and usually escorting something worse."
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
 shape = SubResource("CircleShape2D_flybody")

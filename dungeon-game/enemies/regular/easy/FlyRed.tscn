@@ -26,6 +26,8 @@ pack_size = Vector2i(2, 3)
 pack_mixes_family = false
 death_scene = ExtResource("3_explosion")
 visual_scale = 0.55
+display_name = "Red Fly"
+log_description = "Bloated with gas. Explodes when it dies, hurting anything close - including you. Kill it at range."
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
 shape = SubResource("CircleShape2D_flybody")

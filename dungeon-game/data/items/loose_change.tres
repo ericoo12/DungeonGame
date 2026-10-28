@@ -7,5 +7,6 @@
 script = ExtResource("1_script")
 luck_bonus = 2.0
 item_name = "Loose Change"
-description = "Every flush pays off. Luck up."
+description = "Luck up."
+flavor_text = "Every flush pays off."
 icon = ExtResource("2_icon")

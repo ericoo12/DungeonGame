@@ -30,12 +30,11 @@ func _ready() -> void:
 		"up":   load(UP_PATH),
 	}
 
-	# Lives inside Player/Body (see Player.add_cosmetic), so grandparent is the Player —
-	# same as the boots, whose parent is a cosmetic anchor.
+	# Lives inside Player/Body (see Player.add_cosmetic), so grandparent is the Player.
 	player_ref = get_parent().get_parent() as Player
 
 
-# Mirrors the torso the same way the boots mirror the lower body: the torso is static,
+# Mirrors the torso the same way leg cosmetics mirror the lower body: the torso is static,
 # so instead of animation/frame we copy its texture direction, position, scale and flip.
 func _process(_delta: float) -> void:
 	if not is_instance_valid(player_ref) or player_ref.torso_sprite == null:

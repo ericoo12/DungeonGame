@@ -22,6 +22,9 @@ func on_hit(target: Node, player: Player) -> void: pass #the actuall effect
 ## velocity, size). For effects that spawn things where the shot hit (SplitShotProc).
 ## Not called for lasers / beams (they have no projectile).
 func on_projectile_hit(projectile: Node, target: Node) -> void: pass
+## Called by Projectile when it reaches the end of its flight without hitting anything
+## (it's about to land on the floor). Not called when it hits a wall.
+func on_projectile_expire(projectile: Node) -> void: pass
 
 
 ## Line shown in the inventory for items carrying this effect. Uses the CURRENT chance,

@@ -9,5 +9,6 @@ max_hearts_bonus = -1
 speed_bonus = 35.0
 player_size_bonus = -0.15
 item_name = "Emergency Diet"
-description = "Nothing left to lose. Smaller and faster, but health down."
+description = "Smaller and faster, but health down."
+flavor_text = "Nothing left to lose."
 icon = ExtResource("2_icon")

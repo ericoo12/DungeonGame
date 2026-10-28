@@ -9,6 +9,8 @@ extends Node2D
 
 
 func _ready() -> void:
+	Discovery.reveal_all = true  # test room: every item shows its info, nothing is saved
+	tree_exiting.connect(func(): Discovery.reveal_all = false)
 	for node in $Entities.get_children():
 		var pickup := node as ItemPickup
 		if pickup == null or pickup.item == null:

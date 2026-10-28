@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dd8ups7u4k2rl" path="res://assets/sprites/items/icons/porcelain_skin.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://items/cosmetics/porcelain_skin/PorcelainSkin.tscn" id="9_cosmetic"]
 
 [resource]
 script = ExtResource("1_script")
+cosmetic_scene = ExtResource("9_cosmetic")
+cosmetic_slot = "Body"
 max_hearts_bonus = 3
 player_size_bonus = 0.25
 item_name = "Porcelain Skin"
-description = "Hard, cold and surprisingly fragile. Lots of health, but a much bigger target."
+description = "Lots of health, but a much bigger target."
+flavor_text = "Hard, cold and surprisingly fragile."
 icon = ExtResource("2_icon")

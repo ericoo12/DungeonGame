@@ -11,5 +11,6 @@ fire_rate_bonus = -0.08
 size_bonus = 0.35
 shot_speed_bonus = -0.35
 item_name = "Clogged Barrel"
-description = "Bigger blockage, bigger blast. Damage and shot size up, shot speed and fire rate down."
+description = "Damage and shot size up, shot speed and fire rate down."
+flavor_text = "Bigger blockage, bigger blast."
 icon = ExtResource("2_icon")

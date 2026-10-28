@@ -5,6 +5,12 @@
 [ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://enemies/projectiles/EnemyProjectile.tscn" id="3_2ebgb"]
 [ext_resource type="Texture2D" uid="uid://bkrwgbih3ax1o" path="res://assets/sprites/enemies/toilet_brush/brush_attack_spit_left.png" id="4_qa37g"]
 
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/toilet_brush/brush_walk_left.png" id="9_logicon"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_logicon"]
+atlas = ExtResource("9_logicon")
+region = Rect2(0, 0, 256, 256)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_cmmky"]
 atlas = ExtResource("4_qa37g")
 region = Rect2(70.00069, 26.166672, 115.66669, 218.66667)
@@ -26,6 +32,9 @@ is_boss = true
 max_health = 110.0
 move_speed = 45.0
 visual_scale = 0.2
+display_name = "Toilet Brush"
+log_description = "The first boss. Strafes around you mixing lunges, spit fans and bursts. Below half health it gets angry: faster, more shots and a ring attack."
+log_icon = SubResource("AtlasTexture_logicon")
 
 [node name="testsprite" parent="." index="0" unique_id=963101555]
 texture = SubResource("AtlasTexture_cmmky")

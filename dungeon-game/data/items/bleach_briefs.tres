@@ -13,5 +13,6 @@ script = ExtResource("1_script")
 shot_speed_bonus = 0.2
 shot_proc = SubResource("Resource_shot_proc")
 item_name = "Bleach Briefs"
-description = "Kills 99.9% of everything. Shot speed up, shots can burst for bonus damage."
+description = "Shot speed up, shots can burst for bonus damage."
+flavor_text = "Kills 99.9% of everything."
 icon = ExtResource("2_icon")

@@ -21,6 +21,8 @@ knockback_immune = true
 movement_behavior = ExtResource("2_mxipq")
 attack_behavior = ExtResource("3_ut8t4")
 visual_scale = 0.9
+display_name = "Sewer Pipe"
+log_description = "A pipe that stares back. Never moves, keeps shooting gunk at you from across the room."
 
 [node name="testsprite" parent="." index="0" unique_id=963101555]
 texture = ExtResource("2_6ptda")

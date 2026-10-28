@@ -1,5 +1,7 @@
 ## Baby Plumber: follows the player and throws a short-range wrench at the nearest enemy
 ## within `attack_range` every `cooldown` seconds, by itself (not tied to your shots).
+## The wrench briefly STUNS what it hits (bosses: half as long) - crowd control, not
+## just more damage.
 class_name BabyPlumber
 extends TrailFollower
 
@@ -10,6 +12,8 @@ extends TrailFollower
 @export var shot_size: float = 0.9
 @export var knockback: float = 60.0
 @export var shot_tint: Color = Color(0.75, 0.78, 0.85)
+## Seconds a wrench hit stuns (EnemyBase.apply_stun halves it for bosses). 0 = off.
+@export var stun_time: float = 0.6
 
 const SHOT_SCENE := preload("res://player/Projectile.tscn")
 
@@ -57,6 +61,10 @@ func _throw_at(target: EnemyBase) -> void:
 	shot.scale = Vector2.ONE * shot_size
 	shot.shooter = player_ref
 	shot.modulate = shot_tint
+	if stun_time > 0.0:
+		var stun := StunShotProc.new()
+		stun.duration = stun_time
+		shot.procs = [stun]
 	get_parent().add_child(shot)
 	shot.global_position = global_position + sprite.position
 	shot.launch((target.global_position - shot.global_position).normalized(), Vector2.ZERO)

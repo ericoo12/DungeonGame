@@ -10,6 +10,11 @@ class_name EnemyBase
 ## Side-view sheets are drawn facing left by default; tick this for art facing right
 ## (e.g. the snake). With side_view_frames, attack_sheet_path becomes its attack cycle.
 @export var side_view_faces_right: bool = false
+## With side_view_frames: sprite_sheet_path has 2 rows - row 1 the move loop, row 2 the
+## action (attack anim: hop, dash, bite...). See AnimSheetLoader.build_side_view_2row_frames().
+@export var two_row_sheet: bool = false
+## two_row_sheet: row 2 is the death animation instead of an attack (e.g. a popping bubble).
+@export var action_row_is_death: bool = false
 ## Optional extra sheets for side-view enemies moving mostly up/down (same frame layout).
 @export_file("*.png") var sheet_up_path: String = ""
 @export_file("*.png") var sheet_down_path: String = ""
@@ -58,6 +63,8 @@ var _burst_tween: Tween = null
 @export var contact_damage: float = 0.5  # hearts
 @export var contact_damage_interval: float = 0.6
 @export var contact_knockback_strength: float = 100.0
+## Pops (dies) right after hurting the player by touch, e.g. the Soap Bubble.
+@export var dies_on_contact: bool = false
 
 # --- Knockback (received when THIS enemy takes damage) ---
 @export var knockback_recovery_speed: float = 800.0
@@ -76,6 +83,25 @@ var _burst_tween: Tween = null
 @export_range(0.0, 1.0) var knockback_chain_min: float = 0.25
 
 @export var is_boss: bool = false
+
+@export_group("Logbook")
+## Name and text shown in the Logbook (Discovery). Empty name = the scene file name.
+@export var display_name: String = ""
+@export_multiline var log_description: String = ""
+## Logbook picture. Empty = the first frame of sprite_sheet_path.
+@export var log_icon: Texture2D
+@export_group("")
+
+@export_group("Phase shield")
+## 0 = off. The first time health drops to this share of max_health, it stops there and
+## the enemy can't be hurt for phase_shield_time seconds (flickers). Bosses use it so
+## every fight shows its second phase, however strong the build - damage isn't reduced.
+@export_range(0.0, 1.0) var phase_shield_at: float = 0.0
+@export var phase_shield_time: float = 1.2
+@export_group("")
+signal phase_shield_started
+var _phase_shield_done: bool = false
+var _phase_shield_until_ms: int = 0
 ## Bosses only (is_boss): incoming knockback is scaled by this, then capped at
 ## boss_max_knockback (px/s), so high-knockback builds can't shove a boss around.
 ## Bosses also skip the damage animation (only the white flash) so constant hits
@@ -113,7 +139,13 @@ var heading: Vector2 = Vector2.DOWN
 ## Set by attacks that move the body themselves (LungeAttack's strike): while active it
 ## replaces the movement behaviour's velocity. Knockback still wins.
 var forced_velocity_active: bool = false
+## Environment push for this frame (water currents, suction), added before moving and
+## used up every frame. Sources call add_external_push() each frame it applies.
+var external_velocity: Vector2 = Vector2.ZERO
 var forced_velocity: Vector2 = Vector2.ZERO
+## Set by attacks that mustn't be cut short by hits (RollAttack's roll): hits still deal
+## damage and flash, but don't play the damage animation (which would end the attack).
+var super_armor: bool = false
 
 # --- Slow (SlowShotProc) ---
 const SLOW_TINT := Color(0.55, 0.75, 1.0)
@@ -170,6 +202,7 @@ func _ready() -> void:
 	if attack_behavior:
 		attack_behavior = attack_behavior.duplicate()
 
+	Discovery.mark_enemy_seen(scene_file_path)
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 	hitbox.area_exited.connect(_on_hitbox_area_exited)
 	player = get_tree().get_first_node_in_group("player")
@@ -178,7 +211,10 @@ func _ready() -> void:
 		add_to_group("boss")
 		EventBus.boss_spawned.emit(max_health)
 
-	if side_view_frames > 0:
+	if side_view_frames > 0 and two_row_sheet:
+		sprite.sprite_frames = AnimSheetLoader.build_side_view_2row_frames(sprite_sheet_path, side_view_frames,
+			10.0, action_row_is_death)
+	elif side_view_frames > 0:
 		sprite.sprite_frames = AnimSheetLoader.build_side_view_enemy_frames(sprite_sheet_path, side_view_frames, 12.0,
 			attack_sheet_path, sheet_up_path, sheet_down_path, attack_sheet_up_path, attack_sheet_down_path)
 	elif attack_sheet_path != "":
@@ -237,14 +273,23 @@ func _physics_process(delta: float) -> void:
 	if velocity.length_squared() > 1.0 and knockback_velocity.length() <= 1.0:
 		heading = velocity.normalized()
 
-	if attack_behavior and action_state == "" and _confuse_timer <= 0.0 and not is_stunned():
+	# Getting hit ("damage" flinch) doesn't stop an enemy from starting its attack, so a
+	# constant stream of shots can't keep a turret or a wizard from ever firing.
+	if attack_behavior and (action_state == "" or action_state == "damage") \
+			and _confuse_timer <= 0.0 and not is_stunned():
 		attack_behavior.try_attack(self, delta)
 
 	_apply_slow_to_velocity(delta)
+	velocity += external_velocity
+	external_velocity = Vector2.ZERO
 	move_and_slide()
 
 	if action_state == "":
 		_play_run_animation()
+
+
+func add_external_push(push: Vector2) -> void:
+	external_velocity += push
 
 
 func set_visual_scale(value: float) -> void:
@@ -306,10 +351,12 @@ func _play_run_animation() -> void:
 
 
 func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback_strength: float = 0.0) -> void:
-	if is_dying:
+	if is_dying or is_phase_shielded():
 		return
 
 	health -= amount * damage_taken_mult
+	if _check_phase_shield():
+		return
 	_update_label()
 
 	if is_boss:
@@ -348,7 +395,11 @@ func take_damage(amount: float, knockback_dir: Vector2 = Vector2.ZERO, knockback
 
 
 func _play_damage_animation() -> void:
-	if is_dying:
+	if is_dying or super_armor:
+		return
+	# Shots never interrupt what the enemy is doing (attack windup, hop, shake...): the hit
+	# still flashes red, the action just carries on.
+	if action_state != "" and action_state != "damage":
 		return
 
 	action_state = "damage"
@@ -375,8 +426,10 @@ func _play_attack_animation() -> void:
 	if action_state == "attack":  # already attacking, don't restart
 		return
 
-	action_state = "attack"
 	var animation_name := "attack_" + facing_direction
+	if not sprite.sprite_frames.has_animation(animation_name):
+		return  # no attack art (e.g. the Soap Bubble: its 2nd row is its pop)
+	action_state = "attack"
 	sprite.play(animation_name)
 
 	await sprite.animation_finished
@@ -391,6 +444,8 @@ func _play_attack_animation() -> void:
 
 
 func die() -> void:
+	Discovery.mark_enemy_killed(scene_file_path)
+	EventBus.enemy_killed.emit(self)
 	set_physics_process(false)
 	hitbox.set_deferred("monitoring", false)
 	velocity = Vector2.ZERO
@@ -454,6 +509,9 @@ func _deal_damage_to(area: Area2D) -> void:
 	if target and target.has_method("take_damage"):
 		var knockback_dir: Vector2 = target.global_position - global_position
 		target.take_damage(contact_damage, knockback_dir, contact_knockback_strength)
+		if dies_on_contact and not is_dying:
+			is_dying = true
+			die.call_deferred()  # runs from a physics callback
 
 
 func _spawn_shadow() -> void:
@@ -477,9 +535,11 @@ func get_player_aim_point() -> Vector2:
 ## Damage-over-time tick (PoisonStatus): no hit animation, no knockback, so poison
 ## can't stun-lock. Still kills, and still updates the boss bar.
 func take_dot_damage(amount: float, flash_color: Color = Color(0.5, 1.0, 0.4)) -> void:
-	if is_dying:
+	if is_dying or is_phase_shielded():
 		return
 	health -= amount
+	if _check_phase_shield():
+		return
 	_update_label()
 	if is_boss:
 		EventBus.boss_health_changed.emit(health)
@@ -491,6 +551,37 @@ func take_dot_damage(amount: float, flash_color: Color = Color(0.5, 1.0, 0.4)) -
 	await get_tree().create_timer(0.1).timeout
 	if is_instance_valid(sprite):
 		sprite.modulate = Color.WHITE
+
+
+## True if this enemy has its own action animation (attack sheet or 2-row sheet), so
+## behaviours can show it (hops, shakes...) instead of the move loop.
+func has_action_anim() -> bool:
+	return (attack_sheet_path != "" or (two_row_sheet and not action_row_is_death)) \
+		and sprite.sprite_frames.has_animation("attack_" + facing_direction)
+
+
+## Phase shield (see phase_shield_at): true while it can't be hurt.
+func is_phase_shielded() -> bool:
+	return Time.get_ticks_msec() < _phase_shield_until_ms
+
+
+## Called right after health went down. If it crossed phase_shield_at for the first
+## time: health stops at the threshold and the shield starts. Returns true then.
+func _check_phase_shield() -> bool:
+	if phase_shield_at <= 0.0 or _phase_shield_done or health > max_health * phase_shield_at:
+		return false
+	_phase_shield_done = true
+	health = max_health * phase_shield_at
+	_phase_shield_until_ms = Time.get_ticks_msec() + int(phase_shield_time * 1000.0)
+	knockback_velocity = Vector2.ZERO
+	_update_label()
+	if is_boss:
+		EventBus.boss_health_changed.emit(health)
+	var tween := create_tween().set_loops(int(phase_shield_time / 0.15))
+	tween.tween_property(sprite, "self_modulate", Color(2.0, 2.0, 2.0, 0.55), 0.075)
+	tween.tween_property(sprite, "self_modulate", Color.WHITE, 0.075)
+	phase_shield_started.emit()
+	return true
 
 
 ## Stuns (no movement, no attacks) for `duration` seconds. Bosses: half as long.

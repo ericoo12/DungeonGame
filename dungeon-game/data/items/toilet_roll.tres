@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 orbital_scene = ExtResource("3_ext")
 item_name = "Toilet Roll"
-description = "Two-ply protection. Spins around you fast and blocks enemy shots."
+description = "Spins around you fast, blocks enemy shots and leaves a paper streamer that slows enemies."
+flavor_text = "Two-ply protection."
 icon = ExtResource("2_icon")
 rarity = 1

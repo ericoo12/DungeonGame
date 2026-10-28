@@ -49,6 +49,19 @@ func _on_new_game() -> void:
 	tween.tween_callback(func(): get_tree().change_scene_to_file(GAME_SCENE))
 
 
+## Items and enemies discovered so far (Discovery), on top of the menu.
+func _on_logbook() -> void:
+	if _leaving:
+		return
+	_set_buttons_enabled(false)
+	var book := Logbook.new()
+	add_child(book)
+	move_child(book, _fade.get_index())  # under the fade overlay
+	book.closed.connect(func():
+		_set_buttons_enabled(true)
+		_buttons[1].grab_focus())
+
+
 func _on_quit() -> void:
 	if _leaving:
 		return
@@ -102,6 +115,7 @@ func _build_ui() -> void:
 	menu.add_theme_constant_override("separation", 10)
 	panel.add_child(menu)
 	_add_button(menu, "New Game", _on_new_game)
+	_add_button(menu, "Logbook", _on_logbook)
 	_add_button(menu, "Quit", _on_quit)
 
 	# Controls

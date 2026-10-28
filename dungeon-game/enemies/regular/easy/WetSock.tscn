@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/StopAndGoMovement.gd" id="s_StopAndGoMovement"]
+[ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://enemies/projectiles/EnemyProjectile.tscn" id="p_proj"]
+[ext_resource type="Script" path="res://enemies/behaviors/WanderMovement.gd" id="s_WanderMovement"]
+
+[sub_resource type="Resource" id="Resource_chase"]
+script = ExtResource("s_WanderMovement")
+alert_radius = 0.0
+wander_speed = 16.0
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_StopAndGoMovement")
+chase = SubResource("Resource_chase")
+move_time = Vector2(1.4, 2.4)
+spray_scene = ExtResource("p_proj")
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 67.6
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 94.6
+
+[node name="WetSock" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/wet_sock/wet_sock_left.png"
+side_view_frames = 4
+two_row_sheet = true
+shadow_scale_ratio = 5.37
+shadow_offset = Vector2(0, 6.1)
+max_health = 12.0
+move_speed = 16.0
+movement_behavior = SubResource("Resource_move")
+pack_size = Vector2i(1, 1)
+family = &"sock"
+visual_scale = 0.074
+display_name = "Wet Sock"
+log_description = "A soggy, furious sock. Squelches around aimlessly, and every so often stops to shake itself off - flinging dirty water in every direction."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 1.6)
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")
+
+[node name="AnimatedSprite2D" parent="." index="3" unique_id=622601666]
+offset = Vector2(0, -5)

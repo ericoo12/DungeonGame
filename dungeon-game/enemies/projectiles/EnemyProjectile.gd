@@ -43,6 +43,7 @@ func _ready() -> void:
 	lifetime = max_range / maxf(speed, 1.0)
 	_update_height(0.0)
 	_spawn_shadow()
+	DangerHalo.attach(self, sprite)
 	await get_tree().physics_frame
 	monitoring = true
 	add_to_group("projectiles")

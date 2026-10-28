@@ -45,6 +45,14 @@ func _ready() -> void:
 			walls.queue_free()
 
 
+func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
+	super.setup(room_data, distance, dungeon, entities_container)
+	# Obstacle art (e.g. the treasure vaults) is drawn y-sorted with the player.
+	for node in find_children("*", "StaticBody2D", true, false):
+		if node is ArenaObstacle:
+			(node as ArenaObstacle).move_art_to(entities_container)
+
+
 ## Spawns the final boss (Dungeon.final_boss_scene, not a random normal boss) on the
 ## EnemySpawnPoints/BossSpawn marker and hands it this arena (navigation/sight).
 func _spawn_boss(dungeon: Dungeon, entities_container: Node2D) -> void:

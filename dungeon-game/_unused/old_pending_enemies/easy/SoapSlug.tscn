@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/SwarmChaseMovement.gd" id="s_SwarmChaseMovement"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_SwarmChaseMovement")
+swarm_group = &"slug"
+turn_rate = 4.0
+scurry_amount = 0.1
+w_cohesion = 0.0
+w_alignment = 0.0
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 64.1
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 89.7
+
+[node name="SoapSlug" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/soap_slug/soap_slug_move_4frames.png"
+side_view_frames = 4
+shadow_scale_ratio = 4.49
+shadow_offset = Vector2(0, 4)
+max_health = 8.0
+move_speed = 18.0
+movement_behavior = SubResource("Resource_move")
+pack_size = Vector2i(1, 2)
+family = &"slug"
+visual_scale = 0.078
+display_name = "Soap Slug"
+log_description = "A blob of soap that slides straight at you, leaving bubbles. Slow, but it never gives up."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")

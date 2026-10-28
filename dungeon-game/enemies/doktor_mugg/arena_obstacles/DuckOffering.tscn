@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://enemies/doktor_mugg/arena_obstacles/ArenaObstacle.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objects/duck_offering.png" id="2_art"]
+
+[node name="DuckOffering" instance=ExtResource("1_base")]
+blocks_projectiles = false
+blocks_sight = false
+obstacle_size = Vector2(56, 26)
+placeholder_color = Color(0.15, 0.8, 0.25, 1)
+art_sheet = ExtResource("2_art")
+art_frames = 4
+art_content = Rect2(10, 57, 235, 136)
+art_low = true
+art_width = 62.0
+art_fps = 6.0

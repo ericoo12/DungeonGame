@@ -13,5 +13,6 @@ script = ExtResource("1_script")
 luck_bonus = 0.5
 shot_proc = SubResource("Resource_shot_proc")
 item_name = "Soap in Your Eyes"
-description = "No peeking! Luck up, shots can confuse enemies."
+description = "Luck up, shots can confuse enemies."
+flavor_text = "No peeking!"
 icon = ExtResource("2_icon")

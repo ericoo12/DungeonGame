@@ -11,6 +11,13 @@ var _frozen: bool = false
 
 func _ready() -> void:
 	visible = true
+	# Item info card (next to items) and pickup banner, under the rest of the HUD.
+	var popup := ItemInfoPopup.new()
+	add_child(popup)
+	move_child(popup, 0)
+	var banner := ItemBanner.new()
+	add_child(banner)
+	move_child(banner, 1)
 	item_overlay.visible = false
 	EventBus.item_added.connect(_on_item_added)
 	EventBus.active_item_changed.connect(_on_active_item_changed)
@@ -48,5 +55,5 @@ func _on_item_added(item: Item) -> void:
 
 
 func _on_active_item_changed(item: ActiveItem) -> void:
-	active_item_icon.texture = item.icon
+	active_item_icon.texture = item.icon if item else null
 	item_overlay.set_active(item)

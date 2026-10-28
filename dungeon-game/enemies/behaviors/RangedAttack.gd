@@ -6,6 +6,8 @@ extends AttackBehavior
 @export var cooldown: float = 1.8
 @export var projectile_scene: PackedScene
 @export var projectile_damage: float = 0.5
+## > 0 overrides the projectile's own speed (e.g. a slow water drop). 0 = scene default.
+@export var projectile_speed: float = 0.0
 ## Random delay (min, max) before the FIRST shot once the player is in range: gives the
 ## player a moment after entering, and de-syncs multiple shooters in one room.
 @export var first_shot_delay: Vector2 = Vector2(0.4, 1.2)
@@ -65,9 +67,11 @@ func _attack(enemy: EnemyBase) -> void:
 func _fire(enemy: EnemyBase) -> void:
 	var dir: Vector2 = (enemy.get_player_aim_point() - enemy.global_position).normalized()
 	var proj := projectile_scene.instantiate()
+	proj.damage = projectile_damage
+	if projectile_speed > 0.0 and "speed" in proj:
+		proj.speed = projectile_speed  # before add_child: the shot sets its range from it in _ready
 	enemy.get_parent().add_child(proj)
 	proj.global_position = enemy.global_position
-	proj.damage = projectile_damage
 	if proj.has_method("launch"):
 		proj.launch(dir, Vector2.ZERO)
 

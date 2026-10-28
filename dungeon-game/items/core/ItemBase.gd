@@ -5,7 +5,10 @@ class_name ItemBase
 extends Resource
 
 @export var item_name: String = ""
-@export var description: String = ""
+## What it does (shown once the item is discovered, see Discovery).
+@export_multiline var description: String = ""
+## Short joke/hint, always shown - also before you know what the item does.
+@export var flavor_text: String = ""
 @export var icon: Texture2D
 ## Shop price in ducks. 0 = the default for its rarity (Dungeon shop prices).
 @export var shop_price: int = 0

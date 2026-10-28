@@ -3,16 +3,26 @@
 [ext_resource type="Script" uid="uid://c6x5p12ywxpy8" path="res://pickups/HeartPickup.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pickups/hearts/half_heart.png" id="2_tex"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_half"]
-radius = 22.42
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 3.0
 
-[node name="HalfHeartPickup" type="Area2D"]
-scale = Vector2(0.15, 0.15)
+[sub_resource type="CircleShape2D" id="CircleShape2D_touch"]
+radius = 6.0
+
+[node name="HalfHeartPickup" type="CharacterBody2D"]
 script = ExtResource("1_script")
 heal_amount = 0.5
+display_size = 9.6
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_half")
+shape = SubResource("CircleShape2D_body")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="PickupArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+shape = SubResource("CircleShape2D_touch")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visual"]
 texture = ExtResource("2_tex")

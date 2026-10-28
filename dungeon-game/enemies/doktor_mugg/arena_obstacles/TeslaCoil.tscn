@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://enemies/doktor_mugg/arena_obstacles/ArenaObstacle.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objects/experimental_energy_coils.png" id="2_art"]
+
+[node name="TeslaCoil" instance=ExtResource("1_base")]
+blocks_sight = true
+obstacle_size = Vector2(60, 18)
+placeholder_color = Color(0.15, 0.4, 1, 1)
+art_sheet = ExtResource("2_art")
+art_frames = 4
+art_content = Rect2(4, 32, 248, 162)
+art_width = 66.0
+art_fps = 10.0

@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/SwarmChaseMovement.gd" id="s_SwarmChaseMovement"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_SwarmChaseMovement")
+swarm_group = &"tooth"
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 59.7
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 74.6
+
+[node name="LostTooth" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/lost_tooth/lost_tooth_move_4frames.png"
+side_view_frames = 4
+shadow_scale_ratio = 4.48
+shadow_offset = Vector2(0, 4)
+max_health = 5.0
+move_speed = 65.0
+movement_behavior = SubResource("Resource_move")
+pack_size = Vector2i(2, 3)
+family = &"tooth"
+visual_scale = 0.067
+display_name = "Lost Tooth"
+log_description = "A tooth on tiny legs. Runs straight at you in small groups - like a rat, but a smaller target."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")

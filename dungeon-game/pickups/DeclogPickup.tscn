@@ -3,16 +3,26 @@
 [ext_resource type="Script" uid="uid://ckkcdsxkn4f0x" path="res://pickups/DuckPickup.gd" id="1_pick"]
 [ext_resource type="Texture2D" uid="uid://cst7aoa0nv5x1" path="res://assets/sprites/pickups/declogger/declogger.png" id="2_f1ms2"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_declog"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 3.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_touch"]
 radius = 7.0
 
-[node name="DeclogPickup" type="Area2D" unique_id=1607288593]
+[node name="DeclogPickup" type="CharacterBody2D"]
 script = ExtResource("1_pick")
 currency = "decloggers"
+display_size = 12.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1388866630]
-shape = SubResource("CircleShape2D_declog")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1769819749]
-scale = Vector2(0.375, 0.375)
+[node name="PickupArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+shape = SubResource("CircleShape2D_touch")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visual"]
 texture = ExtResource("2_f1ms2")

@@ -2,13 +2,17 @@
 
 [ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://b57q2tbm12xkm" path="res://assets/sprites/items/icons/lead_underwear.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://items/cosmetics/lead_underwear/LeadUnderwear.tscn" id="9_cosmetic"]
 
 [resource]
 script = ExtResource("1_script")
+cosmetic_scene = ExtResource("9_cosmetic")
+cosmetic_slot = "Underwear"
 shot_speed_bonus = -0.3
 player_knockback_immune = true
 knockback_multiplier = 1.5
 item_name = "Lead Underwear"
-description = "Built for impact. You can't be knocked back, your shots knock harder, shot speed down."
+description = "You can't be knocked back, your shots knock harder, shot speed down."
+flavor_text = "Built for impact."
 icon = ExtResource("2_icon")
 rarity = 1

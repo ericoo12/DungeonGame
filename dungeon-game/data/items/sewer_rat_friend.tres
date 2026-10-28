@@ -10,5 +10,6 @@ rarity = 1
 follower_trail_delay = 0.35
 follower_scene = ExtResource("3_ext")
 item_name = "Sewer Rat Friend"
-description = "One of the clean ones. Runs over to bite nearby enemies, then comes back."
+description = "Runs over to bite nearby enemies, then comes back."
+flavor_text = "One of the clean ones."
 icon = ExtResource("2_icon")

@@ -1,18 +1,26 @@
 ## Audio (autoload "Audio") — background music + sound effects.
 ##
-## Music: one looping track. Keeps playing through pauses (inventory, P freeze) and
+## Music: one looping track per stage (STAGE_MUSIC_PATHS; stages past the end use the
+## last one), plus the boss theme. Keeps playing through pauses (inventory, P freeze) and
 ## scene reloads (death), since autoloads live outside the scene.
 ## SFX: Audio.play_sfx(stream) from anywhere. A small pool of players so sounds can
 ## overlap (fast fire rates), each with a little random pitch so repeats don't sound
 ## identical. SFX pause with the game.
 ##
-## To swap the placeholder audio: replace the files at MUSIC_PATH / SHOOT_PATH
-## (same names), or point these constants at new files.
+## To swap the placeholder audio: replace the files at these paths (same names), or
+## point the constants at new files. The shot sound is currently not played (removed
+## from Player._shoot); play_shoot() is kept in case it comes back.
 extends Node
 
 # Paths + load() (not preload) so a missing/not-yet-imported file never breaks the
 # autoload: the game just runs without that sound.
 const MUSIC_PATH := "res://assets/audio/music/sewer_theme.ogg"
+## Index 0 = stage 1.
+const STAGE_MUSIC_PATHS := [
+	"res://assets/audio/music/sewer_theme.ogg",
+	"res://assets/audio/music/stage2_theme.ogg",
+	"res://assets/audio/music/stage3_theme.ogg",
+]
 const BOSS_MUSIC_PATH := "res://assets/audio/music/boss_theme.ogg"
 const SHOOT_PATH := "res://assets/audio/sfx/shoot_plop.wav"
 
@@ -28,7 +36,8 @@ const SFX_VOICES := 8
 var shoot_sound: AudioStream
 
 var _music: AudioStreamPlayer
-var _normal_music: AudioStream
+var _normal_music: AudioStream            # stage 1's track
+var _stage_music: Array[AudioStream] = []
 var _boss_music: AudioStream
 var _fade: Tween
 ## The track that should be playing (may still be fading in). Compared instead of
@@ -47,6 +56,8 @@ func _init() -> void:
 
 	shoot_sound = _load_stream(SHOOT_PATH)
 	_normal_music = _looping(_load_stream(MUSIC_PATH))
+	for path in STAGE_MUSIC_PATHS:
+		_stage_music.append(_normal_music if path == MUSIC_PATH else _looping(_load_stream(path)))
 	_boss_music = _looping(_load_stream(BOSS_MUSIC_PATH))
 	_target_music = _normal_music
 
@@ -90,8 +101,19 @@ func play_boss_music() -> void:
 	_switch_music(_boss_music)
 
 
+## The current stage's track (Dungeon calls this when a floor starts; rooms call it
+## when a boss/challenge fight ends).
 func play_normal_music() -> void:
-	_switch_music(_normal_music)
+	_switch_music(_stage_track())
+
+
+func _stage_track() -> AudioStream:
+	var game_state := get_node_or_null("/root/GameState")
+	var stage: int = game_state.current_stage if game_state else 1
+	if _stage_music.is_empty():
+		return _normal_music
+	var track: AudioStream = _stage_music[clampi(stage - 1, 0, _stage_music.size() - 1)]
+	return track if track else _normal_music
 
 
 ## Fades the current track out, then starts `stream` from the top and fades it in.

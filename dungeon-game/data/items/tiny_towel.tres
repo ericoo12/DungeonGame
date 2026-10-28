@@ -8,5 +8,6 @@ script = ExtResource("1_script")
 player_size_bonus = -0.12
 luck_bonus = 1.0
 item_name = "Tiny Towel"
-description = "Barely covers anything. Smaller, and luck up."
+description = "Smaller, and luck up."
+flavor_text = "Barely covers anything."
 icon = ExtResource("2_icon")

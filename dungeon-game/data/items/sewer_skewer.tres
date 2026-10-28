@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://f6l1ux0gs31k"]
+
+[ext_resource type="Texture2D" uid="uid://d3ip7ocpj6csu" path="res://assets/sprites/items/icons/sewer_skewer_icon.png" id="1_5owmr"]
+[ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+piercing_shots = true
+item_name = "Sewer Skewer"
+description = "Your shots go straight through enemies."
+flavor_text = "Straight through the blockage."
+icon = ExtResource("1_5owmr")
+rarity = 2

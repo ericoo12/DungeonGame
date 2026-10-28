@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/wander_movement.tres" id="2_wander"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/sewer_beam_attack.tres" id="3_beams"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wizbody"]
+radius = 70.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_wizhit"]
+radius = 80.0
+height = 290.0
+
+[node name="SewerWizard" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/sewer_wizard/sewer_wizard_walk_4frames.png"
+side_view_frames = 4
+attack_sheet_path = "res://assets/sprites/enemies/sewer_wizard/sewer_wizard_cast_4frames.png"
+shadow_scale_ratio = 4.3
+shadow_offset = Vector2(0, 3)
+max_health = 22.0
+move_speed = 18.0
+movement_behavior = ExtResource("2_wander")
+family = &"wizard"
+attack_behavior = ExtResource("3_beams")
+visual_scale = 0.115
+display_name = "Sewer Wizard"
+log_description = "Wanders the sewers mumbling. Every few seconds he raises his staff and calls columns of sewer water down - one of them where you stand. Watch for the puddles."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 1)
+shape = SubResource("CircleShape2D_wizbody")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+position = Vector2(0, -13)
+shape = SubResource("CapsuleShape2D_wizhit")
+
+[node name="AnimatedSprite2D" parent="." index="3" unique_id=622601666]
+offset = Vector2(0, -160)

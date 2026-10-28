@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cmsde4vbbthmy" path="res://assets/sprites/items/icons/crooked_barrel.png" id="2_icon"]
 [ext_resource type="Script" uid="uid://cmh0l56ax2vaa" path="res://items/shot_patterns/CrookedSpreadModifier.gd" id="3_sub"]
+[ext_resource type="Texture2D" uid="uid://bgga5m773plke" path="res://assets/sprites/player/arm_crooked_barrel/arm_down.png" id="9_arm_down"]
+[ext_resource type="Texture2D" uid="uid://ddj6u585p1ad5" path="res://assets/sprites/player/arm_crooked_barrel/arm_left.png" id="9_arm_left"]
+[ext_resource type="Texture2D" uid="uid://cepw1foeh0hmk" path="res://assets/sprites/player/arm_crooked_barrel/arm_up.png" id="9_arm_up"]
 
 [sub_resource type="Resource" id="Resource_shot_pattern_modifier"]
 script = ExtResource("3_sub")
@@ -13,7 +16,11 @@ script = ExtResource("1_script")
 damage_bonus = 1
 projectile_size_multiplier = 1.2
 shot_pattern_modifier = SubResource("Resource_shot_pattern_modifier")
+arm_down = ExtResource("9_arm_down")
+arm_left = ExtResource("9_arm_left")
+arm_up = ExtResource("9_arm_up")
 item_name = "Crooked Barrel"
-description = "Accuracy is overrated. Damage and shot size up, shots go off course."
+description = "Damage and shot size up, shots go off course."
+flavor_text = "Accuracy is overrated."
 icon = ExtResource("2_icon")
 rarity = 1

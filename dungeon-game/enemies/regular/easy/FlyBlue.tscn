@@ -23,6 +23,8 @@ family = &"fly"
 pack_member_scene = ExtResource("4_greenfly")
 spawn_weight = 0.5
 visual_scale = 0.55
+display_name = "Blue Fly"
+log_description = "Quick little pest. Buzzes straight for you in small swarms. Fragile, but it never stops."
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
 shape = SubResource("CircleShape2D_flybody")

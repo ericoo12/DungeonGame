@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bxf6vg6ux8cyg"]
+
+[ext_resource type="Script" uid="uid://n5hs800fd8ey" path="res://items/cosmetics/BackCosmetic.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://7dokemllmg2g" path="res://assets/sprites/player/cosmetics/golden_plunger/golden_plunger_down.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://cqcc8l8v03y5i" path="res://assets/sprites/player/cosmetics/golden_plunger/golden_plunger_left.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://cricvb1n6gwnd" path="res://assets/sprites/player/cosmetics/golden_plunger/golden_plunger_up.png" id="4"]
+
+[node name="GoldenPlunger" type="Node2D" unique_id=1045758540]
+script = ExtResource("1")
+texture_down = ExtResource("2")
+texture_left = ExtResource("3")
+texture_up = ExtResource("4")
+offset_down = Vector2(0, -5)
+offset_left = Vector2(50, -5)
+offset_up = Vector2(0, -5)
+scale_down = 0.55
+scale_left = 0.55
+scale_up = 0.55

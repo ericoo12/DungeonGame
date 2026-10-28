@@ -21,6 +21,8 @@ attack_behavior = ExtResource("3_spawn")
 family = &"fly"
 visual_scale = 0.45
 shadow_offset = Vector2(0, 12)
+display_name = "Trash Bin"
+log_description = "Doesn't move, doesn't fight. Just keeps spawning flies until you deal with it."
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
 position = Vector2(0, 7)

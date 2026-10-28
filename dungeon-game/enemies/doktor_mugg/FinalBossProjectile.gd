@@ -18,6 +18,7 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
 	get_tree().create_timer(lifetime).timeout.connect(queue_free)
+	DangerHalo.attach.call_deferred(self)  # deferred: MuggBall builds its shape in _ready
 	await get_tree().physics_frame
 	monitoring = true
 	add_to_group("projectiles")

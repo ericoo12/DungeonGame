@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/StrafeBurstMovement.gd" id="s_StrafeBurstMovement"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_StrafeBurstMovement")
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 64.1
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 89.7
+
+[node name="PipeSpider" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/pipe_spider/pipe_spider_move_4frames.png"
+side_view_frames = 4
+shadow_scale_ratio = 4.49
+shadow_offset = Vector2(0, 4)
+max_health = 9.0
+move_speed = 0.0
+movement_behavior = SubResource("Resource_move")
+pack_size = Vector2i(1, 2)
+family = &"spider"
+visual_scale = 0.078
+display_name = "Pipe Spider"
+log_description = "Made of bent pipe bits. Darts sideways in short bursts, then freezes. Hard to predict, easy to hit while it pauses."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")

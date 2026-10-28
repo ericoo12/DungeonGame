@@ -93,7 +93,7 @@ func add_passive(item: Item) -> void:
 func set_active(item: ActiveItem) -> void:
 	_active_item = item
 	_refresh_active_slot()
-	if visible and _active_slot.has_focus():
+	if visible and _active_slot.has_focus() and item:
 		_show_details(item)
 
 

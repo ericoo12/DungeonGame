@@ -9,7 +9,8 @@ signal purchased
 @export var display_size: float = 16.0     # icon size in px (largest side)
 ## How far from the marker the player can be and still buy (px). Bigger than the
 ## icon on purpose: the items sit on the table, which the player can't walk onto.
-@export var reach_radius: float = 16.0
+## When the player touches two at once, only the CLOSEST one sells (_physics_process).
+@export var reach_radius: float = 14.0
 @export var bob_height: float = 1.5
 @export var bob_period: float = 1.6
 @export var price_color: Color = Color(0.95, 0.88, 0.45)
@@ -30,6 +31,11 @@ var _icon: Sprite2D
 var _price_root: Node2D
 var _label: Label
 var _sold: bool = false
+var _player_inside: Player = null
+var _tried: bool = false   # one buy attempt per visit (walk out and back in to retry)
+## Set after a purchase; cleared once the player has touched no shop item for a moment.
+static var _purchase_lock: bool = false
+static var _clear_since_ms: int = 0
 
 
 func setup(new_item: ItemBase, new_price: int, new_decloggers: int = 0) -> void:
@@ -40,6 +46,7 @@ func setup(new_item: ItemBase, new_price: int, new_decloggers: int = 0) -> void:
 
 func _ready() -> void:
 	add_to_group("item_pickups")  # Dungeon._load_room() clears this group on room change
+	add_to_group("item_info_sources")  # ItemInfoPopup shows what it is when you're close
 	collision_layer = 0
 	collision_mask = 2            # player body
 
@@ -53,7 +60,9 @@ func _ready() -> void:
 	_build_price()
 	_update_affordable()
 
+	add_to_group("shop_items")
 	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
 	EventBus.ducks_changed.connect(_on_ducks_changed)  # method, so it auto-disconnects on free
 
 
@@ -115,7 +124,52 @@ func _update_affordable() -> void:
 
 func _on_body_entered(body: Node) -> void:
 	var player := body as Player
-	if player == null or _sold or (item == null and decloggers <= 0):
+	if player:
+		_player_inside = player
+		_tried = false
+
+
+func _on_body_exited(body: Node) -> void:
+	if body == _player_inside:
+		_player_inside = null
+		_tried = false
+
+
+func _physics_process(_delta: float) -> void:
+	if _purchase_lock:
+		var now := Time.get_ticks_msec()
+		if _player_touches_any():
+			_clear_since_ms = now
+		elif now - _clear_since_ms > 350:
+			_purchase_lock = false
+	if _player_inside == null or _tried or _sold or _purchase_lock or not is_instance_valid(_player_inside):
+		return
+	if not _is_closest_to(_player_inside):
+		return
+	_tried = true
+	_try_buy(_player_inside)
+
+
+func _player_touches_any() -> bool:
+	for other in get_tree().get_nodes_in_group("shop_items"):
+		if is_instance_valid(other) and not other._sold and other._player_inside != null:
+			return true
+	return false
+
+
+## Only the item nearest to the player sells, so standing between two never buys both
+## (or the one you weren't going for).
+func _is_closest_to(player: Player) -> bool:
+	var my_d := global_position.distance_to(player.global_position)
+	for other in get_tree().get_nodes_in_group("shop_items"):
+		if other != self and is_instance_valid(other) and not other._sold \
+				and other.global_position.distance_to(player.global_position) < my_d:
+			return false
+	return true
+
+
+func _try_buy(player: Player) -> void:
+	if _sold or (item == null and decloggers <= 0):
 		return
 	if not player.spend_ducks(price):
 		_deny()
@@ -132,6 +186,10 @@ func _on_body_entered(body: Node) -> void:
 	elif item is Item:
 		player.add_item(item as Item)
 	purchased.emit()
+	# Nothing else sells until you've stepped away from every item on the table, so one
+	# walk into the table never buys two things.
+	_purchase_lock = true
+	_clear_since_ms = Time.get_ticks_msec()
 	queue_free()
 
 

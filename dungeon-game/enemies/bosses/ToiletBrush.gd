@@ -64,6 +64,9 @@ func _ready() -> void:
 	max_health *= GameState.get_health_multiplier()
 	contact_damage = snappedf(contact_damage * GameState.get_damage_multiplier(), 0.5)
 	health = max_health
+	Discovery.mark_enemy_seen(scene_file_path)
+	if phase_shield_at <= 0.0:
+		phase_shield_at = enrage_health_ratio  # brief invulnerable moment as phase 2 starts
 
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 	hitbox.area_exited.connect(_on_hitbox_area_exited)

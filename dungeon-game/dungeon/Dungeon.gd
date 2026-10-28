@@ -19,6 +19,18 @@ var boss_scenes: Array[PackedScene] = []
 @export var boss_room_scene: PackedScene
 @export var item_room_scene: PackedScene
 @export var shop_room_scene: PackedScene
+## Big normal rooms (2x1, 1x2, 2x2 map squares): built in code from the room's size.
+@export var shaped_room_scene: PackedScene = preload("res://rooms/ShapedRoom.tscn")
+## Chance each new normal room is a big one (DungeonGenerator.BIG_SHAPES), per stage
+## (index 0 = stage 1; later stages use the last value).
+@export var big_room_chance_by_stage: Array[float] = [0.25, 0.3, 0.35]
+## Challenge room (sacrifice altars + 3 waves) and the chance a floor has one.
+@export var challenge_room_scene: PackedScene = preload("res://rooms/challenge/ChallengeRoom.tscn")
+## Chance a floor has a challenge room, per stage (index 0 = stage 1; stages past the
+## end use the last value). Lower on stage 1, so you don't see one every run start.
+@export var challenge_room_chance_by_stage: Array[float] = [0.25, 0.5, 0.5]
+## > 0 overrides every stage's chance (debug/tests).
+var challenge_room_chance_override: float = -1.0
 
 @export_group("Final boss")
 ## On this stage the boss room is the final boss's own arena with the final boss in it
@@ -117,6 +129,8 @@ var current_floor_variant: RoomFloorVariant = null
 const STAGE_DOOR_SCENE := preload("res://dungeon/StageDoor.tscn")
 
 var layout: Dictionary = {}
+## A map square of the current room (its home_cell(): always one of the room's own
+## squares - an L's top-left box corner can be missing).
 var current_grid_pos: Vector2i = Vector2i.ZERO
 var current_room: Node2D = null
 var player: Player
@@ -161,11 +175,13 @@ func _load_scenes_from_folder(path: String) -> Array[PackedScene]:
 	
 
 func _generate_and_load_floor() -> void:
+	Audio.play_normal_music()  # each stage has its own track (fades over on a new stage)
 	if not floor_variants.is_empty():
 		current_floor_variant = floor_variants[randi() % floor_variants.size()]
 
 	var result := DungeonGenerator.generate(get_room_count_for_stage(GameState.current_stage),
-		0.1, 1, chest_toilet_chance)
+		0.1, 1, chest_toilet_chance, get_challenge_room_chance(GameState.current_stage),
+		get_big_room_chance(GameState.current_stage))
 	layout = result.layout
 	room_distances = result.distances
 	if GameState.current_stage <= free_special_rooms_until_stage:
@@ -208,13 +224,17 @@ func _on_boss_defeated() -> void:
 	pass
 
 
-func travel(direction: Vector2i) -> void:
+## Through the door on map square `from_cell` (default: the current room's top-left
+## square), side `direction`. Big rooms span several squares, so the door's square
+## decides which room is on the other side and which of its doors you come out of.
+func travel(direction: Vector2i, from_cell: Variant = null) -> void:
 	if not can_travel:
 		return
-	var next_pos: Vector2i = current_grid_pos + direction
-	if layout.has(next_pos):
+	var cell: Vector2i = from_cell if from_cell is Vector2i else current_grid_pos
+	var next_cell: Vector2i = cell + direction
+	if layout.has(next_cell):
 		can_travel = false
-		_load_room(next_pos, direction)
+		_load_room(next_cell, direction, next_cell)
 		get_tree().create_timer(TRAVEL_COOLDOWN).timeout.connect(func(): can_travel = true)
 
 ## Through an unclogged toilet (Toilet.gd): to the linked room, arriving at its toilet.
@@ -227,7 +247,9 @@ func travel_through_toilet(target: Vector2i) -> void:
 
 
 ## entered_from = direction travelled (door), or ZERO when arriving through a toilet.
-func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
+## grid_pos = any map square of the room. entry_cell = the map square of the door you
+## come in through (big rooms; default: the room's home square).
+func _load_room(grid_pos: Vector2i, entered_from: Vector2i, entry_cell: Variant = null) -> void:
 	for proj in get_tree().get_nodes_in_group("projectiles"):
 		proj.queue_free()
 		
@@ -248,17 +270,20 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 		prop.queue_free()
 
 	var data: RoomData = layout[grid_pos]
+	grid_pos = data.home_cell()  # any square of a big room -> the same one every time
 
 	for child in room_container.get_children():
 		child.queue_free()
 	current_room = null
 
 	var scene: PackedScene
-	match data.type:
+	match data.type if not data.is_multi_cell() else -1:
+		-1: scene = shaped_room_scene
 		RoomData.Type.START: scene = start_room_scene
 		RoomData.Type.BOSS: scene = final_boss_room_scene if is_final_boss_stage() else boss_room_scene
 		RoomData.Type.ITEM: scene = item_room_scene
 		RoomData.Type.SHOP: scene = shop_room_scene
+		RoomData.Type.CHALLENGE: scene = challenge_room_scene
 		_: 
 			if data.scene_path == "":
 				scene = normal_room_scenes[randi() % normal_room_scenes.size()]
@@ -269,7 +294,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	current_room = scene.instantiate()
 	room_container.add_child(current_room)
 	current_grid_pos = grid_pos   # moved up from further down
-	current_room.setup(data, room_distances.get(grid_pos, 0), self, entities)
+	current_room.setup(data, room_distances.get(data.home_cell(), 0), self, entities)
 	current_room.room_cleared.connect(func(): data.cleared = true)
 
 
@@ -277,27 +302,47 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i) -> void:
 	if entered_from == Vector2i.ZERO and current_room.toilet:
 		player.global_position = current_room.toilet.get_arrival_point()
 	else:
-		player.global_position = _room_entry_position(entered_from)
+		player.global_position = _room_entry_position(entered_from, entry_cell if entry_cell is Vector2i else grid_pos)
 	_apply_room_camera_bounds()
 	player.reset_position_history()
 	player.reset_followers_position()
 	EventBus.room_entered.emit()
 
+func get_challenge_room_chance(stage: int) -> float:
+	if challenge_room_scene == null:
+		return 0.0
+	if challenge_room_chance_override >= 0.0:
+		return challenge_room_chance_override
+	if challenge_room_chance_by_stage.is_empty():
+		return 0.0
+	return challenge_room_chance_by_stage[clampi(stage - 1, 0, challenge_room_chance_by_stage.size() - 1)]
+
+
 func is_final_boss_stage() -> bool:
 	return final_boss_stage > 0 and GameState.current_stage == final_boss_stage and final_boss_room_scene != null
 
 
-## Normal rooms: room center + get_entry_offset(). The final boss arena is bigger and
-## knows its own size.
-func _room_entry_position(entered_from: Vector2i) -> Vector2:
-	if current_room is FinalBossArena:
-		return (current_room as FinalBossArena).get_entry_position(entered_from, ENTRY_DISTANCE_FROM_WALL)
+## Normal rooms: room center + get_entry_offset(). Bigger rooms (final boss arena,
+## challenge room) know their own size.
+func _room_entry_position(entered_from: Vector2i, entry_cell: Variant = null) -> Vector2:
+	if not entry_cell is Vector2i:
+		entry_cell = current_grid_pos
+	if current_room.has_method("get_entry_position"):
+		return current_room.get_entry_position(entered_from, ENTRY_DISTANCE_FROM_WALL)
+	if current_room is RoomController:
+		return (current_room as RoomController).get_door_entry_point(entry_cell, -entered_from, self)
 	return current_room.global_position + get_entry_offset(entered_from * -1)
 
 
+func get_big_room_chance(stage: int) -> float:
+	if shaped_room_scene == null or big_room_chance_by_stage.is_empty():
+		return 0.0
+	return big_room_chance_by_stage[clampi(stage - 1, 0, big_room_chance_by_stage.size() - 1)]
+
+
 func _apply_room_camera_bounds() -> void:
-	if current_room is FinalBossArena:
-		var bounds := (current_room as FinalBossArena).get_arena_bounds()
+	if current_room.has_method("get_arena_bounds"):
+		var bounds: Rect2 = current_room.get_arena_bounds()
 		player.set_camera_bounds(bounds.get_center(), bounds.size)
 	else:
 		player.set_camera_bounds(current_room.global_position, room_world_size)
@@ -401,6 +446,12 @@ func _load_obstacle_pools() -> void:
 
 
 ## Returns the RoomData.Type of the room next to the current one, or -1 if there's none.
+## Type of the room on the other side of map square `cell`'s `direction` edge (-1 = none).
+func get_neighbor_type_at(cell: Vector2i, direction: Vector2i) -> int:
+	var data: RoomData = layout.get(cell + direction)
+	return data.type if data else -1
+
+
 func get_neighbor_type(direction: Vector2i) -> int:
 	var data: RoomData = layout.get(current_grid_pos + direction)
 	return data.type if data else -1

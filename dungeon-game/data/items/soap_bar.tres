@@ -9,5 +9,6 @@ speed_bonus = 25.0
 knockback_bonus = -30.0
 player_size_bonus = -0.1
 item_name = "Soap Bar"
-description = "Slippery when wet. Smaller and faster, knockback down."
+description = "Smaller and faster, knockback down."
+flavor_text = "Slippery when wet."
 icon = ExtResource("2_icon")

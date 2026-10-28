@@ -8,5 +8,6 @@ script = ExtResource("1_script")
 speed_bonus = 20.0
 knockback_bonus = -25.0
 item_name = "Rubber Duck Soles"
-description = "Walk like water. Speed up, knockback down."
+description = "Speed up, knockback down."
+flavor_text = "Walk like water."
 icon = ExtResource("2_icon")

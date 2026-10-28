@@ -66,6 +66,8 @@ const DEFAULT_WALLS: Array = [
 @onready var player: Player = $Entities/Player
 @onready var spawn_marker: Marker2D = $SpawnPoint
 @onready var info: Label = $UI/Info
+## How many enemy names the selector shows at once (the rest scroll with Q/E).
+const LIST_ROWS := 11
 
 var _scenes: Array[PackedScene] = []
 var _selected: int = 0
@@ -77,6 +79,8 @@ var _obstacles: Array[Node] = []
 
 
 func _ready() -> void:
+	Discovery.reveal_all = true  # test room: nothing counts towards the Logbook
+	tree_exiting.connect(func(): Discovery.reveal_all = false)
 	GameState.current_stage = start_stage
 	_scenes = _find_enemy_scenes()
 
@@ -214,9 +218,17 @@ func _update_info() -> void:
 	lines.append("F5 zoom   O random obstacles   L default obstacles   K no obstacles")
 	lines.append("Enemies alive: %d" % _enemy_count())
 	lines.append("")
-	for i in _scenes.size():
-		var name := _scenes[i].resource_path.get_file().get_basename()
-		lines.append(("> " if i == _selected else "   ") + name)
+	# Only a window of the list around the selection, so it always fits on screen.
+	var total := _scenes.size()
+	var first := clampi(_selected - LIST_ROWS / 2, 0, maxi(total - LIST_ROWS, 0))
+	var last := mini(first + LIST_ROWS, total)
+	lines.append("Enemy %d / %d" % [_selected + 1, total])
+	lines.append("   ^ %d more" % first if first > 0 else "")
+	for i in range(first, last):
+		var path := _scenes[i].resource_path
+		var tier := path.get_base_dir().get_file()  # easy / medium / hard / bosses
+		lines.append(("> " if i == _selected else "   ") + path.get_file().get_basename() + "   (" + tier + ")")
+	lines.append("   v %d more" % (total - last) if last < total else "")
 	info.text = "\n".join(lines)
 
 

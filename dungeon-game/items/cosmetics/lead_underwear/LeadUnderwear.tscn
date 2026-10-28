@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://items/cosmetics/LegOverlayCosmetic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/lead_underwear/lead_underwear_front.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/lead_underwear/lead_underwear_left.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/lead_underwear/lead_underwear_up.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/lead_underwear/lead_underwear_torso_down.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/lead_underwear/lead_underwear_torso_up.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/lead_underwear/lead_underwear_torso_left.png" id="7"]
+
+[node name="LeadUnderwear" type="Node2D"]
+script = ExtResource("1")
+sheet_front = ExtResource("2")
+sheet_left = ExtResource("3")
+sheet_up = ExtResource("4")
+torso_down = ExtResource("5")
+torso_up = ExtResource("6")
+torso_left = ExtResource("7")

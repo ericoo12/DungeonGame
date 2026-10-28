@@ -70,6 +70,8 @@ contact_knockback_strength = 200.0
 knockback_immune = true
 is_boss = true
 visual_scale = 0.6
+display_name = "Doktor Mugg"
+log_description = "The final boss. Reads your movement, uses cover, throws toilet-paper rolls and gets more aggressive the more you hurt him."
 
 [node name="testsprite" parent="." index="0" unique_id=963101555]
 scale = Vector2(1.5, 1)

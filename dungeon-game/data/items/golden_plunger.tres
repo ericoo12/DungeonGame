@@ -2,13 +2,17 @@
 
 [ext_resource type="Script" path="res://items/core/Item.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/items/icons/golden_plunger.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://items/cosmetics/golden_plunger/GoldenPlunger.tscn" id="9_cosmetic"]
 
 [resource]
 script = ExtResource("1_script")
+cosmetic_scene = ExtResource("9_cosmetic")
+cosmetic_slot = "Back"
 rarity = 1
 damage_bonus = 1
 luck_bonus = 1.0
 shop_price = 20
 item_name = "Golden Plunger"
-description = "The finest unclogging money can buy. Damage and luck up."
+description = "Damage and luck up."
+flavor_text = "The finest unclogging money can buy."
 icon = ExtResource("2_icon")

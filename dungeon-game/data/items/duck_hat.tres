@@ -12,5 +12,6 @@ hurt_drop_scene = ExtResource("2_duck")
 cosmetic_scene = ExtResource("3_hat")
 cosmetic_slot = "Head"
 item_name = "Duck Hat"
-description = "Squeak when squeezed. Taking damage drops 1-2 ducks."
+description = "Taking damage drops 1-2 ducks."
+flavor_text = "Squeak when squeezed."
 icon = ExtResource("3_xxeab")

@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://enemies/doktor_mugg/arena_obstacles/ArenaObstacle.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objects/specimen_trays.png" id="2_art"]
+
+[node name="SpecimenTray" instance=ExtResource("1_base")]
+blocks_projectiles = false
+blocks_sight = false
+obstacle_size = Vector2(54, 24)
+placeholder_color = Color(0.15, 0.8, 0.25, 1)
+art_sheet = ExtResource("2_art")
+art_frames = 4
+art_content = Rect2(8, 51, 240, 145)
+art_low = true
+art_width = 60.0
+art_fps = 0.0

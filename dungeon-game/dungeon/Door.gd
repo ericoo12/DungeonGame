@@ -3,9 +3,12 @@ class_name Door
 
 ## Which texture pair the door uses. Set by RoomBase each time a room loads,
 ## based on the room on the other side (or this room, if it's the special one).
-enum Style { NORMAL, ITEM, BOSS, SHOP }
+enum Style { NORMAL, ITEM, BOSS, SHOP, CHALLENGE }
 
 @export var direction: Vector2i = Vector2i.ZERO
+## The map square this door is on (set by the room; big rooms have doors on several
+## squares). Dungeon.travel goes to the room on the other side of this square's edge.
+var cell: Vector2i = Vector2i.ZERO
 
 # Normal door — names kept the same so existing values set in the editor aren't lost.
 @export_group("Normal")
@@ -70,6 +73,10 @@ func _update_visual() -> void:
 		Style.SHOP:
 			if shop_closed_texture: closed = shop_closed_texture
 			if shop_open_texture: open = shop_open_texture
+		Style.CHALLENGE:  # boss door, painted blood red
+			if boss_closed_texture: closed = boss_closed_texture
+			if boss_open_texture: open = boss_open_texture
+	sprite.modulate = Color(1.0, 0.45, 0.45) if style == Style.CHALLENGE else Color.WHITE
 
 	sprite.texture = open if unlocked else closed
 
@@ -79,4 +86,4 @@ func _on_body_entered(body: Node) -> void:
 		return
 	var dungeon := get_tree().get_first_node_in_group("dungeon")
 	if dungeon:
-		dungeon.call_deferred("travel", direction)
+		dungeon.call_deferred("travel", direction, cell)

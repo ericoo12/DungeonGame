@@ -10,5 +10,6 @@ rarity = 1
 follower_trail_delay = 0.45
 follower_scene = ExtResource("3_ext")
 item_name = "Baby Plumber"
-description = "Union rules don't apply. Throws wrenches at nearby enemies."
+description = "Throws wrenches at nearby enemies. Wrenches briefly stun."
+flavor_text = "Union rules don't apply."
 icon = ExtResource("2_icon")

@@ -9,10 +9,14 @@
 [ext_resource type="PackedScene" uid="uid://dy1wrcm6o60f8" path="res://pickups/DeclogPickup.tscn" id="7_declog"]
 [ext_resource type="PackedScene" path="res://pickups/HalfHeartPickup.tscn" id="hh_scene"]
 
+[sub_resource type="Resource" id="Resource_halfheart"]
+script = ExtResource("1_entry")
+scene = ExtResource("hh_scene")
+weight = 2.5
+
 [sub_resource type="Resource" id="Resource_heart"]
 script = ExtResource("1_entry")
 scene = ExtResource("3_heart")
-weight = 1.0
 
 [sub_resource type="Resource" id="Resource_d1"]
 script = ExtResource("1_entry")
@@ -35,11 +39,6 @@ weight_per_luck = 0.15
 script = ExtResource("1_entry")
 scene = ExtResource("7_declog")
 weight = 1.5
-
-[sub_resource type="Resource" id="Resource_halfheart"]
-script = ExtResource("1_entry")
-scene = ExtResource("hh_scene")
-weight = 2.5
 
 [resource]
 script = ExtResource("2_table")

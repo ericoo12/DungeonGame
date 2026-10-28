@@ -49,8 +49,33 @@ var movement = MuggMovement.new(self)
 var combat = MuggCombat.new(self)
 var tactics = MuggTactics.new(self)
 
+## New animation pack (assets/sprites/enemies/doktor_mugg/clean/: 4 rows = down, left,
+## right, up; 88 px cells with the 64 px frame centred). The "clean" sheets are the
+## artist's sheets re-cut so no frame shows pieces of its neighbours.
+const ART_DIR := "res://assets/sprites/enemies/doktor_mugg/clean/"
+const PACK := {
+	# name: [file, frames, fps, loop]
+	"idle": ["doktor_mugg_idle.png", 4, 6.0, true],
+	"run": ["doktor_mugg_run.png", 4, 10.0, true],
+	"throw": ["doktor_mugg_throw.png", 4, 10.0, false],
+	"running_throw": ["doktor_mugg_running_throw.png", 4, 10.0, false],
+	"cluster_throw": ["doktor_mugg_cluster_throw.png", 4, 10.0, false],
+	"lob": ["doktor_mugg_lob.png", 4, 10.0, false],
+	"dodge": ["doktor_mugg_dodge.png", 4, 12.0, false],
+	"cover": ["doktor_mugg_cover.png", 4, 10.0, false],
+	"damage": ["doktor_mugg_hurt.png", 4, 12.0, false],
+	"death": ["doktor_mugg_death.png", 6, 8.0, false],
+}
+const ART_CELL := 88
+const ATTACK_ANIM := {"basic_shot": "throw", "running_shot": "running_throw",
+	"cluster_shot": "cluster_throw", "homing_shot": "lob"}
+
+
 func _setup_animations() -> void:
-	super._setup_animations()
+	if ResourceLoader.exists(ART_DIR + "doktor_mugg_idle.png"):
+		sprite.sprite_frames = _build_pack_frames()
+	else:
+		super._setup_animations()
 	if random_seed == 0:
 		_rng.randomize()
 	else:
@@ -58,6 +83,68 @@ func _setup_animations() -> void:
 	behavior_tree.configure(self)
 	state_machine.state_changed.connect(func(_previous, _current): queue_redraw())
 	label.visible = debug_ai
+
+func _build_pack_frames() -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+	var dirs := ["down", "left", "right", "up"]
+	for anim in PACK:
+		var info: Array = PACK[anim]
+		var tex := load(ART_DIR + info[0]) as Texture2D
+		if tex == null:
+			continue
+		for row in dirs.size():
+			var anim_name: String = anim + "_" + dirs[row]
+			frames.add_animation(anim_name)
+			frames.set_animation_speed(anim_name, info[2])
+			frames.set_animation_loop(anim_name, info[3])
+			for i in int(info[1]):
+				var at := AtlasTexture.new()
+				at.atlas = tex
+				at.region = Rect2(i * ART_CELL, row * ART_CELL, ART_CELL, ART_CELL)
+				frames.add_frame(anim_name, at)
+			if anim == "throw":  # contact "attack" pose = the throw
+				frames.add_animation("attack_" + dirs[row])
+				frames.set_animation_speed("attack_" + dirs[row], info[2])
+				frames.set_animation_loop("attack_" + dirs[row], false)
+				for i in int(info[1]):
+					frames.add_frame("attack_" + dirs[row], frames.get_frame_texture(anim_name, i))
+	return frames
+
+
+## Holds `anim` (facing the current direction) on `frame`.
+func _show_frame(anim: String, frame: int) -> void:
+	var anim_name := anim + "_" + facing_direction
+	if not sprite.sprite_frames.has_animation(anim_name):
+		return
+	if sprite.animation != anim_name:
+		sprite.play(anim_name)
+	sprite.pause()
+	sprite.frame = clampi(frame, 0, sprite.sprite_frames.get_frame_count(anim_name) - 1)
+
+
+## Picks the frame for the committed action from how far into it we are, so the art
+## follows the gameplay timing: throws wind up on 0-1, release on 2 (the shot leaves
+## exactly when the attack fires), follow through on 3.
+func _update_action_visual() -> void:
+	var e := action_elapsed
+	match action_state:
+		"basic_shot", "cluster_shot", "homing_shot", "running_shot":
+			var w := _active_windup
+			var f := 0 if e < w * 0.5 else (1 if e < w else (2 if e < w + fire_duration + _active_recovery * 0.5 else 3))
+			_show_frame(ATTACK_ANIM[action_state], f)
+		"dodge":
+			_show_frame("dodge", 3 if e >= dodge_duration else mini(2, int(e / maxf(dodge_duration, 0.01) * 3.0)))
+		"area_attack":
+			if blackboard.has_last_seen and e < 0.05:
+				_update_facing_direction(global_position.direction_to(blackboard.last_seen_position))
+			var k := e / maxf(area_warning, 0.01)
+			_show_frame("lob", 0 if k < 0.25 else (1 if k < 0.55 else (2 if k < 0.85 else 3)))
+		"cover_hold":
+			if blackboard.has_last_seen and e < 0.05:
+				_update_facing_direction(global_position.direction_to(blackboard.last_seen_position))
+			_show_frame("cover", mini(2, int(e * 10.0)))
+
 
 func set_arena(room: FinalBossArena) -> void:
 	arena = room
@@ -132,6 +219,7 @@ func ai_basic_shot(kind: String = "basic_shot") -> DecisionNode.Status:
 
 func _update_action(_delta: float) -> void:
 	combat.advance_action(_delta)
+	_update_action_visual()
 
 func _on_action_ended(_action: String, _cancelled: bool) -> void:
 	combat.cleanup_action(_action, _cancelled)

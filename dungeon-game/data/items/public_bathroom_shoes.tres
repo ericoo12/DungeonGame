@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" path="res://items/core/Item.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/items/icons/public_bathroom_shoes.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://items/cosmetics/bathroom_shoes/BathroomShoes.tscn" id="9_cosmetic"]
 
 [resource]
 script = ExtResource("1_script")
+cosmetic_scene = ExtResource("9_cosmetic")
+cosmetic_slot = "Feet"
 speed_bonus = 25.0
 player_size_bonus = 0.08
 item_name = "Public Bathroom Shoes"
-description = "Never touch the floor. Speed up, a bit bigger."
+description = "Speed up, a bit bigger."
+flavor_text = "Never touch the floor."
 icon = ExtResource("2_icon")

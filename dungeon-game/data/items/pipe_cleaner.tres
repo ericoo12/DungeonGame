@@ -8,5 +8,6 @@ script = ExtResource("1_script")
 fire_rate_bonus = 0.08
 shot_speed_bonus = 0.2
 item_name = "Pipe Cleaner"
-description = "Smooth flow. Fire rate and shot speed up."
+description = "Fire rate and shot speed up."
+flavor_text = "Smooth flow."
 icon = ExtResource("2_icon")

@@ -23,6 +23,7 @@ var room_entry: Dictionary = {}
 
 func _ready() -> void:
 	add_to_group("item_pickups")
+	add_to_group("item_info_sources")  # ItemInfoPopup shows what it is when you're close
 	body_entered.connect(_on_body_entered)
 	_update_visual()
 	_start_bob()

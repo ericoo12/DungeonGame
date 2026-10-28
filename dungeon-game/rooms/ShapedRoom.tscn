@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://b1ktu3n06cjut" path="res://rooms/NormalRoom01.tscn" id="1_base"]
+[ext_resource type="Script" path="res://rooms/ShapedRoom.gd" id="2_script"]
+
+[node name="ShapedRoom" instance=ExtResource("1_base")]
+script = ExtResource("2_script")

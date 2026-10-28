@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="SewerBeamAttack" format=3]
+
+[ext_resource type="Script" path="res://enemies/behaviors/SewerBeamAttack.gd" id="1_beam"]
+
+[resource]
+script = ExtResource("1_beam")

@@ -1,0 +1,12 @@
+drip_drop_left.png 1024x512
+dust_bunny_left.png 1024x512
+leaky_valve_left.png 1024x512
+lost_tooth_left.png 1024x512
+maggot_roll_left.png 1024x512
+mop_head_left.png 1024x512
+pipe_spider_left.png 1024x512
+plunger_head_left.png 1024x512
+sewer_roach_left.png 1024x512
+soap_bubble_left.png 1024x512
+soap_slug_left.png 1024x512
+wet_sock_left.png 1024x512

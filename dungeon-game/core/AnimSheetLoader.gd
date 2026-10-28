@@ -196,6 +196,39 @@ static func build_side_view_enemy_frames(path: String, frame_count: int, fps: fl
 	return frames
 
 
+## Side-view enemy with ONE sheet of 2 rows (e.g. 4 x 2 frames of 256x256, facing left):
+## row 1 = move loop (run_*, also used for damage_*), row 2 = its action (attack_*: hop,
+## dash, bite...). death_from_action_row: row 2 is the death animation instead (Soap
+## Bubble popping). Directions down/left/up all use the same art (mirrored for right).
+static func build_side_view_2row_frames(path: String, frame_count: int, fps: float = 12.0,
+		death_from_action_row: bool = false) -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+	var tex := load(path) as Texture2D
+	if tex == null:
+		push_error("AnimSheetLoader: could not load 2-row enemy sheet: " + path)
+		return frames
+	var w := tex.get_width() / frame_count
+	var h := tex.get_height() / 2
+	for dir in ["down", "left", "up"]:
+		_add_row(frames, "run_" + dir, tex, 0, w, h, frame_count, fps, true)
+		_add_row(frames, "damage_" + dir, tex, 0, w, h, frame_count, fps, false)
+		_add_row(frames, ("death_" if death_from_action_row else "attack_") + dir, tex, 1, w, h, frame_count, fps, false)
+	return frames
+
+
+static func _add_row(frames: SpriteFrames, anim: String, tex: Texture2D, row: int, w: int, h: int,
+		count: int, fps: float, loop: bool) -> void:
+	frames.add_animation(anim)
+	frames.set_animation_speed(anim, fps)
+	frames.set_animation_loop(anim, loop)
+	for i in count:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(i * w, row * h, w, h)
+		frames.add_frame(anim, atlas)
+
+
 static func _load_optional(path: String) -> Texture2D:
 	if path == "":
 		return null

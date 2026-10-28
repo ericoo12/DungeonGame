@@ -39,6 +39,23 @@ func _detonate() -> void:
 		_damage_player()
 	if damages_enemies:
 		_damage_enemies()
+	_push_pickups()
+
+
+## Blows floor pickups (hearts, ducks...) away and into the air.
+func _push_pickups() -> void:
+	var reach := radius * 1.4
+	for node in get_tree().get_nodes_in_group("physics_pickups"):
+		var pickup := node as PhysicsPickup
+		if pickup == null:
+			continue
+		var away := pickup.global_position - global_position
+		var dist := away.length()
+		if dist > reach:
+			continue
+		if dist < 0.01:
+			away = Vector2.RIGHT.rotated(randf() * TAU)
+		pickup.knock(away.normalized() * lerpf(220.0, 80.0, dist / reach), 160.0)
 
 
 func _damage_player() -> void:

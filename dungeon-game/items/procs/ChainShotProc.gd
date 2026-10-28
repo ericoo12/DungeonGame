@@ -4,7 +4,7 @@ class_name ChainShotProc
 extends ShotProcEffect
 
 @export var chain_range: float = 80.0
-@export var damage_ratio: float = 0.6
+@export var damage_ratio: float = 2.6
 @export var tint: Color = Color(0.75, 0.95, 1.0)
 
 

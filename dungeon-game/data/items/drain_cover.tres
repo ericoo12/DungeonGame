@@ -9,5 +9,6 @@ script = ExtResource("1_script")
 rarity = 2
 orbital_scene = ExtResource("3_ext")
 item_name = "Drain Cover"
-description = "Heavy protection. A big, slow orbital that blocks shots and hits hard."
+description = "A big, slow orbital that blocks shots and hits hard."
+flavor_text = "Heavy protection."
 icon = ExtResource("2_icon")

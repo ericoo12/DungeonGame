@@ -12,5 +12,6 @@ script = ExtResource("1_script")
 effect = SubResource("Resource_effect")
 max_charges = 3
 item_name = "Overflow Alarm"
-description = "Everybody out! Floods the room: enemies slowed and you run faster for 5 seconds."
+description = "Floods the room: enemies slowed and you run faster for 5 seconds."
+flavor_text = "Everybody out!"
 icon = ExtResource("2_icon")

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WanderMovement" format=3]
+
+[ext_resource type="Script" path="res://enemies/behaviors/WanderMovement.gd" id="1_wander"]
+
+[resource]
+script = ExtResource("1_wander")
+alert_radius = 0.0
+wander_speed = 18.0

@@ -43,6 +43,9 @@ var shooter: Player = null
 var procs: Array[ShotProcEffect] = []
 ## Never hits this node (split shots ignore the enemy they split from).
 var ignored_target: Node = null
+## Sewer Skewer (Player.piercing_shots): flies on through enemies, hitting each once.
+var pierce: bool = false
+var _pierced: Array[Node] = []
 
 const SHADOW_SCENE := preload("res://effects/Shadow.tscn")
 const SPLASH_SCENE := preload("res://effects/ProjectileSplash.tscn")
@@ -95,7 +98,21 @@ func _physics_process(delta: float) -> void:
 		_shadow.offset = Vector2(0, depth - _fallen)
 
 	if elapsed >= lifetime:
-		_land()
+		_expire()
+
+
+## End of the flight with nothing hit: procs get a say (Split Seam splits here), then land.
+func _expire() -> void:
+	if has_landed:
+		return
+	for proc in procs:
+		proc.on_projectile_expire(self)
+	_land()
+
+
+## How far the shot has dropped from gun height so far (its falling arc).
+func get_fallen() -> float:
+	return _fallen
 
 
 func _spawn_shadow() -> void:
@@ -138,10 +155,15 @@ func _try_deal_damage(target: Node) -> void:
 	if has_landed or target == ignored_target:
 		return
 	if target.has_method("take_damage"):
+		if pierce:
+			if _pierced.has(target):
+				return
+			_pierced.append(target)
 		target.take_damage(damage, velocity.normalized(), knockback_strength)
 		for proc in procs:
 			proc.on_hit(target, shooter)
 			proc.on_projectile_hit(self, target)
-		_land()
+		if not pierce or target is Obstacle:
+			_land()
 	elif target.is_in_group("walls") or target.is_in_group("projectile_blockers"):  # final-arena blue blocks
 		_land()

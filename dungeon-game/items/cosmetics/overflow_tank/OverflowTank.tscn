@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://d0pbhk3ws02iu"]
+
+[ext_resource type="Script" uid="uid://n5hs800fd8ey" path="res://items/cosmetics/BackCosmetic.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dg7scp53ocpoo" path="res://assets/sprites/player/cosmetics/overflow_tank/overflow_tank_down.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://conu0hpus62kb" path="res://assets/sprites/player/cosmetics/overflow_tank/overflow_tank_left.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://cvouspwb1jxnv" path="res://assets/sprites/player/cosmetics/overflow_tank/overflow_tank_up.png" id="4"]
+
+[node name="OverflowTank" type="Node2D" unique_id=2128276153]
+script = ExtResource("1")
+texture_down = ExtResource("2")
+texture_left = ExtResource("3")
+texture_up = ExtResource("4")
+offset_down = Vector2(0, 20)
+offset_left = Vector2(45, 45)
+offset_up = Vector2(0, 40)
+scale_down = 0.4
+scale_left = 0.4
+scale_up = 0.4

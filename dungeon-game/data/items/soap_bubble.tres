@@ -8,5 +8,6 @@
 script = ExtResource("1_script")
 orbital_scene = ExtResource("3_ext")
 item_name = "Soap Bubble"
-description = "Clean protection. Orbits you and blocks one enemy shot, then pops and comes back."
+description = "Orbits you and blocks one enemy shot, then pops into a ring of little bubbles that hurt enemies. Comes back after a while."
+flavor_text = "Clean protection."
 icon = ExtResource("2_icon")

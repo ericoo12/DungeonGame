@@ -13,6 +13,10 @@ class_name FinalBossBase
 @export var is_static_visual: bool = false
 # --- Stats ---
 @export var max_health: float = 30.0
+@export_group("Logbook")
+@export var display_name: String = ""
+@export_multiline var log_description: String = ""
+@export_group("")
 @export var move_speed: float = 10.0
 
 # --- Contact damage ---
@@ -26,6 +30,8 @@ class_name FinalBossBase
 
 @export var is_boss: bool = false
 @export var spawn_grace_period: float = 0.5
+## Seconds the body lies on its last death frame before it's removed.
+@export var death_hold_time: float = 1.2
 
 
 var spawn_timer: float = 0.0
@@ -67,6 +73,7 @@ func _ready() -> void:
 	max_health *= GameState.get_health_multiplier()
 	contact_damage = snappedf(contact_damage * GameState.get_damage_multiplier(), 0.5)
 	health = max_health
+	Discovery.mark_enemy_seen(scene_file_path)
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 	hitbox.area_exited.connect(_on_hitbox_area_exited)
 	player = get_tree().get_first_node_in_group("player")
@@ -122,7 +129,7 @@ func _physics_process(delta: float) -> void:
 		if velocity.length() > 0.5:
 			_play_run_animation()
 		else:
-			sprite.stop()
+			_play_idle_animation()
 
 
 ## Runs while alive after spawn protection, including during hurt/attack actions.
@@ -247,6 +254,16 @@ func _update_facing_direction(dir: Vector2) -> void:
 		facing_direction = "down" if dir.y > 0.0 else "up"
 
 
+## Standing still: the idle loop if the sprite has one, else the run pose stopped.
+func _play_idle_animation() -> void:
+	var animation_name := "idle_" + facing_direction
+	if sprite.sprite_frames.has_animation(animation_name):
+		if sprite.animation != animation_name or not sprite.is_playing():
+			sprite.play(animation_name)
+	else:
+		sprite.stop()
+
+
 func _play_run_animation() -> void:
 	var animation_name := "run_" + facing_direction
 	if sprite.sprite_frames.has_animation(animation_name):
@@ -284,6 +301,7 @@ func die() -> void:
 		return
 	# Keep only the bounded death action ticking; no AI, contacts or movement.
 	is_dying = true
+	Discovery.mark_enemy_killed(scene_file_path)
 	_cancel_current_action()
 	knockback_velocity = Vector2.ZERO
 	overlapping_hurtboxes.clear()
@@ -292,7 +310,8 @@ func die() -> void:
 	body_collision.set_deferred("disabled", true)
 	var animation := "death_" + facing_direction
 	_action_state = "death"
-	_action_duration = _animation_duration(animation)
+	# The death animation stops on its last frame; the body stays a moment before it goes.
+	_action_duration = _animation_duration(animation) + death_hold_time
 	_play_action_animation(animation)
 	if not sprite.sprite_frames.has_animation(animation):
 		finish_action(_action_id)

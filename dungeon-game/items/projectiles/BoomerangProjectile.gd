@@ -1,6 +1,8 @@
 ## U-Bend's shot: flies out, slows to a stop, then flies back to the player.
-## Goes through enemies (hits each one once on the way out and once on the way back),
-## turns around early when it hits a wall or obstacle, and flies over walls on the way
+## Hitting an enemy on the way out turns it around (that enemy isn't hit again); hitting
+## one on the way back ends the shot - so it hits at most one enemy per leg. With Drain
+## Snake (pierce) it goes through enemies instead, hitting each once per leg.
+## Turns around early when it hits a wall or obstacle, and flies over walls on the way
 ## back so it can't get stuck. On the way back it flies THROUGH the player and keeps
 ## going for `overshoot_distance` px before it drops (it isn't caught).
 ## Range stat = how far it goes out; shot speed = how fast.
@@ -66,19 +68,24 @@ func _physics_process(delta: float) -> void:
 	else:
 		_overshoot_left -= velocity.length() * delta
 		if _overshoot_left <= 0.0:
-			_land()
+			_expire()
 			return
 	global_position += velocity * delta
 	sprite_rotator.rotation += spin_speed * delta
 	if elapsed >= max_flight_time:
-		_land()
+		_expire()
 
 
-func _start_return() -> void:
+func _start_return(keep_hit: Node = null) -> void:
 	if _returning:
 		return
 	_returning = true
+	# Stop dead first: otherwise the outward velocity reads as "already flying away from
+	# the player" and it would sail on instead of coming back.
+	velocity = Vector2.ZERO
 	_hit_this_leg.clear()
+	if keep_hit:
+		_hit_this_leg.append(keep_hit)  # don't hit the enemy it just bounced off again
 	_return_speed = _speed0 * 0.25
 
 
@@ -100,3 +107,8 @@ func _try_deal_damage(target: Node) -> void:
 		for proc in procs:
 			proc.on_hit(target, shooter)
 			proc.on_projectile_hit(self, target)
+		if not pierce:
+			if _returning:
+				_land()
+			else:
+				_start_return(target)

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://items/cosmetics/ArmSparksCosmetic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/cosmetics/auras/static_cling_gun_sparks.png" id="2"]
+
+[node name="StaticCling" type="Node2D"]
+script = ExtResource("1")
+strip = ExtResource("2")

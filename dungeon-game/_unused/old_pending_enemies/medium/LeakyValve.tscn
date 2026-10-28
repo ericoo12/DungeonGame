@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/WanderMovement.gd" id="s_WanderMovement"]
+[ext_resource type="Script" path="res://enemies/behaviors/RangedAttack.gd" id="s_RangedAttack"]
+[ext_resource type="PackedScene" uid="uid://dk6xlvxec8kec" path="res://enemies/projectiles/EnemyProjectile.tscn" id="p_proj"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_WanderMovement")
+alert_radius = 0.0
+wander_speed = 15.0
+
+[sub_resource type="Resource" id="Resource_attack"]
+script = ExtResource("s_RangedAttack")
+range = 220.0
+cooldown = 3.0
+projectile_speed = 70.0
+projectile_scene = ExtResource("p_proj")
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 60.0
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 80.0
+
+[node name="LeakyValve" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/leaky_valve/leaky_valve_move_4frames.png"
+side_view_frames = 4
+attack_sheet_path = "res://assets/sprites/enemies/leaky_valve/leaky_valve_spurt_4frames.png"
+shadow_scale_ratio = 4.5
+shadow_offset = Vector2(0, 6)
+max_health = 12.0
+move_speed = 15.0
+movement_behavior = SubResource("Resource_move")
+attack_behavior = SubResource("Resource_attack")
+pack_size = Vector2i(1, 1)
+family = &"valve"
+visual_scale = 0.1
+display_name = "Leaky Valve"
+log_description = "A valve on little feet. Wanders around and now and then spurts a slow drop of water at you."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")

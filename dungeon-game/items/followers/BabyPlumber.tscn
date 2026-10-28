@@ -10,5 +10,5 @@ bob_height = 2.0
 bob_speed = 8.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.4, 0.4)
+scale = Vector2(0.24, 0.24)
 texture = ExtResource("2_tex")

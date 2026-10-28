@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/behaviors/FloatLineMovement.gd" id="s_FloatLineMovement"]
+
+[sub_resource type="Resource" id="Resource_move"]
+script = ExtResource("s_FloatLineMovement")
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 80.0
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 93.3
+
+[node name="SoapBubble" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/soap_bubble/soap_bubble_left.png"
+side_view_frames = 4
+two_row_sheet = true
+action_row_is_death = true
+shadow_scale_ratio = 4.71
+shadow_offset = Vector2(0, 6.4)
+max_health = 1.0
+move_speed = 40.0
+movement_behavior = SubResource("Resource_move")
+pack_size = Vector2i(1, 3)
+family = &"bubble"
+visual_scale = 0.075
+display_name = "Soap Bubble"
+log_description = "A bubble with grime inside. Floats in a straight line and bounces off walls. Pops on touch - shoot it before it reaches you."
+dies_on_contact = true
+knockback_immune = true
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 0.9)
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("Circle_hit")
+
+[node name="AnimatedSprite2D" parent="." index="3" unique_id=622601666]
+offset = Vector2(0, -10)

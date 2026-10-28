@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Resource" uid="uid://cmuxxey7yt7a1" path="res://enemies/behaviors/presets/stationary_movement.tres" id="2_still"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/roll_attack.tres" id="3_roll"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hbbody"]
+radius = 80.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hbhit"]
+radius = 100.0
+
+[node name="Hairball" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/hairball/hairball_idle_4frames.png"
+side_view_frames = 4
+attack_sheet_path = "res://assets/sprites/enemies/hairball/hairball_roll_4frames.png"
+shadow_scale_ratio = 4.7
+shadow_offset = Vector2(0, 2)
+max_health = 16.0
+move_speed = 0.0
+movement_behavior = ExtResource("2_still")
+family = &"hairball"
+attack_behavior = ExtResource("3_roll")
+visual_scale = 0.12
+display_name = "Hairball"
+log_description = "A clog with a grudge. Sits still, curls up and shakes, then rolls the length of the room at you, bouncing off walls. Shots can't stop a roll - move."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, -6)
+shape = SubResource("CircleShape2D_hbbody")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_hbhit")
+
+[node name="AnimatedSprite2D" parent="." index="3" unique_id=622601666]
+offset = Vector2(0, -86)

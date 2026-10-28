@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="RollAttack" format=3]
+
+[ext_resource type="Script" path="res://enemies/behaviors/RollAttack.gd" id="1_roll"]
+
+[resource]
+script = ExtResource("1_roll")

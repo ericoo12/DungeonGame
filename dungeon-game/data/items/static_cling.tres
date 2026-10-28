@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b0mpmlsvj5s5w" path="res://items/core/Item.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://h2ucpsbodejg" path="res://assets/sprites/items/icons/static_cling.png" id="2_icon"]
 [ext_resource type="Script" uid="uid://mr5k5vxsye6j" path="res://items/procs/ChainShotProc.gd" id="3_sub"]
+[ext_resource type="PackedScene" path="res://items/cosmetics/auras/StaticCling.tscn" id="9_cosmetic"]
 
 [sub_resource type="Resource" id="Resource_shot_proc"]
 script = ExtResource("3_sub")
@@ -12,7 +13,10 @@ base_chance = 0.15
 script = ExtResource("1_script")
 luck_bonus = 0.5
 shot_proc = SubResource("Resource_shot_proc")
+cosmetic_scene = ExtResource("9_cosmetic")
+cosmetic_slot = "Aura"
 item_name = "Static Cling"
-description = "They're stuck together. Luck up, shots can zap a nearby enemy."
+description = "Luck up, shots can zap a nearby enemy."
+flavor_text = "They're stuck together."
 icon = ExtResource("2_icon")
 rarity = 1

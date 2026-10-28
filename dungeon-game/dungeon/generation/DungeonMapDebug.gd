@@ -36,16 +36,17 @@ func _draw() -> void:
 			RoomData.Type.BOSS: color = Color(0.9, 0.2, 0.2)
 			RoomData.Type.ITEM: color = Color(1.0, 0.85, 0.2)
 			RoomData.Type.SHOP: color = Color(0.3, 0.85, 0.4)
+			RoomData.Type.CHALLENGE: color = Color(0.7, 0.3, 0.9)
 			_: color = Color(0.6, 0.6, 0.6) if data.cleared else Color(0.9, 0.8, 0.3)
 
-		if grid_pos == dungeon.current_grid_pos:
+		if dungeon.layout.get(dungeon.current_grid_pos) == data:
 			draw_rect(Rect2(screen_pos - Vector2(2, 2), Vector2.ONE * (cell_size - 4)), Color(1, 1, 1), false, 2.0)
 
 		draw_rect(Rect2(screen_pos, Vector2.ONE * (cell_size - 6)), color)
 
 		# Door connections, drawn as short lines toward each connected neighbor
 		for dir in [DungeonGenerator.NORTH, DungeonGenerator.SOUTH, DungeonGenerator.EAST, DungeonGenerator.WEST]:
-			if data.doors.get(dir, false):
+			if data.has_door_at(grid_pos, dir):
 				var center: Vector2 = screen_pos + Vector2.ONE * (cell_size - 6) / 2.0
 				var line_end: Vector2 = center + Vector2(dir) * cell_size * 0.6
 				draw_line(center, line_end, Color(0.3, 0.3, 0.3), 2.0)

@@ -1,6 +1,9 @@
 extends Area2D
 class_name Orbital
 
+const BUBBLE_SHOT := preload("res://items/orbitals/BubbleShot.gd")
+const PAPER_STREAMER := preload("res://items/orbitals/PaperStreamer.gd")
+
 @export var radius: float = 40.0
 @export var damage: float = 0.0  # 0 = pure blocker, deals no contact damage
 @export var damage_interval: float = 0.3
@@ -18,7 +21,15 @@ class_name Orbital
 ## Soap Bubble: pops after blocking one projectile and comes back after respawn_time.
 @export var pops_on_block: bool = false
 @export var respawn_time: float = 4.0
+## When it pops, it flings this many little bubbles out in a ring (BubbleShot) that
+## hurt the enemies they hit. 0 = just pops.
+@export var pop_ring_count: int = 0
+@export var pop_ring_damage: float = 1.5
+@export var pop_ring_speed: float = 95.0
+@export var pop_ring_range: float = 75.0
 @export_group("")
+## Toilet Roll: unrolls a paper streamer behind it that slows enemies (PaperStreamer).
+@export var paper_trail: bool = false
 
 var _popped: bool = false
 
@@ -39,6 +50,18 @@ func _ready() -> void:
 	if blocks_projectiles:
 		area_entered.connect(_on_area_entered)
 	player_ref = get_parent()
+	if paper_trail:
+		_make_streamer.call_deferred()
+
+
+var _streamer: Node2D
+
+
+func _make_streamer() -> void:
+	var ground := get_tree().get_first_node_in_group("ground_effects")
+	_streamer = PAPER_STREAMER.new()
+	_streamer.source = self
+	(ground if ground else player_ref.get_parent()).add_child(_streamer)
 
 
 func _physics_process(delta: float) -> void:
@@ -73,6 +96,8 @@ static func _is_enemy_shot(area: Area2D) -> bool:
 
 func _pop() -> void:
 	_popped = true
+	if pop_ring_count > 0:
+		_fire_pop_ring.call_deferred(global_position)
 	visible = false
 	set_deferred("monitoring", false)
 	overlapping_bodies.clear()
@@ -82,6 +107,23 @@ func _pop() -> void:
 	_popped = false
 	visible = true
 	monitoring = true
+
+
+## Ring of little bubbles from where it popped (deferred: popping happens inside a
+## physics callback, where new areas can't be added).
+func _fire_pop_ring(at: Vector2) -> void:
+	var world := player_ref.get_parent() if is_instance_valid(player_ref) else null
+	if world == null:
+		return
+	var twist := randf() * TAU
+	for i in pop_ring_count:
+		var b: Area2D = BUBBLE_SHOT.new()
+		var dir := Vector2.RIGHT.rotated(twist + TAU * i / pop_ring_count)
+		b.velocity = dir * pop_ring_speed
+		b.damage = pop_ring_damage
+		b.max_range = pop_ring_range
+		world.add_child(b)
+		b.global_position = at + dir * 4.0
 
 
 func _on_body_entered(body: Node) -> void:

@@ -47,7 +47,8 @@ func run() -> void:
 	add_child(homing)
 	homing.launch(Vector2.RIGHT)
 	await frames(12)
-	check(not is_instance_valid(homing), "Homing paper stops at green block")
+	check(is_instance_valid(homing) and homing.position.x > 90, "Homing paper rolls over green block")
+	homing.queue_free()
 	var straight := MuggBall.new()
 	straight.speed = 600
 	add_child(straight)

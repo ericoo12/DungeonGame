@@ -13,5 +13,6 @@ script = ExtResource("1_script")
 range_bonus = 0.3
 shot_proc = SubResource("Resource_shot_proc")
 item_name = "Wet Floor Sign"
-description = "Watch your step. Range up, shots can make enemies slip and slide."
+description = "Range up, shots can make enemies slip and slide."
+flavor_text = "Watch your step."
 icon = ExtResource("2_icon")

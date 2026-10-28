@@ -8,6 +8,7 @@
 script = ExtResource("1_gcuj7")
 shot_proc = ExtResource("3_dm8e2")
 item_name = "Sticky Briefs"
-description = "They really cling"
+description = "Shots can slow enemies down."
+flavor_text = "They really cling."
 icon = ExtResource("1_nmnsy")
 metadata/_custom_type_script = "uid://b0mpmlsvj5s5w"

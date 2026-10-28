@@ -9,5 +9,6 @@ fire_rate_bonus = -0.06
 range_bonus = 0.4
 shot_speed_bonus = 0.5
 item_name = "Pressure Valve"
-description = "Do not overtighten. Shot speed and range up, fire rate down."
+description = "Shot speed and range up, fire rate down."
+flavor_text = "Do not overtighten."
 icon = ExtResource("2_icon")

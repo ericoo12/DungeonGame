@@ -31,7 +31,9 @@ func _ready() -> void:
 	if randf() < 0.5:
 		_spin_rate = -_spin_rate
 	collision_layer = 64
-	collision_mask = 401 if homing else 273 # Homing rolls also hit movement blockers (128).
+	# Walls, shot blockers (vaults/coils) and the player. Low shoot-through objects
+	# (movement-only, layer 128) don't stop any roll, homing ones included.
+	collision_mask = 273
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	if homing:
 		paper_trail = MuggPaperTrail.new()
@@ -44,6 +46,7 @@ func _ready() -> void:
 	circle.radius = ball_radius
 	collision.shape = circle
 	add_child(collision)
+	DangerHalo.attach(self)
 	monitoring = false
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
@@ -100,10 +103,6 @@ func _physics_process(delta: float) -> void:
 
 func _try_deal_damage(body: Node) -> void:
 	if _spent:
-		return
-	if homing and body is PhysicsBody2D and (body.collision_layer & 128) != 0:
-		_spent = true
-		queue_free()
 		return
 	if body.has_method("take_damage") or body.is_in_group("walls") or body.is_in_group("projectile_blockers"):
 		_spent = true

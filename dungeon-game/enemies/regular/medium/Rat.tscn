@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://b828w81uw08h1"]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://enemies/behaviors/presets/swarm_chase_movement.tres" id="2_swarm"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ratbody"]
+radius = 14.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rathit"]
+radius = 18.0
+
+[node name="Rat" unique_id=1579853284 instance=ExtResource("1_base")]
+sprite_sheet_path = "res://assets/sprites/enemies/rat/rat_run.png"
+side_view_frames = 4
+shadow_offset = Vector2(0, 5)
+max_health = 7.0
+move_speed = 60.0
+movement_behavior = ExtResource("2_swarm")
+pack_size = Vector2i(2, 3)
+family = &"rat"
+spawn_weight = 3.0
+visual_scale = 0.35
+display_name = "Sewer Rat"
+log_description = "Hunts in packs. The pack works together to cut you off and surround you, splitting around obstacles."
+
+[node name="CollisionShape2D" parent="." index="1" unique_id=1367813687]
+position = Vector2(0, 2)
+shape = SubResource("CircleShape2D_ratbody")
+
+[node name="CollisionShape2D" parent="Hitbox" parent_id_path=PackedInt32Array(1065903410) index="0" unique_id=703121797]
+shape = SubResource("CircleShape2D_rathit")
