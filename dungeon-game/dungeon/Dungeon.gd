@@ -23,7 +23,7 @@ var boss_scenes: Array[PackedScene] = []
 @export var shaped_room_scene: PackedScene = preload("res://rooms/ShapedRoom.tscn")
 ## Chance each new normal room is a big one (DungeonGenerator.BIG_SHAPES), per stage
 ## (index 0 = stage 1; later stages use the last value).
-@export var big_room_chance_by_stage: Array[float] = [0.25, 0.3, 0.35]
+@export var big_room_chance_by_stage: Array[float] = [0.1, 0.12, 0.15]
 ## Challenge room (sacrifice altars + 3 waves) and the chance a floor has one.
 @export var challenge_room_scene: PackedScene = preload("res://rooms/challenge/ChallengeRoom.tscn")
 ## Chance a floor has a challenge room, per stage (index 0 = stage 1; stages past the
