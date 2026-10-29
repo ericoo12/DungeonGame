@@ -14,6 +14,8 @@ class_name ChallengeRoom
 const ALTAR_SCRIPT := preload("res://rooms/challenge/SacrificeAltar.gd")
 const WARNING_SCRIPT := preload("res://rooms/challenge/SpawnWarning.gd")
 const PILLAR_SCENE := preload("res://obstacles/Rock.tscn")
+const ROOM_ART := preload("res://rooms/RoomArt.gd")
+const ROOM_TEX := preload("res://assets/sprites/tiles/special_rooms/challenge_room_224x112.png")
 
 enum State { IDLE, FIGHTING, DONE }
 
@@ -99,45 +101,12 @@ static func _set_box(node: CollisionShape2D, rect: Rect2) -> void:
 	node.scale = Vector2.ONE
 
 
-## Floor art: the floor variant's room picture as 4 mirrored, stretched quarters (like
-## the final boss arena), plus a plain fill behind.
-func _apply_floor_variant(variant: RoomFloorVariant) -> void:
-	var tex: Texture2D = variant.texture if variant and variant.texture else load("res://assets/sprites/tiles/sewer.png")
-	var art := Node2D.new()
-	art.name = "QuarterArt"
-	art.z_index = -2
+## Floor art: the challenge room's own quarter (ritual circle in the middle), built at
+## room_size by RoomArt.
+func _apply_floor_variant(_variant: RoomFloorVariant) -> void:
+	var art := ROOM_ART.build(ROOM_TEX, room_size)
 	add_child(art)
 	move_child(art, 0)
-	var w := room_size.x / 2.0
-	var h := room_size.y / 2.0
-	var fill := TextureRect.new()
-	var patch := AtlasTexture.new()
-	patch.atlas = tex
-	patch.region = Rect2(80, 48, 64, 48)
-	fill.texture = patch
-	fill.stretch_mode = TextureRect.STRETCH_TILE
-	fill.position = Vector2(-w, -h)
-	fill.size = room_size
-	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	art.add_child(fill)
-	for q in [[-1, -1], [1, -1], [-1, 1], [1, 1]]:
-		var holder := Node2D.new()
-		holder.position = Vector2(q[0] * w, q[1] * h)
-		holder.scale = Vector2(-q[0], -q[1])  # mirror so each quarter's wall faces out
-		art.add_child(holder)
-		var quarter := AtlasTexture.new()
-		quarter.atlas = tex
-		quarter.region = Rect2(10, 0, 202, 112)
-		var nine := NinePatchRect.new()
-		nine.texture = quarter
-		nine.size = Vector2(w, h)
-		nine.draw_center = false
-		nine.patch_margin_left = 32
-		nine.patch_margin_top = 32
-		nine.axis_stretch_horizontal = NinePatchRect.AXIS_STRETCH_MODE_TILE
-		nine.axis_stretch_vertical = NinePatchRect.AXIS_STRETCH_MODE_TILE
-		nine.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		holder.add_child(nine)
 
 
 ## Camera limits and door arrival points use these (Dungeon checks for them).

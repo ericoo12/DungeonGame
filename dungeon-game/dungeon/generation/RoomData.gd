@@ -21,6 +21,8 @@ var doors: Dictionary = {}
 ## the (absolute) map square the door is on and dir the side. Works for any room size.
 var edge_doors: Dictionary = {}
 var cleared: bool = false
+## The player has been in this room (minimap: yellow; unvisited neighbours are grey).
+var visited: bool = false
 var scene_path: String = ""
 var stage_door_activated: bool = false
 var assigned_item: ItemBase = null

@@ -8,6 +8,9 @@ class_name FinalBossArena
 ## Local room rectangle in gameplay units. Keep it aligned with the arena walls.
 @export var arena_bounds := Rect2(-216.0, -112.0, 432.0, 224.0)
 const SIGHT_BLOCKER_MASK: int = 1 << 9
+const ROOM_ART := preload("res://rooms/RoomArt.gd")
+## Dr Mugg's lair: room quarter art (RoomArt builds it at the arena's size).
+const LAIR_TEX := preload("res://assets/sprites/tiles/special_rooms/dr_mugg_lair_224x112.png")
 ## Switch to the boss theme while this arena is loaded (back to normal music when it's
 ## left or the boss dies). Off for test scenes that only borrow the arena's walls.
 @export var play_boss_music: bool = true
@@ -43,6 +46,14 @@ func _ready() -> void:
 		if walls:
 			remove_child(walls)
 			walls.queue_free()
+	# The lair art replaces the sewer QuarterArt set up in the scene.
+	var old_art := get_node_or_null("QuarterArt")
+	if old_art:
+		old_art.visible = false
+	var art := ROOM_ART.build(LAIR_TEX, arena_bounds.size)
+	art.position = arena_bounds.get_center()
+	add_child(art)
+	move_child(art, 0)
 
 
 func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_container: Node2D) -> void:
@@ -96,15 +107,6 @@ func has_clear_sight(from: Vector2, to: Vector2) -> bool:
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 
-func _apply_floor_variant(variant: RoomFloorVariant) -> void:
-	if not variant or not variant.texture:
-		return
-	var floor_patch := AtlasTexture.new()
-	floor_patch.atlas = variant.texture
-	floor_patch.region = Rect2(80, 48, 64, 48)
-	$QuarterArt/FloorFill.texture = floor_patch
-	for name in ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]:
-		var atlas := AtlasTexture.new()
-		atlas.atlas = variant.texture
-		atlas.region = Rect2(10, 0, 202, 112)
-		get_node("QuarterArt/" + name + "/Art").texture = atlas
+## The lair keeps its own art (built in _ready), whatever the floor's variant is.
+func _apply_floor_variant(_variant: RoomFloorVariant) -> void:
+	pass

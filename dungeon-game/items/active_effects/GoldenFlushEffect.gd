@@ -1,6 +1,7 @@
-## Golden Flush: turns the room golden until you leave it - every enemy you kill in
-## this room has `duck_chance` to drop a duck (sometimes a 5-duck). Luck adds a bit.
-## The player glows gold while it lasts (TempStatBuff tint; ends on the next room).
+## Golden Flush: for `duration` seconds (or until you leave the room) every enemy you
+## kill has `duck_chance` to drop a duck (sometimes a 5-duck). Luck adds a bit.
+## The player glows gold while it lasts (TempStatBuff tint). Timed so it can't farm a
+## whole challenge room or big room.
 class_name GoldenFlushEffect
 extends ActiveItemEffect
 
@@ -8,6 +9,8 @@ extends ActiveItemEffect
 @export var duck_chance_per_luck: float = 0.05
 @export_range(0.0, 1.0) var five_duck_share: float = 0.15
 @export var tint: Color = Color(1.0, 0.92, 0.5)
+## Seconds it lasts.
+@export var duration: float = 10.0
 
 const DUCK_1 := preload("res://pickups/DuckPickup1.tscn")
 const DUCK_5 := preload("res://pickups/DuckPickup5.tscn")
@@ -16,6 +19,7 @@ const DUCK_5 := preload("res://pickups/DuckPickup5.tscn")
 func activate(player: Player) -> void:
 	var buff := GoldenFlushBuff.new()
 	buff.key = "golden_flush"
+	buff.duration = duration
 	buff.tint = tint
 	buff.chance = duck_chance
 	buff.chance_per_luck = duck_chance_per_luck
@@ -25,7 +29,7 @@ func activate(player: Player) -> void:
 	TempStatBuff.start(player, buff)
 
 
-## The room-long part: listens for kills while it exists.
+## The timed part: listens for kills while it exists.
 class GoldenFlushBuff extends TempStatBuff:
 	var chance: float = 0.5
 	var chance_per_luck: float = 0.05

@@ -13,6 +13,8 @@ var _combat_cleared: bool = false  # so the active-item charge is only given onc
 @onready var floor_bottom_right: Sprite2D = $Background/BotRigth
 @onready var stage_door: StageDoor = get_node_or_null("Doors/StageDoor")
 var _is_boss_room: bool = false
+## Boss reward pedestal, from the room centre (the stage door is at about (0, -51)).
+const BOSS_ITEM_OFFSET := Vector2(0, 26)
 var _entities_container: Node2D = null
 var _current_room_data: RoomData = null
 var _dungeon: Dungeon = null
@@ -73,6 +75,11 @@ func setup(room_data: RoomData, distance: int, dungeon: Dungeon, entities_contai
 		_spawn_shop(room_data, dungeon)
 	elif room_data.type == RoomData.Type.ITEM and not room_data.item_taken:
 		_spawn_pickup(room_data, dungeon)
+
+	# Boss rooms: the reward item stays on its pedestal until taken.
+	if room_data.type == RoomData.Type.BOSS and room_data.cleared and room_data.assigned_item \
+			and not room_data.item_taken:
+		_spawn_pickup(room_data, dungeon, BOSS_ITEM_OFFSET)
 
 	if room_data.cleared or room_data.type == RoomData.Type.START:
 		return
@@ -275,13 +282,22 @@ func _on_enemy_removed() -> void:
 	if _enemy_count <= 0:
 		_unlock_all_doors()
 		room_cleared.emit()
+		if _is_boss_fight_room():
+			Audio.play_normal_music()
 		if not _combat_cleared:
 			_combat_cleared = true
 			EventBus.combat_room_cleared.emit()
 		_roll_room_clear_reward()
+		_spawn_boss_reward.call_deferred()  # the boss is still leaving the tree here
 		if stage_door:
 			stage_door.activate()
 			_current_room_data.stage_door_activated = true
+
+
+## Boss rooms switch to the boss music while the fight is on.
+func _is_boss_fight_room() -> bool:
+	return _current_room_data != null and _current_room_data.type == RoomData.Type.BOSS \
+		and is_inside_tree() and not is_queued_for_deletion()
 
 
 func _unlock_all_doors() -> void:
@@ -301,6 +317,7 @@ func _door_node_name(dir: Vector2i) -> String:
 func _spawn_boss(dungeon: Dungeon, entities_container: Node2D) -> void:
 	if dungeon.boss_scenes.is_empty():
 		return
+	Audio.play_boss_music()  # back to the stage track when the room is cleared
 
 	var scene: PackedScene = dungeon.boss_scenes[randi() % dungeon.boss_scenes.size()]
 
@@ -342,7 +359,18 @@ func _spawn_stage_door() -> void:
 	door.global_position = spawn_pos
 
 
-func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
+## After a boss dies (Dr Mugg too - the run goes on): an item pedestal below the room
+## centre (the stage door is above it).
+func _spawn_boss_reward() -> void:
+	if not _is_boss_fight_room() or _dungeon == null:
+		return
+	if _current_room_data.item_taken:
+		return
+	_spawn_pickup(_current_room_data, _dungeon, BOSS_ITEM_OFFSET)
+
+
+## `offset` (from the room centre) places it; default: the first enemy spawn point.
+func _spawn_pickup(room_data: RoomData, dungeon: Dungeon, offset: Variant = null) -> void:
 	var chosen_item: ItemBase
 
 	if room_data.assigned_item:
@@ -362,6 +390,8 @@ func _spawn_pickup(room_data: RoomData, dungeon: Dungeon) -> void:
 		if is_ancestor_of(p):
 			local_points.append(p)
 	var spawn_pos: Vector2 = local_points[0].global_position if local_points.size() > 0 else global_position
+	if offset is Vector2:
+		spawn_pos = global_position + offset
 
 	var pickup: ItemPickup = ITEM_PICKUP_SCENE.instantiate()
 	_entities_container.add_child(pickup)
@@ -383,12 +413,16 @@ func _spawn_shop(room_data: RoomData, dungeon: Dungeon) -> void:
 
 	if not room_data.shop_rolled:
 		room_data.shop_rolled = true
-		var item_spots := spots.size() - 1 if spots.size() >= 2 else spots.size()
+		# Rightmost spot: a declogger, the one left of it: a heart; the rest: items.
+		var item_spots := spots.size() - (2 if spots.size() >= 3 else (1 if spots.size() >= 2 else 0))
 		var available := dungeon.pick_items(item_spots)  # rarity-weighted
 		for i in mini(item_spots, available.size()):
 			var item: ItemBase = available[i]
 			GameState.picked_up_items.append(item)  # reserved: won't show up elsewhere
 			room_data.shop_stock.append({"item": item, "price": _shop_price(item, dungeon), "sold": false})
+		if spots.size() >= 3:  # one full heart of healing
+			room_data.shop_stock.append({"item": null, "hearts": 1,
+				"price": dungeon.shop_heart_price, "sold": false})
 		if spots.size() >= 2:  # last (rightmost) spot: a declogger
 			room_data.shop_stock.append({"item": null, "decloggers": 1,
 				"price": dungeon.shop_declogger_price, "sold": false})
@@ -398,7 +432,7 @@ func _spawn_shop(room_data: RoomData, dungeon: Dungeon) -> void:
 		if entry.sold:
 			continue
 		var shop_item: ShopItem = SHOP_ITEM_SCENE.instantiate()
-		shop_item.setup(entry.item, entry.price, entry.get("decloggers", 0))
+		shop_item.setup(entry.item, entry.price, entry.get("decloggers", 0), entry.get("hearts", 0))
 		_entities_container.add_child(shop_item)
 		shop_item.global_position = spots[i].global_position
 		shop_item.purchased.connect(func(): entry.sold = true)

@@ -133,6 +133,8 @@ func _build_ui() -> void:
 	_add_control_row(grid, "Use item", UIStyle.action_key_text("use_active_item"))
 	_add_control_row(grid, "Inventory", UIStyle.action_key_text("toggle_items"))
 
+	_build_highscore()
+
 	# Credits, bottom-right
 	var credits := UIStyle.label(CREDITS_TEXT, 13, UIStyle.COL_MUTED)
 	credits.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -148,6 +150,31 @@ func _build_ui() -> void:
 	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_fade)
+
+
+## Highscore panel on the left side: the furthest stage cleared over all runs.
+func _build_highscore() -> void:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UIStyle.box(UIStyle.COL_PANEL, UIStyle.COL_PANEL_BORDER, 3, 16))
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
+	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	panel.offset_left = 40
+	panel.custom_minimum_size = Vector2(190, 0)
+	add_child(panel)
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 2)
+	panel.add_child(box)
+	var best := Discovery.best_stage()
+	var heading := UIStyle.label("HIGHSCORE", 15, UIStyle.COL_MUTED)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(heading)
+	var value := UIStyle.label("Stage %d" % best if best > 0 else "-", 34, UIStyle.COL_TITLE)
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(value)
+	var note := UIStyle.label("furthest stage cleared" if best > 0 else "no stage cleared yet", 13, UIStyle.COL_MUTED)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(note)
 
 
 ## Sewer floor as 4 mirrored quarters (exactly how RoomBase lays it out), stretched to

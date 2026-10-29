@@ -148,7 +148,7 @@ item = ExtResource("12_ktptm")
 position = Vector2(66, 110)
 item = ExtResource("14_153g2")
 
-[node name="UsedToiletPaper" parent="Entities" unique_id=437305726 instance=ExtResource("6_32oie")]
+[node name="Hairspray" parent="Entities" unique_id=437305726 instance=ExtResource("6_32oie")]
 position = Vector2(-124, -130)
 item = ExtResource("18_1g4r2")
 

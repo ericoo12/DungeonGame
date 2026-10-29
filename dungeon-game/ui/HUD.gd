@@ -6,6 +6,8 @@ class_name HUD
 @onready var active_item_icon: TextureRect = $ActiveItemSlot/Icon
 @onready var dungeon_map: Control = $DungeonMap
 
+const HEALTH_BAR := preload("res://ui/EnemyHealthBar.gd")
+
 ## P: freezes the whole game with nothing drawn on top (for screenshots).
 var _frozen: bool = false
 
@@ -19,6 +21,9 @@ func _ready() -> void:
 	add_child(banner)
 	move_child(banner, 1)
 	item_overlay.visible = false
+	HEALTH_BAR.show_all = debug_stats.visible
+	dungeon_map.visible = true
+	move_child(dungeon_map, item_overlay.get_index())  # under the inventory screen
 	EventBus.item_added.connect(_on_item_added)
 	EventBus.active_item_changed.connect(_on_active_item_changed)
 
@@ -39,7 +44,7 @@ func _input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("toggle_debug_stats"):
 		debug_stats.visible = not debug_stats.visible
-		dungeon_map.visible = not dungeon_map.visible
+		HEALTH_BAR.show_all = debug_stats.visible  # enemy health bars
 
 
 func _toggle_item_overlay() -> void:

@@ -28,7 +28,7 @@ const DOOR_GAP := 16.0
 ## art, so the band's pipe picks up right where the art's pipe ends.
 ## Variants without art get the mitre only.
 const INNER_CORNER_ART := {
-	"res://assets/sprites/tiles/sewer.png": ["res://assets/sprites/tiles/sewer_inner_corner_rust.png", Vector2(60, 61), 64.0],
+	"res://assets/sprites/tiles/sewer.png": ["res://assets/sprites/tiles/sewer_inner_corner_rust.png", Vector2(65, 66), 75.0],
 }
 ## Columns of the top band used for the mitre (has the rusty pipe on sewer.png, no drip).
 const MITRE_TOP_U := 192.0
@@ -38,11 +38,18 @@ const VOID_COLOR := Color(0.07, 0.075, 0.08)
 
 ## Parts of the floor variant's room quarter (its top-left corner, see RoomBase.tscn):
 ## the corner plate, the top wall band and the left wall band (32 px thick).
-const Q_CORNER := Rect2(10, 0, 32, 32)
-const Q_TOP_BAND := Rect2(42, 0, 170, 32)
-const Q_LEFT_BAND := Rect2(10, 32, 32, 80)
-const Q_FLOOR := Rect2(80, 48, 64, 48)
-const BAND := 32.0
+## Measured on the quarter art so the drawn wall edge (the dark trim line) is where a
+## normal room draws it - and where the collision is (RoomBase walls: 37 px in from the
+## side, 29 / 33 px from the top / bottom). Side walls: texture columns 0-37 (trim at
+## 36), top/bottom walls: rows 0-34 (trim at 33).
+const Q_CORNER := Rect2(0, 0, 38, 35)
+const Q_TOP_BAND := Rect2(42, 0, 170, 35)
+const Q_LEFT_BAND := Rect2(0, 40, 38, 72)
+## The quarter's floor (no walls); its right edge is a normal room's centre line.
+const Q_FLOOR := Rect2i(40, 36, 184, 76)
+const ROOM_ART := preload("res://rooms/RoomArt.gd")
+const BAND_X := 38.0   # side (west/east) wall thickness
+const BAND_Y := 35.0   # top/bottom (north/south) wall thickness
 
 ## Extra enemies for each square past the first, as a share of a normal room's count
 ## (0.5: a 2x1 room gets 1.5x, a 2x2 room 2.5x, an L 2x).
@@ -260,14 +267,9 @@ func _apply_floor_variant(variant: RoomFloorVariant) -> void:
 	add_child(art)
 	move_child(art, 0)
 
-	for y in shape.y:
-		for x in shape.x:
-			var rel := Vector2i(x, y)
-			var r := _square_rect(rel)
-			if _in(rel):
-				art.add_child(_tiled(tex, Q_FLOOR, r.position, r.size))
-			else:
-				art.add_child(_void_fill(r))
+	art.add_child(_floor(tex))
+	for rel in _missing_squares():
+		art.add_child(_void_fill(_square_rect(rel)))
 
 	var inner_art: Array = INNER_CORNER_ART.get(tex.resource_path, [])
 	var inner_tex: Texture2D = load(inner_art[0]) if not inner_art.is_empty() and ResourceLoader.exists(inner_art[0]) else null
@@ -326,15 +328,15 @@ func _add_wall_bands(art: Node, tex: Texture2D, inner_band_u: float) -> void:
 					holder.scale = Vector2(-1 if dir == DungeonGenerator.EAST else 1, -1 if dir == DungeonGenerator.SOUTH else 1)
 					var edge_j := line + (1 if dir == DungeonGenerator.SOUTH else 0)
 					if horizontal and (_concave_at(run_start, edge_j) or _concave_at(k, edge_j)):
-						var band := Rect2(inner_band_u, 0, Q_TOP_BAND.end.x - inner_band_u, BAND)
+						var band := Rect2(inner_band_u, 0, Q_TOP_BAND.end.x - inner_band_u, BAND_Y)
 						if not _concave_at(run_start, edge_j):
 							holder.position.x += length  # tile from the right end, mirrored
 							holder.scale.x = -1
-						holder.add_child(_tiled(tex, band, Vector2.ZERO, Vector2(length, BAND)))
+						holder.add_child(_tiled(tex, band, Vector2.ZERO, Vector2(length, BAND_Y)))
 					elif horizontal:
-						holder.add_child(_tiled(tex, Q_TOP_BAND, Vector2.ZERO, Vector2(length, BAND)))
+						holder.add_child(_tiled(tex, Q_TOP_BAND, Vector2.ZERO, Vector2(length, BAND_Y)))
 					else:
-						holder.add_child(_tiled(tex, Q_LEFT_BAND, Vector2.ZERO, Vector2(BAND, length)))
+						holder.add_child(_tiled(tex, Q_LEFT_BAND, Vector2.ZERO, Vector2(BAND_X, length)))
 					art.add_child(holder)
 					run_start = -1
 
@@ -350,22 +352,22 @@ func _inner_corner(tex: Texture2D, p: Vector2, out: Vector2i, inner_tex: Texture
 	# Below the diagonal: the bottom wall (top band, its row = depth below the corner).
 	var bottom := Polygon2D.new()
 	bottom.texture = tex
-	bottom.polygon = PackedVector2Array([Vector2(0, 0), Vector2(0, BAND), Vector2(-BAND, BAND)])
-	bottom.uv = PackedVector2Array([Vector2(MITRE_TOP_U, 0), Vector2(MITRE_TOP_U, BAND), Vector2(MITRE_TOP_U - BAND, BAND)])
+	bottom.polygon = PackedVector2Array([Vector2(0, 0), Vector2(0, BAND_Y), Vector2(-BAND_X, BAND_Y)])
+	bottom.uv = PackedVector2Array([Vector2(MITRE_TOP_U, 0), Vector2(MITRE_TOP_U, BAND_Y), Vector2(MITRE_TOP_U - BAND_X, BAND_Y)])
 	holder.add_child(bottom)
 	# Above it: the left wall (left band mirrored, its column = depth left of the corner).
 	var side := Polygon2D.new()
 	side.texture = tex
-	side.polygon = PackedVector2Array([Vector2(0, 0), Vector2(-BAND, 0), Vector2(-BAND, BAND)])
+	side.polygon = PackedVector2Array([Vector2(0, 0), Vector2(-BAND_X, 0), Vector2(-BAND_X, BAND_Y)])
 	var u0 := Q_LEFT_BAND.position.x
 	var v0 := Q_LEFT_BAND.position.y + 16.0
-	side.uv = PackedVector2Array([Vector2(u0, v0), Vector2(u0 + BAND, v0), Vector2(u0 + BAND, v0 + BAND)])
+	side.uv = PackedVector2Array([Vector2(u0, v0), Vector2(u0 + BAND_X, v0), Vector2(u0 + BAND_X, v0 + BAND_Y)])
 	holder.add_child(side)
 	if inner_tex:
 		var fc := floor_corner
 		# Vertical wall part (incl. the elbow), then the horizontal part to its right.
-		holder.add_child(_region_sprite(inner_tex, Rect2(fc.x, 0, BAND, fc.y), Vector2(-BAND, BAND - fc.y)))
-		holder.add_child(_region_sprite(inner_tex, Rect2(fc.x + BAND, fc.y - BAND, inner_tex.get_width() - fc.x - BAND, BAND), Vector2.ZERO))
+		holder.add_child(_region_sprite(inner_tex, Rect2(fc.x, 0, BAND_X, fc.y), Vector2(-BAND_X, BAND_Y - fc.y)))
+		holder.add_child(_region_sprite(inner_tex, Rect2(fc.x + BAND_X, fc.y - BAND_Y, inner_tex.get_width() - fc.x - BAND_X, BAND_Y), Vector2.ZERO))
 	return holder
 
 
@@ -377,6 +379,11 @@ func _region_sprite(tex: Texture2D, region: Rect2, pos: Vector2) -> Sprite2D:
 	spr.region_rect = region
 	spr.position = pos
 	return spr
+
+
+## The whole box's floor (RoomArt: mirrored like a normal room, so the slabs line up).
+func _floor(tex: Texture2D) -> Sprite2D:
+	return ROOM_ART.mirrored_floor(tex, room_size, Vector2.ZERO)
 
 
 func _tiled(tex: Texture2D, region: Rect2, pos: Vector2, size: Vector2) -> TextureRect:

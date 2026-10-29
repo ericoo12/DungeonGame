@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dwa7putw81xer" path="res://enemies/base/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://enemies/bosses/gutterjaw/Gutterjaw.gd" id="2_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/gutterjaw/clean/gutterjaw_stalk.png" id="3_art"]
+
+[sub_resource type="AtlasTexture" id="Atlas_icon"]
+atlas = ExtResource("3_art")
+region = Rect2(0, 0, 320, 288)
+
+[sub_resource type="CircleShape2D" id="Circle_body"]
+radius = 48.0
+
+[sub_resource type="CircleShape2D" id="Circle_hit"]
+radius = 60.0
+
+[node name="Gutterjaw" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+sprite_sheet_path = "res://assets/sprites/enemies/gutterjaw/clean/gutterjaw_stalk.png"
+is_static_visual = true
+log_icon = SubResource("Atlas_icon")
+shadow_scale_ratio = 4.6
+shadow_offset = Vector2(0, 4)
+max_health = 130.0
+move_speed = 55.0
+contact_damage = 0.5
+is_boss = true
+visual_scale = 0.32
+display_name = "Gutterjaw"
+log_description = "A huge sewer crocodile that hunts whatever falls down the drain. Circles you, snaps when you stand at its jaws, ambushes from under the sewage, sweeps with its tail and charges head first - straight into walls if you let it."
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("Circle_body")
+
+[node name="CollisionShape2D" parent="Hitbox" index="0"]
+shape = SubResource("Circle_hit")
+
+[node name="AnimatedSprite2D" parent="." index="3"]
+offset = Vector2(0, -60)

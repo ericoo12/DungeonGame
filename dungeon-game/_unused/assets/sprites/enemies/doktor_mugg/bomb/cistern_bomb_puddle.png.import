@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnf4pwpgcla1j"
-path="res://.godot/imported/hairspray_pixel.png-9edee13c790c792147ed6a56fde84e8c.ctex"
+uid="uid://bbxpgg328pac2"
+path="res://.godot/imported/cistern_bomb_puddle.png-46685ebf340596f46c501f4e66e174e2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/items_icons/hairspray_pixel.png"
-dest_files=["res://.godot/imported/hairspray_pixel.png-9edee13c790c792147ed6a56fde84e8c.ctex"]
+source_file="res://assets/sprites/enemies/doktor_mugg/bomb/cistern_bomb_puddle.png"
+dest_files=["res://.godot/imported/cistern_bomb_puddle.png-46685ebf340596f46c501f4e66e174e2.ctex"]
 
 [params]
 

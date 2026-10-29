@@ -19,6 +19,7 @@ signal purchased
 const DUCK_ICON := preload("res://assets/sprites/pickups/ducks/duck_1.png")
 	## Loaded at runtime (not preload) so a missing/unimported icon can't stop the script compiling.
 const DECLOGGER_ICON_PATH := "res://assets/sprites/pickups/declogger/declogger.png"
+const HEART_ICON_PATH := "res://assets/sprites/pickups/hearts/heart.png"
 ## World-space text: big font scaled down stays crisp under the 3x camera zoom.
 const LABEL_FONT_SIZE := 24
 const LABEL_SCALE := 0.25
@@ -26,6 +27,7 @@ const LABEL_SCALE := 0.25
 var item: ItemBase
 var price: int = 0
 var decloggers: int = 0  # > 0: sells decloggers instead of an item
+var hearts: int = 0      # > 0: sells this many full hearts of healing (not when you're at full health)
 
 var _icon: Sprite2D
 var _price_root: Node2D
@@ -38,10 +40,11 @@ static var _purchase_lock: bool = false
 static var _clear_since_ms: int = 0
 
 
-func setup(new_item: ItemBase, new_price: int, new_decloggers: int = 0) -> void:
+func setup(new_item: ItemBase, new_price: int, new_decloggers: int = 0, new_hearts: int = 0) -> void:
 	item = new_item
 	price = new_price
 	decloggers = new_decloggers
+	hearts = new_hearts
 
 
 func _ready() -> void:
@@ -72,6 +75,8 @@ func _build_icon() -> void:
 	var tex: Texture2D = null
 	if decloggers > 0:
 		tex = load(DECLOGGER_ICON_PATH) as Texture2D
+	elif hearts > 0:
+		tex = load(HEART_ICON_PATH) as Texture2D
 	elif item:
 		tex = item.icon
 	if tex:
@@ -118,7 +123,7 @@ func _on_ducks_changed(_total: int) -> void:
 
 func _update_affordable() -> void:
 	var player := get_tree().get_first_node_in_group("player") as Player
-	var can := player != null and player.ducks >= price
+	var can := player != null and player.ducks >= price and not (hearts > 0 and _at_full_health(player))
 	_label.add_theme_color_override("font_color", price_color if can else cant_afford_color)
 
 
@@ -169,7 +174,10 @@ func _is_closest_to(player: Player) -> bool:
 
 
 func _try_buy(player: Player) -> void:
-	if _sold or (item == null and decloggers <= 0):
+	if _sold or (item == null and decloggers <= 0 and hearts <= 0):
+		return
+	if hearts > 0 and _at_full_health(player):
+		_deny()  # nothing to heal: don't take the ducks
 		return
 	if not player.spend_ducks(price):
 		_deny()
@@ -178,6 +186,8 @@ func _try_buy(player: Player) -> void:
 	_sold = true
 	if decloggers > 0:
 		player.add_decloggers(decloggers)
+	elif hearts > 0:
+		player.heal(float(hearts))
 	elif item is ActiveItem:
 		var previous: ActiveItem = player.add_active_item(item as ActiveItem)
 		if previous:  # the old one is put down just above the counter, not lost
@@ -191,6 +201,10 @@ func _try_buy(player: Player) -> void:
 	_purchase_lock = true
 	_clear_since_ms = Time.get_ticks_msec()
 	queue_free()
+
+
+static func _at_full_health(player: Player) -> bool:
+	return player.current_hearts >= float(player.max_hearts)
 
 
 ## Can't afford: quick shake + red flash on the price.

@@ -66,6 +66,8 @@ func _nearest_source(player: Node2D) -> Node2D:
 func _special_label(source: Node) -> Dictionary:
 	if source and int(source.get("decloggers") if "decloggers" in source else 0) > 0:
 		return {"name": "Plunger", "text": "Unclogs one toilet."}
+	if source and int(source.get("hearts") if "hearts" in source else 0) > 0:
+		return {"name": "Heart", "text": "Heals one full heart."}
 	return {}
 
 

@@ -62,6 +62,7 @@ var contact_tick_timer: float = 0.0
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
+const HEALTH_BAR := preload("res://ui/EnemyHealthBar.gd")
 @onready var label: Label = $Label  # DEBUG ONLY — remove once real enemies ship, no health bars on regular enemies per project plan
 
 @export var visual_scale: float = 1.0
@@ -82,6 +83,12 @@ func _ready() -> void:
 	spawn_timer = spawn_grace_period
 	set_visual_scale(visual_scale)
 	_update_label()
+
+	# Health bar (shown with the debug view, Tab); replaces the old number label.
+	label.visible = false
+	var bar: Node2D = HEALTH_BAR.new()
+	bar.target = self
+	add_child(bar)
 	if is_boss:
 		add_to_group("boss")
 		EventBus.boss_spawned.emit(max_health)

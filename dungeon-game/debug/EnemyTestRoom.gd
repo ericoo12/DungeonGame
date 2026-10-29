@@ -43,6 +43,14 @@ extends Node2D
 ## The arena is 4 normal rooms big. Grid cells (16 px) of its inside plus the wall ring.
 const ARENA_GRID := Rect2i(-26, -13, 52, 26)
 ## Fills the arena's door gaps (its doors are sized for normal rooms).
+## The open floor inside the wall ring (global). Bosses that keep to the floor
+## (Gutterjaw's dive, charges) read this; the arena room's own get_floor_rect() is empty
+## here because its walls are rebuilt at the bigger size.
+func get_floor_rect() -> Rect2:
+	var inner := Rect2(Vector2(ARENA_GRID.position + Vector2i.ONE) * 16.0, Vector2(ARENA_GRID.size - Vector2i(2, 2)) * 16.0)
+	return Rect2(room.global_position + inner.position, inner.size)
+
+
 const DOOR_GAP_FILLS: Array[Rect2] = [
 	Rect2(-24, -224, 48, 32), Rect2(-24, 192, 48, 32),
 	Rect2(-432, -24, 32, 48), Rect2(400, -24, 32, 48),

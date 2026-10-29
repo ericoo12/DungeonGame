@@ -9,7 +9,7 @@ const DRAIN_TEX := preload("res://assets/sprites/enemies/great_clog/great_clog_f
 const DRAIN_CENTER := Vector2(140, 129)
 
 ## On-screen width of a drain (px).
-@export var drain_size: float = 20.0
+@export var drain_size: float = 34.0
 
 var mouth: Vector2           # global, where the boss sits
 var drain_dir: Vector2       # towards the boss's wall

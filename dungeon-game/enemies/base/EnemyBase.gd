@@ -183,6 +183,7 @@ var contact_tick_timer: float = 0.0
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
+const HEALTH_BAR := preload("res://ui/EnemyHealthBar.gd")
 @onready var label: Label = $Label  # DEBUG ONLY — remove once real enemies ship, no health bars on regular enemies per project plan
 
 @export var visual_scale: float = 1.0
@@ -231,6 +232,12 @@ func _ready() -> void:
 	# Start somewhere in the normal phase so a group doesn't burst in sync.
 	_burst_timer = randf_range(1.0, maxf(burst_pause, 1.0))
 	_update_label()
+
+	# Health bar (shown with the debug view, Tab); replaces the old number label.
+	label.visible = false
+	var bar: Node2D = HEALTH_BAR.new()
+	bar.target = self
+	add_child(bar)
 
 
 

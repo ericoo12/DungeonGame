@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://rwtyxjlpapf3" path="res://ui/HeartDisplay.gd" id="2_6ll6g"]
 [ext_resource type="Script" uid="uid://p0w7irxisi33" path="res://ui/DebugStatsDisplay.gd" id="3_6ll6g"]
 [ext_resource type="Script" uid="uid://r1q1tv2oe0m5" path="res://ui/ActiveItemSlotDisplay.gd" id="4_ig75s"]
-[ext_resource type="Script" uid="uid://daratb0dfgggh" path="res://dungeon/generation/DungeonMapDebug.gd" id="5_4ed8p"]
+[ext_resource type="Script" uid="uid://daratb0dfgggh" path="res://ui/DungeonMap.gd" id="5_4ed8p"]
 [ext_resource type="Script" uid="uid://8kjueqtdtrcn" path="res://ui/InventoryOverlay.gd" id="6_invov"]
 [ext_resource type="Script" uid="uid://ccltcsekkawjx" path="res://ui/DuckCounterDisplay.gd" id="7_ducks"]
 [ext_resource type="Texture2D" uid="uid://cst7aoa0nv5x1" path="res://assets/sprites/pickups/declogger/declogger.png" id="8_declog"]
@@ -81,9 +81,10 @@ script = ExtResource("6_invov")
 
 [node name="DungeonMap" type="Control" parent="." unique_id=135109454]
 layout_mode = 3
-anchors_preset = 0
-offset_left = 1029.0
-offset_top = 57.0
-offset_right = 1069.0
-offset_bottom = 97.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("5_4ed8p")

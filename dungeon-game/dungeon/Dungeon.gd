@@ -47,7 +47,9 @@ var item_pool: Array[ItemBase] = []
 ## One folder; each scene's Obstacle.breakable flag decides which pool it lands in.
 @export var obstacle_folder: String = "res://obstacles/"
 @export_range(0.0, 1.0) var obstacle_spawn_chance: float = 0.35   # per obstacle_spawn_points marker
-@export_range(0.0, 1.0) var breakable_obstacle_ratio: float = 0.6 # breakable vs solid
+## Breakable (bags/baskets) vs solid (stones). Kept low so smashing everything isn't a
+## chore; each breakable has a better drop chance instead (data/drops/obstacle_drops.tres).
+@export_range(0.0, 1.0) var breakable_obstacle_ratio: float = 0.35
 @export var obstacle_layout_candidates: int = 16                  # layouts generated + scored per room
 @export var validate_obstacle_layouts: bool = true                # false = plain random roll, no checks
 @export_group("")
@@ -76,6 +78,8 @@ var item_pool: Array[ItemBase] = []
 @export var rare_price_bonus: int = 5
 ## The rightmost shop spot sells a declogger (when the shop has 2+ spots).
 @export var shop_declogger_price: int = 3
+## The spot left of the declogger sells one full heart of healing (when the shop has 3+ spots).
+@export var shop_heart_price: int = 3
 @export_group("")
 
 @export_group("Item rarity")
@@ -221,7 +225,7 @@ func roll_room_clear_drop(took_damage: bool) -> PackedScene:
 
 
 func _on_boss_defeated() -> void:
-	pass
+	Discovery.record_stage_cleared(GameState.current_stage)  # main menu highscore
 
 
 ## Through the door on map square `from_cell` (default: the current room's top-left
@@ -270,6 +274,7 @@ func _load_room(grid_pos: Vector2i, entered_from: Vector2i, entry_cell: Variant 
 		prop.queue_free()
 
 	var data: RoomData = layout[grid_pos]
+	data.visited = true  # minimap
 	grid_pos = data.home_cell()  # any square of a big room -> the same one every time
 
 	for child in room_container.get_children():

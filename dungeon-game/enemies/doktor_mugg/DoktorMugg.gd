@@ -82,7 +82,7 @@ func _setup_animations() -> void:
 		_rng.seed = random_seed
 	behavior_tree.configure(self)
 	state_machine.state_changed.connect(func(_previous, _current): queue_redraw())
-	label.visible = debug_ai
+	label.visible = _debug_view()
 
 func _build_pack_frames() -> SpriteFrames:
 	var frames := SpriteFrames.new()
@@ -177,7 +177,8 @@ func _update_cooldowns(delta: float) -> void:
 	_update_perception(delta)
 	_blocked_duration = _blocked_duration + delta if blackboard.has_last_seen and not blackboard.shot_clear else 0.0
 	queue_redraw()
-	if debug_ai:
+	label.visible = _debug_view()
+	if label.visible:
 		label.text = "%s | %.0f HP" % [state_machine.state_name(), health]
 
 func _update_perception(delta: float) -> void:
@@ -234,8 +235,14 @@ func _play_attack_animation() -> void:
 	# Contact damage is passive; only the tree starts committed boss attacks.
 	pass
 
+## The AI debug drawing (state label, aim/windup/dodge lines, path) shows with the HUD's
+## debug view (Tab - same switch as the stats and enemy health bars).
+func _debug_view() -> bool:
+	return HEALTH_BAR.show_all
+
+
 func _draw() -> void:
-	if not is_instance_valid(state_machine):
+	if not is_instance_valid(state_machine) or not _debug_view():
 		return
 	if state_machine.state == MuggStateMachine.State.DODGE:
 		draw_line(Vector2.ZERO, -_dodge_direction * 35.0, Color(0.3, 0.9, 1.0), 4.0)
@@ -246,7 +253,7 @@ func _draw() -> void:
 		draw_line(_locked_aim * 22.0, _locked_aim * 65.0, warning_color, 3.0)
 	elif state_machine.state == MuggStateMachine.State.RECOVERY:
 		draw_arc(Vector2.ZERO, 22.0, 0, TAU, 32, Color(0.5, 0.8, 1, 0.6), 1.0)
-	if debug_ai and is_instance_valid(navigator):
+	if is_instance_valid(navigator):
 		var previous := Vector2.ZERO
 		for point in navigator.path:
 			var local := to_local(point)

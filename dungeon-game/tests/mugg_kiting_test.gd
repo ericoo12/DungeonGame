@@ -39,7 +39,7 @@ func run() -> void:
 	boss.ai_basic_shot()
 	boss._update_cooldowns(0.05)
 	boss._advance_action(0.05)
-	check(boss.velocity.length() > 0, "Windup moves before final plant window")
+	check(boss.velocity.length() < 1, "Windup stands still (calmer Mugg: kite_windup_speed 0)")
 	boss.velocity = Vector2.ZERO
 	boss._advance_action(boss._active_windup - boss.kite_plant_window * 0.5 - boss.action_elapsed)
 	check(boss.velocity == Vector2.ZERO, "Final release plant remains readable")
@@ -76,9 +76,9 @@ func run() -> void:
 			moving += 1
 		safe = safe and boss.navigator.position_clear(boss.position)
 	boss.set_physics_process(false)
-	check(moving > 240, "Real fight moves on at least two thirds of frames")
+	check(moving > 120 and moving < 330, "Real fight mixes moving and standing (calmer Mugg)")
 	check(boss.blackboard.shots_fired >= 3, "Sustained kiting maintains attack pressure")
 	check(safe, "Real fight stays inside safe arena geometry")
 	check(boss.max_health == 100, "Boss health unchanged")
-	print("MUGG KITING: ",checks," checks; ",failures," failures; moving frames ",moving,"/360")
+	print("MUGG KITING: ",checks," checks; ",failures," failures; moving frames ",moving,"/360 shots ",boss.blackboard.shots_fired, " dodges ", boss.blackboard.get("dodges"))
 	get_tree().quit(0 if failures == 0 else 1)

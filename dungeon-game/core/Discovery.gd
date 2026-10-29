@@ -3,6 +3,7 @@
 ##            flavour_text when you walk up to them; known ones show the full
 ##            description and stats (ItemInfoPopup). Counts how often each was taken.
 ##   Enemies: "seen" when one spawns near you, counts kills. Shown in the Logbook.
+##   Best stage: the furthest stage whose boss you've beaten (main menu highscore).
 ## Static class (no autoload needed): call Discovery.is_item_known(item) etc. anywhere.
 class_name Discovery
 extends RefCounted
@@ -15,6 +16,7 @@ static var reveal_all: bool = false
 static var _loaded: bool = false
 static var _items: Dictionary = {}    # resource_path -> times picked up
 static var _enemies: Dictionary = {}  # scene_path -> {"seen": bool, "kills": int}
+static var _best_stage: int = 0        # furthest stage cleared (boss beaten), 0 = none
 
 ## Enemy scenes that moved folder (tier changes): old path -> new path. Saved progress
 ## under an old path is carried over when the logbook loads.
@@ -86,12 +88,30 @@ static func mark_enemy_killed(scene_path: String) -> void:
 	_save()
 
 
+# --- Highscore ----------------------------------------------------------------------
+
+static func best_stage() -> int:
+	_load()
+	return _best_stage
+
+
+## A stage's boss was beaten: keeps the furthest one.
+static func record_stage_cleared(stage: int) -> void:
+	if reveal_all:
+		return  # test rooms don't count
+	_load()
+	if stage > _best_stage:
+		_best_stage = stage
+		_save()
+
+
 # --- Saving -------------------------------------------------------------------------
 
 ## Wipes all progress (Logbook "Forget everything" button).
 static func reset() -> void:
 	_items.clear()
 	_enemies.clear()
+	_best_stage = 0
 	_loaded = true
 	_save()
 
@@ -109,6 +129,7 @@ static func _load() -> void:
 		return
 	_items = cfg.get_value("items", "picked", {})
 	_enemies = cfg.get_value("enemies", "log", {})
+	_best_stage = int(cfg.get_value("stats", "best_stage", 0))
 	var moved := false
 	for old in MOVED_ENEMIES:
 		if _enemies.has(old):
@@ -126,4 +147,5 @@ static func _save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("items", "picked", _items)
 	cfg.set_value("enemies", "log", _enemies)
+	cfg.set_value("stats", "best_stage", _best_stage)
 	cfg.save(SAVE_PATH)
