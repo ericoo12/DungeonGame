@@ -4,6 +4,13 @@ signal stage_changed(new_stage: int)
 
 var current_stage: int = 1
 var picked_up_items: Array[ItemBase] = []
+## Items to start the next run with (TestRoom's exit, for recording item combos):
+## {"items": [Item], "active": ActiveItem, "charges": int, "ducks": int}. Dungeon
+## applies and clears it when the run starts. Empty = a normal run.
+var start_loadout: Dictionary = {}
+## Bosses already fought this run (scene paths): each floor gets one it hasn't had yet,
+## until every boss has been used once.
+var used_bosses: Array[String] = []
 
 ## Run seed. Seeds both `rng` (for luck rolls etc.) and Godot's global randi()/randf()
 ## (dungeon layout, obstacles, enemy spawns), so the same seed replays the same run as
@@ -38,6 +45,7 @@ func advance_stage() -> void:
 func reset() -> void:
 	current_stage = 1
 	picked_up_items.clear()
+	used_bosses.clear()
 	_new_seed()
 	stage_changed.emit(current_stage)
 

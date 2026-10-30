@@ -7,6 +7,7 @@ class_name HUD
 @onready var dungeon_map: Control = $DungeonMap
 
 const HEALTH_BAR := preload("res://ui/EnemyHealthBar.gd")
+const TRAILER_TOOLS := preload("res://debug/TrailerTools.gd")
 
 ## P: freezes the whole game with nothing drawn on top (for screenshots).
 var _frozen: bool = false
@@ -24,6 +25,8 @@ func _ready() -> void:
 	HEALTH_BAR.show_all = debug_stats.visible
 	dungeon_map.visible = true
 	move_child(dungeon_map, item_overlay.get_index())  # under the inventory screen
+	if OS.is_debug_build():
+		add_child(TRAILER_TOOLS.new())  # F1-F7 recording helpers (debug/TrailerTools.gd)
 	EventBus.item_added.connect(_on_item_added)
 	EventBus.active_item_changed.connect(_on_active_item_changed)
 

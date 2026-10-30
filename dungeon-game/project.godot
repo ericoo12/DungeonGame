@@ -28,6 +28,10 @@ window/size/viewport_height=672
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[editor]
+
+movie_writer/movie_file="C:/universitet/GameAi/DungeonGame/recordings/take.avi"
+
 [global_group]
 
 player=""

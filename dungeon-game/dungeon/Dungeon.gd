@@ -150,12 +150,63 @@ func _ready() -> void:
 	easy_enemy_scenes = _load_scenes_from_folder(easy_enemy_folder)
 	medium_enemy_scenes = _load_scenes_from_folder(medium_enemy_folder)
 	hard_enemy_scenes = _load_scenes_from_folder(hard_enemy_folder)
-	boss_scenes = _load_scenes_from_folder(boss_folder)
+	boss_scenes = _load_boss_scenes(boss_folder)
 	item_pool = _load_items_from_folder(item_pool_folder)
 	_load_obstacle_pools()
 	_cache_enemy_families()
 	
 	_generate_and_load_floor()
+	if not GameState.start_loadout.is_empty():
+		call_deferred("_apply_start_loadout")
+
+
+## A run started from TestRoom's exit: hand the player the items picked there.
+## Not counted as discoveries (the logbook only tracks real finds).
+func _apply_start_loadout() -> void:
+	var loadout := GameState.start_loadout
+	GameState.start_loadout = {}
+	if player == null:
+		return
+	var was_revealed := Discovery.reveal_all
+	Discovery.reveal_all = true
+	for item in loadout.get("items", []):
+		if item is Item:
+			player.add_item(item)
+			GameState.picked_up_items.append(item)
+	var active = loadout.get("active")
+	if active is ActiveItem:
+		player.add_active_item(active, int(loadout.get("charges", -1)))
+		GameState.picked_up_items.append(active)
+	player.add_ducks(int(loadout.get("ducks", 0)))
+	Discovery.reveal_all = was_revealed
+
+
+## Every boss under `path`, subfolders included (each boss can keep its own folder):
+## the scenes whose root sets is_boss = true. Helper scenes in those folders (e.g. the
+## Great Clog's HairClog) aren't bosses, so they're skipped.
+func _load_boss_scenes(path: String) -> Array[PackedScene]:
+	var result: Array[PackedScene] = []
+	var dir := DirAccess.open(path)
+	if dir == null:
+		push_error("Dungeon: could not open folder " + path)
+		return result
+	for file_name in dir.get_files():
+		file_name = file_name.trim_suffix(".remap")  # exported builds
+		if file_name.ends_with(".tscn"):
+			var scene: PackedScene = load(path + file_name)
+			if scene and _is_boss_scene(scene):
+				result.append(scene)
+	for sub in dir.get_directories():
+		result.append_array(_load_boss_scenes(path + sub + "/"))
+	return result
+
+
+static func _is_boss_scene(scene: PackedScene) -> bool:
+	var state := scene.get_state()
+	for i in state.get_node_property_count(0):
+		if state.get_node_property_name(0, i) == "is_boss":
+			return state.get_node_property_value(0, i) == true
+	return false
 
 
 func _load_scenes_from_folder(path: String) -> Array[PackedScene]:

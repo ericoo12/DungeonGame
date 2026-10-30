@@ -314,12 +314,35 @@ func _door_node_name(dir: Vector2i) -> String:
 	return "West"
 
 
+## This floor's boss: one not fought yet this run (GameState.used_bosses), picked once
+## per boss room. When every boss has been used, any boss except the last one.
+func _pick_boss(dungeon: Dungeon) -> PackedScene:
+	var data := _current_room_data
+	if data and data.boss_scene_path != "":
+		return load(data.boss_scene_path)
+	var fresh: Array[PackedScene] = []
+	for s in dungeon.boss_scenes:
+		if not GameState.used_bosses.has(s.resource_path):
+			fresh.append(s)
+	if fresh.is_empty():
+		var last := GameState.used_bosses[-1] if not GameState.used_bosses.is_empty() else ""
+		GameState.used_bosses.clear()
+		for s in dungeon.boss_scenes:
+			if s.resource_path != last or dungeon.boss_scenes.size() == 1:
+				fresh.append(s)
+	var scene: PackedScene = fresh[randi() % fresh.size()]
+	GameState.used_bosses.append(scene.resource_path)
+	if data:
+		data.boss_scene_path = scene.resource_path
+	return scene
+
+
 func _spawn_boss(dungeon: Dungeon, entities_container: Node2D) -> void:
 	if dungeon.boss_scenes.is_empty():
 		return
 	Audio.play_boss_music()  # back to the stage track when the room is cleared
 
-	var scene: PackedScene = dungeon.boss_scenes[randi() % dungeon.boss_scenes.size()]
+	var scene := _pick_boss(dungeon)
 
 	var spawn_points := get_tree().get_nodes_in_group("enemy_spawn_points")
 	var local_points: Array = []

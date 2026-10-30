@@ -30,8 +30,9 @@ func setup(player: Player, delay: float) -> void:
 	circle.radius = catch_radius
 	shape.shape = circle
 	_catcher.add_child(shape)
-	add_child(_catcher)
 	_catcher.area_entered.connect(_on_area_entered)
+	# Deferred: picked up from a body_entered signal, while physics is flushing queries.
+	add_child.call_deferred(_catcher)
 
 
 func _spawn_puddle() -> void:

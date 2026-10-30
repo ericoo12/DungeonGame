@@ -23,6 +23,9 @@ var edge_doors: Dictionary = {}
 var cleared: bool = false
 ## The player has been in this room (minimap: yellow; unvisited neighbours are grey).
 var visited: bool = false
+## BOSS rooms: the boss picked for this floor (kept, so leaving and coming back - or
+## dying in the fight - doesn't reroll it).
+var boss_scene_path: String = ""
 var scene_path: String = ""
 var stage_door_activated: bool = false
 var assigned_item: ItemBase = null

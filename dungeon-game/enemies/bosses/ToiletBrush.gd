@@ -85,6 +85,12 @@ func _ready() -> void:
 	spawn_timer = spawn_grace_period
 	_strafe_sign = 1.0 if randf() < 0.5 else -1.0
 	_update_label()
+	# Health bar like every other enemy (EnemyBase._ready isn't called here): shown
+	# with the debug view (Tab), replaces the old number label.
+	label.visible = false
+	var bar: Node2D = HEALTH_BAR.new()
+	bar.target = self
+	add_child(bar)
 
 
 func _physics_process(delta: float) -> void:

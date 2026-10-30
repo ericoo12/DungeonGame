@@ -8,7 +8,15 @@ extends Node2D
 @export var name_offset_y: float = 9.0
 
 
+## The exit toilet (walk in: start a stage 1 run with the items you picked up here).
+const LOADOUT_EXIT := preload("res://debug/LoadoutExit.gd")
+@export var exit_position: Vector2 = Vector2(-30, 270)
+
+
 func _ready() -> void:
+	var exit_door := LOADOUT_EXIT.new()
+	exit_door.position = exit_position
+	$Entities.add_child(exit_door)
 	Discovery.reveal_all = true  # test room: every item shows its info, nothing is saved
 	tree_exiting.connect(func(): Discovery.reveal_all = false)
 	for node in $Entities.get_children():
