@@ -22,6 +22,7 @@ func _ready() -> void:
 	add_child(banner)
 	move_child(banner, 1)
 	item_overlay.visible = false
+	debug_stats.visible = false  # debug view (stats, enemy health bars, AI lines) starts hidden: Tab shows it
 	HEALTH_BAR.show_all = debug_stats.visible
 	dungeon_map.visible = true
 	move_child(dungeon_map, item_overlay.get_index())  # under the inventory screen
@@ -32,6 +33,8 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if get_tree().get_first_node_in_group("game_over"):
+		return  # game over screen is up: no pause/inventory/debug toggles
 	if event.is_action_pressed("toggle_pause") and not item_overlay.visible:
 		_frozen = not _frozen
 		get_tree().paused = _frozen

@@ -19,6 +19,8 @@ var used_bosses: Array[String] = []
 const FORCED_SEED := 0
 var run_seed: int = 0
 var rng := RandomNumberGenerator.new()
+## When this run started (game over screen shows the run time).
+var run_start_ms: int = 0
 
 const HEALTH_SCALE_PER_STAGE := 0.25  # +25% enemy/boss max health per stage beyond 1
 const DAMAGE_SCALE_PER_STAGE := 0.15  # +15% enemy/boss contact damage per stage beyond 1
@@ -50,7 +52,13 @@ func reset() -> void:
 	stage_changed.emit(current_stage)
 
 
+## Seconds since the run started.
+func run_seconds() -> float:
+	return (Time.get_ticks_msec() - run_start_ms) / 1000.0
+
+
 func _new_seed() -> void:
+	run_start_ms = Time.get_ticks_msec()
 	randomize()  # make sure the seed itself is random
 	run_seed = FORCED_SEED if FORCED_SEED != 0 else randi()
 	rng.seed = run_seed

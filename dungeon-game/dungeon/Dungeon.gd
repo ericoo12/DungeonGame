@@ -35,7 +35,7 @@ var challenge_room_chance_override: float = -1.0
 @export_group("Final boss")
 ## On this stage the boss room is the final boss's own arena with the final boss in it
 ## (instead of boss_room_scene + a random boss from boss_folder). 0 = never.
-@export var final_boss_stage: int = 3
+@export var final_boss_stage: int = 4  # stages 1-3: the three regular bosses, then Dr Mugg
 @export var final_boss_room_scene: PackedScene = preload("res://enemies/doktor_mugg/FinalBossRoom.tscn")
 @export var final_boss_scene: PackedScene = preload("res://enemies/doktor_mugg/DoktorMugg.tscn")
 @export_group("")

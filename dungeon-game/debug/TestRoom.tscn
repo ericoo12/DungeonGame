@@ -56,7 +56,7 @@
 [ext_resource type="Resource" uid="uid://dstfk82ej52g8" path="res://data/items/septic_infection.tres" id="new_septic_infection"]
 [ext_resource type="Resource" uid="uid://cxyffnhfhkadr" path="res://data/items/sewer_gas.tres" id="new_sewer_gas"]
 [ext_resource type="Resource" path="res://data/items/sewer_rat_friend.tres" id="new_sewer_rat_friend"]
-[ext_resource type="Resource" path="res://data/items/sewer_skewer.tres" id="new_sewer_skewer"]
+[ext_resource type="Resource" uid="uid://f6l1ux0gs31k" path="res://data/items/sewer_skewer.tres" id="new_sewer_skewer"]
 [ext_resource type="Resource" uid="uid://dfbj2mvx24g6o" path="res://data/items/side_leakage.tres" id="new_side_leakage"]
 [ext_resource type="Resource" uid="uid://4i021t52hvpn" path="res://data/items/slow_shot.tres" id="new_slow_shot_item"]
 [ext_resource type="Resource" path="res://data/items/soap_bar.tres" id="new_soap_bar"]

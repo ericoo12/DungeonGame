@@ -7,7 +7,7 @@
 ##   F4  get a random item (rarity-weighted, like an item room)
 ##   F5  +20 ducks and full health
 ##   F6  go to this floor's boss room
-##   F7  next stage (e.g. stage 3 = Dr Mugg)
+##   F7  next stage (e.g. stage 4 = Dr Mugg)
 ## Each press prints what it did to the Output panel.
 extends Node
 

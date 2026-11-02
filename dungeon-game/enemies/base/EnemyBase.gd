@@ -502,6 +502,9 @@ func _on_hitbox_area_exited(area: Area2D) -> void:
 func _deal_contact_damage() -> void:
 	if spawn_timer > 0.0:
 		return
+	# Slipping on a Wet Floor Sign shot (SlipShotProc): sliding around, can't bite.
+	if Time.get_ticks_msec() < int(get_meta(&"harmless_until_ms", 0)):
+		return
 	if overlapping_hurtboxes.is_empty():
 		return
 	_play_attack_animation()

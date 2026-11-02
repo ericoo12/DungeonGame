@@ -816,6 +816,8 @@ func _overlaps_enemy_body() -> bool:
 	return not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
 
 
+const GAME_OVER_SCREEN := preload("res://ui/GameOverScreen.gd")
+
 func _die() -> void:
 	if is_dying:
 		return
@@ -826,8 +828,8 @@ func _die() -> void:
 
 	lower_sprite.stop()
 	await get_tree().create_timer(0.5).timeout
-	GameState.reset()
-	get_tree().reload_current_scene()
+	# Game over screen (freezes the game; Try Again / Main Menu start over from there).
+	GAME_OVER_SCREEN.show_for(self)
 
 
 func add_item(item: Item) -> void:
